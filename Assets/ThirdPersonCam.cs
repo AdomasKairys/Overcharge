@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Cinemachine;
+using System;
 
 public class ThirdPersonCam : MonoBehaviour
 {
@@ -71,13 +73,29 @@ public class ThirdPersonCam : MonoBehaviour
         currentStyle = newStyle;
     }
 
-    //TODO: fix fov change for third person cam
+    //TODO: do something with combat cam
     public void DoFov(float endValue)
     {
-        GetComponent<Camera>().DOFieldOfView(endValue, 0.25f);
+        StartCoroutine(
+            ChangeFOV((result) => thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.FieldOfView = result,
+            thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.FieldOfView, endValue, 0.25f)
+            );
+    }
+    private IEnumerator ChangeFOV(Action<float> fvalue, float startValue,  float endValue, float duration)
+    {
+        float time = 0;
+        while (time < duration)
+        {
+            fvalue(Mathf.Lerp(startValue, endValue, time / duration));
+            yield return null;
+            time += Time.deltaTime;
+        }
     }
     public void DoTilt(float zTilt)
     {
-        transform.DOLocalRotate(new Vector3(0, 0, zTilt), 0.25f);
+        StartCoroutine(
+            ChangeFOV((result) => thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.Dutch = result,
+            thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.Dutch, zTilt, 0.25f)
+            );
     }
 }

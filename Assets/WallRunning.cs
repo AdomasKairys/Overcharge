@@ -52,6 +52,9 @@ public class WallRunning : MonoBehaviour
     private PlayerMovement pm;
     private Rigidbody rb;
 
+    public float defaultFov = 50f;
+    public float highFov = 60f;
+
     private bool wallRemembered;
     private Transform lastWall;
     private Vector3 lastWallNormal;
@@ -145,7 +148,7 @@ public class WallRunning : MonoBehaviour
 
         wallRemembered = false;
 
-        cam.DoFov(90f);
+        cam.DoFov(highFov);
         if (isWallLeft) cam.DoTilt(-5f);
         if (isWallRight) cam.DoTilt(5f);
 
@@ -216,7 +219,7 @@ public class WallRunning : MonoBehaviour
     {
         pm.isWallrunning = false;
 
-        cam.DoFov(80f);
+        cam.DoFov(defaultFov);
         cam.DoTilt(0f);
     }
     private void WallJump()
