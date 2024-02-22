@@ -48,7 +48,7 @@ public class WallRunning : MonoBehaviour
 
     [Header("References")]
     public Transform orientation;
-    public PlayerCam cam;
+    public ThirdPersonCam cam; //type can be change to first person script
     private PlayerMovement pm;
     private Rigidbody rb;
 
