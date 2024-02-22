@@ -76,6 +76,7 @@ public class ThirdPersonCam : MonoBehaviour
     //TODO: do something with combat cam
     public void DoFov(float endValue)
     {
+        StopAllCoroutines();
         StartCoroutine(
             ChangeFOV((result) => thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.FieldOfView = result,
             thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.FieldOfView, endValue, 0.25f)
@@ -93,6 +94,7 @@ public class ThirdPersonCam : MonoBehaviour
     }
     public void DoTilt(float zTilt)
     {
+        StopAllCoroutines();
         StartCoroutine(
             ChangeFOV((result) => thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.Dutch = result,
             thirdPersonCam.GetComponent<CinemachineFreeLook>().m_Lens.Dutch, zTilt, 0.25f)

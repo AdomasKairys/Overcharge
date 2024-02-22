@@ -10,9 +10,12 @@ public class PlayerMovement : MonoBehaviour
     public float sprintSpeed;
     public float slideSpeed;
     public float climbSpeed;
+    public float dashSpeed;
     public float speedIncreaseMultiplier;
     public float slopeIncreaseMultiplier;
     public float wallRunSpeed;
+
+    public float maxYSpeed;
 
     private float desiredMoveSpeed;
     private float lastDesiredMoveSpeed;
@@ -65,12 +68,14 @@ public class PlayerMovement : MonoBehaviour
         wallrunning,
         climbing,
         sliding,
+        dashing,
         air
     }
     public bool isSliding;
     public bool isWallrunning;
     public bool isCrouching;
     public bool isClimbing;
+    public bool isDashing;
 
     private void Start()
     {
@@ -89,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
         SpeedControl();
         StateHandler();
 
-        rb.drag = isGrounded ? groundDrag : 0;
+        rb.drag = isGrounded && state != MovementState.dashing ? groundDrag : 0;
     }
 
     private void FixedUpdate()
@@ -126,9 +131,15 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
+    private MovementState lastState;
     private void StateHandler()
     {
-        if (isClimbing)
+        if (isDashing)
+        {
+            state = MovementState.dashing;
+            desiredMoveSpeed = dashSpeed;
+        }
+        else if (isClimbing)
         {
             state = MovementState.climbing;
             desiredMoveSpeed = climbSpeed;
@@ -166,17 +177,19 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.air;
         }
 
-        if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
+        if (lastState == MovementState.dashing && Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
         {
             StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
         }
         else
         {
+            StopAllCoroutines();
             moveSpeed = desiredMoveSpeed;
         }
 
         lastDesiredMoveSpeed = desiredMoveSpeed;
+        lastState = state;
     }
     private IEnumerator SmoothlyLerpMoveSpeed()
     {
@@ -187,6 +200,7 @@ public class PlayerMovement : MonoBehaviour
         while (time < difference)
         {
             moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
+            print(desiredMoveSpeed);
             if (IsOnSlope())
             {
                 float slopeAngle = Vector3.Angle(Vector3.up, slopeHit.normal);
@@ -199,10 +213,11 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
         moveSpeed = desiredMoveSpeed;
+        
     }
     private void MovePlayer()
     {
-        if (climbingScript.isExitingWall) return;
+        if (climbingScript.isExitingWall || state == MovementState.dashing) return;
 
         moveDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
@@ -238,6 +253,8 @@ public class PlayerMovement : MonoBehaviour
                 rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
             }
         }
+        if (maxYSpeed != 0 && rb.velocity.y > maxYSpeed)
+            rb.velocity = new Vector3(rb.velocity.x, maxYSpeed, rb.velocity.z);
     }
 
     private void Jump()

@@ -2575,7 +2575,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 490027784}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.06164541, y: -0.000000023070305, z: 0.000000039799467, w: 0.9980981}
+  m_LocalRotation: {x: -0.06164541, y: -0.000000023063915, z: 0.00000003978845, w: 0.9980981}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4277,6 +4277,7 @@ GameObject:
   - component: {fileID: 783635929}
   - component: {fileID: 783635930}
   - component: {fileID: 783635931}
+  - component: {fileID: 783635932}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -4341,13 +4342,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fad5b6e326dc3f4c9d5462afb9bc4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 7
-  sprintSpeed: 10
-  slideSpeed: 30
-  climbSpeed: 3
+  walkSpeed: 20
+  sprintSpeed: 20
+  slideSpeed: 60
+  climbSpeed: 5
+  dashSpeed: 100
   speedIncreaseMultiplier: 1.5
   slopeIncreaseMultiplier: 2.5
-  wallRunSpeed: 8.5
+  wallRunSpeed: 25
+  maxYSpeed: 0
   groundDrag: 4
   jumpForce: 12
   jumpCooldown: 0.25
@@ -4355,7 +4358,7 @@ MonoBehaviour:
   crouchSpeed: 3.5
   crouchYScale: 0.5
   jumpKey: 32
-  sprintKey: 304
+  sprintKey: 278
   crouchKey: 306
   playerHeight: 2
   whatIsGround:
@@ -4369,6 +4372,7 @@ MonoBehaviour:
   isWallrunning: 0
   isCrouching: 0
   isClimbing: 0
+  isDashing: 0
 --- !u!114 &783635929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4424,7 +4428,7 @@ MonoBehaviour:
   orientation: {fileID: 1467790827}
   cam: {fileID: 963194232}
   defaultFov: 50
-  highFov: 60
+  highFov: 55
 --- !u!114 &783635931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4455,6 +4459,33 @@ MonoBehaviour:
   minWallNormalAngleChange: 5
   isExitingWall: 0
   exitWallTime: 0.2
+--- !u!114 &783635932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783635925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7074d34b9c94e9478c5cd4d5457bf46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  orientation: {fileID: 1467790827}
+  playerCam: {fileID: 963194228}
+  dashForce: 40
+  dashUpwardForce: 0
+  maxDashYSpeed: 15
+  dashDuration: 0.25
+  cam: {fileID: 963194232}
+  defaultFov: 50
+  highFov: 55
+  useCameraForward: 0
+  allowAllDirections: 1
+  disableGravity: 0
+  resetVel: 0
+  dashCd: 0.25
+  dashKey: 304
 --- !u!1 &887315743
 GameObject:
   m_ObjectHideFlags: 0
@@ -5316,7 +5347,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.52573115, y: -0.00000002597491, z: 0.000000016053377, w: 0.85065085}
+  m_LocalRotation: {x: 0.52573115, y: -0.0000000259749, z: 0.000000016053372, w: 0.85065085}
   m_LocalPosition: {x: 0, y: 4.97, z: 7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7488,7 +7519,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1279749295}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.000000059604638, y: -0.00000001662969, z: 0.00000003325938, w: 1}
+  m_LocalRotation: {x: -0.000000059604638, y: -0.000000016629961, z: 0.00000003325992, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -10450,7 +10481,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1708041375}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.046479583, y: -0.0000000031826648, z: 0.000000005687924, w: 0.9989193}
+  m_LocalRotation: {x: -0.046479583, y: 0.0000000032537564, z: -0.000000005814978, w: 0.9989193}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
