@@ -13,7 +13,7 @@ public class Swinging : MonoBehaviour
     [Header("Swinging")]
     public float swingDuration;
     private float swingTimer;
-    private float maxSwingDistance = 25f;
+    private float maxSwingDistance = 50f;
     private Vector3 swingPoint;
     private SpringJoint joint;
 
@@ -36,14 +36,15 @@ public class Swinging : MonoBehaviour
     {
         swingTimer = swingDuration;
     }
-
     private void Update()
     {
         if (Input.GetKeyDown(swingKey) && swingTimer > 0) StartSwing();
         if (Input.GetKeyUp(swingKey) || swingTimer <= 0) StopSwing();
 
         CheckForSwingPoints();
-
+    }
+    private void FixedUpdate()
+    {
         if (joint != null) OdmGearMovement();
     }
 
@@ -100,9 +101,9 @@ public class Swinging : MonoBehaviour
         if (predictionHit.point == Vector3.zero) return;
 
         // deactivate active grapple
-        if (GetComponent<Grappling>() != null)
-            GetComponent<Grappling>().StopGrapple();
-        pm.ResetRestrictions();
+        //if (GetComponent<Grappling>() != null)
+        //    GetComponent<Grappling>().StopGrapple();
+        //pm.ResetRestrictions();
 
         pm.isSwinging = true;
 
@@ -140,11 +141,13 @@ public class Swinging : MonoBehaviour
     private void OdmGearMovement()
     {
         swingTimer -= Time.deltaTime;
-        rb.AddForce((predictionPoint.position - player.position).normalized * 500f, ForceMode.Force);
+        Vector3 forceHorizontal = orientation.forward + (swingPoint - player.position).normalized * horizontalThrustForce;
         // right
-        if (Input.GetKey(KeyCode.D)) rb.AddForce(orientation.right * horizontalThrustForce, ForceMode.Force);
+        if (Input.GetKey(KeyCode.D)) forceHorizontal += orientation.right;
         // left
-        if (Input.GetKey(KeyCode.A)) rb.AddForce(-orientation.right * horizontalThrustForce, ForceMode.Force);
+        if (Input.GetKey(KeyCode.A)) forceHorizontal -= orientation.right;
+
+        rb.AddForce(forceHorizontal * horizontalThrustForce * Time.deltaTime, ForceMode.Force);
 
         // forward
         //if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * horizontalThrustForce * Time.deltaTime);
@@ -176,6 +179,8 @@ public class Swinging : MonoBehaviour
     {
         // if not grappling, don't draw rope
         if (!joint) return;
+
+        lr.enabled = true;
 
         currentGrapplePosition =
             Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
