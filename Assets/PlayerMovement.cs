@@ -72,13 +72,11 @@ public class PlayerMovement : MonoBehaviour
         climbing,
         sliding,
         swinging,
-        freeze,
         grappling,
         dashing,
         air
     }
 
-    public bool isFrozen;
 
     public bool activeGrapple;
     public bool isSwinging;
@@ -146,13 +144,7 @@ public class PlayerMovement : MonoBehaviour
     private MovementState lastState;
     private void StateHandler()
     {
-        if (isFrozen)
-        {
-            state = MovementState.freeze;
-            desiredMoveSpeed = 0;
-            rb.velocity = Vector3.zero;
-        }
-        else if (activeGrapple)
+        if (activeGrapple)
         {
             state = MovementState.grappling;
             desiredMoveSpeed = grappleSpeed;
@@ -228,7 +220,6 @@ public class PlayerMovement : MonoBehaviour
         while (time < difference)
         {
             moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
-            print(desiredMoveSpeed);
             if (IsOnSlope())
             {
                 float slopeAngle = Vector3.Angle(Vector3.up, slopeHit.normal);
@@ -315,6 +306,12 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 GetSlopeMoveDirection(Vector3 direction)
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
+    }
+    public void GrappleToPoint(Vector3 targetPos)
+    {
+        activeGrapple = true;
+        Vector3 direction = targetPos + cam.transform.forward;
+        rb.AddForce(direction.normalized * 50f, ForceMode.Force);
     }
     private bool enableMovementOnNextTouch;
     public void JumpToPosition(Vector3 targetPosition, float trajectoryHeight)

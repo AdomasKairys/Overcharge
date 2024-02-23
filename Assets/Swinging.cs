@@ -11,6 +11,8 @@ public class Swinging : MonoBehaviour
     public PlayerMovement pm;
 
     [Header("Swinging")]
+    public float swingDuration;
+    private float swingTimer;
     private float maxSwingDistance = 25f;
     private Vector3 swingPoint;
     private SpringJoint joint;
@@ -30,11 +32,15 @@ public class Swinging : MonoBehaviour
     [Header("Input")]
     public KeyCode swingKey = KeyCode.Mouse0;
 
+    private void Start()
+    {
+        swingTimer = swingDuration;
+    }
 
     private void Update()
     {
-        if (Input.GetKeyDown(swingKey)) StartSwing();
-        if (Input.GetKeyUp(swingKey)) StopSwing();
+        if (Input.GetKeyDown(swingKey) && swingTimer > 0) StartSwing();
+        if (Input.GetKeyUp(swingKey) || swingTimer <= 0) StopSwing();
 
         CheckForSwingPoints();
 
@@ -122,6 +128,8 @@ public class Swinging : MonoBehaviour
 
     public void StopSwing()
     {
+        swingTimer = swingDuration;
+
         pm.isSwinging = false;
 
         lr.positionCount = 0;
@@ -131,33 +139,35 @@ public class Swinging : MonoBehaviour
 
     private void OdmGearMovement()
     {
+        swingTimer -= Time.deltaTime;
+        rb.AddForce((predictionPoint.position - player.position).normalized * 500f, ForceMode.Force);
         // right
-        if (Input.GetKey(KeyCode.D)) rb.AddForce(orientation.right * horizontalThrustForce * Time.deltaTime);
+        if (Input.GetKey(KeyCode.D)) rb.AddForce(orientation.right * horizontalThrustForce, ForceMode.Force);
         // left
-        if (Input.GetKey(KeyCode.A)) rb.AddForce(-orientation.right * horizontalThrustForce * Time.deltaTime);
+        if (Input.GetKey(KeyCode.A)) rb.AddForce(-orientation.right * horizontalThrustForce, ForceMode.Force);
 
         // forward
-        if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * horizontalThrustForce * Time.deltaTime);
+        //if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * horizontalThrustForce * Time.deltaTime);
 
-        // shorten cable
-        if (Input.GetKey(KeyCode.Space))
-        {
-            Vector3 directionToPoint = swingPoint - transform.position;
-            rb.AddForce(directionToPoint.normalized * forwardThrustForce * Time.deltaTime);
+        //// shorten cable
+        //if (Input.GetKey(KeyCode.Space))
+        //{
+        //    Vector3 directionToPoint = swingPoint - transform.position;
+        //    rb.AddForce(directionToPoint.normalized * forwardThrustForce * Time.deltaTime);
 
-            float distanceFromPoint = Vector3.Distance(transform.position, swingPoint);
+        //    float distanceFromPoint = Vector3.Distance(transform.position, swingPoint);
 
-            joint.maxDistance = distanceFromPoint * 0.8f;
-            joint.minDistance = distanceFromPoint * 0.25f;
-        }
-        // extend cable
-        if (Input.GetKey(KeyCode.S))
-        {
-            float extendedDistanceFromPoint = Vector3.Distance(transform.position, swingPoint) + extendCableSpeed;
+        //    joint.maxDistance = distanceFromPoint * 0.8f;
+        //    joint.minDistance = distanceFromPoint * 0.25f;
+        //}
+        //// extend cable
+        //if (Input.GetKey(KeyCode.S))
+        //{
+        //    float extendedDistanceFromPoint = Vector3.Distance(transform.position, swingPoint) + extendCableSpeed;
 
-            joint.maxDistance = extendedDistanceFromPoint * 0.8f;
-            joint.minDistance = extendedDistanceFromPoint * 0.25f;
-        }
+        //    joint.maxDistance = extendedDistanceFromPoint * 0.8f;
+        //    joint.minDistance = extendedDistanceFromPoint * 0.25f;
+        //}
     }
 
     private Vector3 currentGrapplePosition;

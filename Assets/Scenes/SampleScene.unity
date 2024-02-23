@@ -4405,7 +4405,6 @@ MonoBehaviour:
   maxSlopeAngle: 40
   climbingScript: {fileID: 783635931}
   cam: {fileID: 963194232}
-  isFrozen: 0
   activeGrapple: 0
   isSwinging: 0
   isSliding: 0
@@ -4569,10 +4568,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 320
   pm: {fileID: 783635928}
+  swingDuration: 4
   orientation: {fileID: 1467790827}
   rb: {fileID: 783635926}
-  horizontalThrustForce: 2000
-  forwardThrustForce: 4000
+  horizontalThrustForce: 200
+  forwardThrustForce: 400
   extendCableSpeed: 20
   predictionSphereCastRadius: 3
   predictionPoint: {fileID: 857082396}
@@ -10888,7 +10888,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1708041375}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.046479583, y: -0.000000006508568, z: 0.000000011631838, w: 0.9989193}
+  m_LocalRotation: {x: -0.046479583, y: -0.0000000063070633, z: 0.00000001127172, w: 0.9989193}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
