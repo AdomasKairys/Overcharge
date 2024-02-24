@@ -42,12 +42,7 @@ public class Climbing : MonoBehaviour
     public bool isExitingWall;
     public float exitWallTime;
     private float exitWallTimer;
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
+    
     // Update is called once per frame
     void Update()
     {
@@ -73,9 +68,8 @@ public class Climbing : MonoBehaviour
         else if (isExitingWall)
         {
             if (isClimbing) StopClimbing();
-
-            if (exitWallTimer > 0) exitWallTimer -= Time.deltaTime;
-            if (exitWallTimer < 0) isExitingWall = false;
+            
+            if (climbTimer > 0) isExitingWall = false;
         }
 
         // State 3 - None
@@ -106,15 +100,11 @@ public class Climbing : MonoBehaviour
 
         lastWall = frontWallHit.transform;
         lastWallNormal = frontWallHit.normal;
-
-        /// idea - camera fov change
     }
 
     private void ClimbingMovement()
     {
         rb.velocity = new Vector3(rb.velocity.x, climbSpeed, rb.velocity.z);
-
-        /// idea - sound effect
     }
 
     private void StopClimbing()
@@ -122,8 +112,6 @@ public class Climbing : MonoBehaviour
         isClimbing = false;
         pm.isClimbing = false;
 
-        /// idea - particle effect
-        /// idea - sound effect
     }
     private void ClimbJump()
     {

@@ -38,7 +38,6 @@ public class Swinging : MonoBehaviour
     }
     private void Update()
     {
-        print(IsSwingOver());
         if (Input.GetKeyDown(swingKey) && !IsSwingOver()) StartSwing();
         if (Input.GetKeyUp(swingKey) || IsSwingOver()) StopSwing();
 
@@ -148,7 +147,7 @@ public class Swinging : MonoBehaviour
         // left
         if (Input.GetKey(KeyCode.A)) forceHorizontal -= orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
 
-        rb.AddForce(forceHorizontal.normalized * horizontalThrustForce * Time.deltaTime/2, ForceMode.Force);
+        rb.AddForce(forceHorizontal.normalized * horizontalThrustForce, ForceMode.Force);
 
         // forward
         //if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * horizontalThrustForce * Time.deltaTime);
@@ -176,7 +175,7 @@ public class Swinging : MonoBehaviour
     private bool IsSwingOver()
     {
         //print(Vector3.Angle(orientation.forward, (predictionHit.point - player.position).normalized) + " " + swingTimer);
-        return swingTimer <= 0f || Vector3.Angle(orientation.forward, (predictionHit.point - player.position).normalized) > 120f;
+        return swingTimer <= 0f || Vector3.Angle(cam.forward, (predictionHit.point - cam.position).normalized) > 90f;
     }
     private Vector3 currentGrapplePosition;
 

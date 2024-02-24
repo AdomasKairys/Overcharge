@@ -37,7 +37,6 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode sprintKey = KeyCode.LeftShift;
     public KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Ground Check")]
@@ -66,7 +65,6 @@ public class PlayerMovement : MonoBehaviour
     public enum MovementState
     {
         walking,
-        spinting,
         crouching,
         wallrunning,
         climbing,
@@ -102,9 +100,12 @@ public class PlayerMovement : MonoBehaviour
 
         MyInput();
         StateHandler();
-        SpeedControl();
 
         rb.drag = isGrounded && state != MovementState.dashing && !isSwinging ? groundDrag : 0;
+    }
+    private void LateUpdate()
+    {
+        SpeedControl();
     }
 
     private void FixedUpdate()
@@ -170,17 +171,12 @@ public class PlayerMovement : MonoBehaviour
             if (IsOnSlope() && rb.velocity.y < 0.1f)
                 desiredMoveSpeed = slideSpeed;
             else
-                desiredMoveSpeed = sprintSpeed;
+                desiredMoveSpeed = walkSpeed;
         }
         else if (isCrouching)
         {
             state = MovementState.crouching;
             desiredMoveSpeed = crouchSpeed;
-        }
-        else if(isGrounded && Input.GetKey(sprintKey))
-        {
-            state = MovementState.spinting;
-            desiredMoveSpeed = sprintSpeed;
         }
         else if (isGrounded)
         {
@@ -192,8 +188,9 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.air;
         }
 
-        if (lastState == MovementState.swinging || lastState == MovementState.dashing || (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0))
+        if (state != MovementState.dashing && state != MovementState.swinging && (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0))
         {
+            StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
         }
         else
@@ -220,16 +217,12 @@ public class PlayerMovement : MonoBehaviour
 
                 time += Time.deltaTime * speedIncreaseMultiplier * slopeIncreaseMultiplier * slopeAngleIncrease;
             }
-            else if (state == MovementState.swinging)
-                time += Time.deltaTime * speedIncreaseMultiplier * speedIncreaseMultiplier;
-            else if (state == MovementState.air && moveSpeed > desiredMoveSpeed)
-                time += Time.deltaTime * Time.deltaTime;
             else
                 time += Time.deltaTime * speedIncreaseMultiplier;
+
             yield return null;
         }
         moveSpeed = desiredMoveSpeed;
-        
     }
     private void MovePlayer()
     {
