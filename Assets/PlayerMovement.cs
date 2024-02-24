@@ -101,8 +101,8 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
 
         MyInput();
-        SpeedControl();
         StateHandler();
+        SpeedControl();
 
         rb.drag = isGrounded && state != MovementState.dashing && !isSwinging ? groundDrag : 0;
     }
@@ -144,12 +144,7 @@ public class PlayerMovement : MonoBehaviour
     private MovementState lastState;
     private void StateHandler()
     {
-        if (activeGrapple)
-        {
-            state = MovementState.grappling;
-            desiredMoveSpeed = grappleSpeed;
-        }
-        else if (isSwinging)
+        if (isSwinging)
         {
             state = MovementState.swinging;
             desiredMoveSpeed = swingSpeed;
@@ -197,9 +192,8 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.air;
         }
 
-        if (lastState == MovementState.dashing || (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0))
+        if (lastState == MovementState.swinging || lastState == MovementState.dashing || (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0))
         {
-            StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
         }
         else
@@ -226,6 +220,10 @@ public class PlayerMovement : MonoBehaviour
 
                 time += Time.deltaTime * speedIncreaseMultiplier * slopeIncreaseMultiplier * slopeAngleIncrease;
             }
+            else if (state == MovementState.swinging)
+                time += Time.deltaTime * speedIncreaseMultiplier * speedIncreaseMultiplier;
+            else if (state == MovementState.air && moveSpeed > desiredMoveSpeed)
+                time += Time.deltaTime * Time.deltaTime;
             else
                 time += Time.deltaTime * speedIncreaseMultiplier;
             yield return null;
@@ -257,8 +255,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void SpeedControl()
     {
-        if (isSwinging) return;
-
         if (IsOnSlope() && !isExitingSlope)
         {
             if (rb.velocity.magnitude > moveSpeed)

@@ -21,7 +21,7 @@ public class Swinging : MonoBehaviour
     public Transform orientation;
     public Rigidbody rb;
     public float horizontalThrustForce;
-    public float forwardThrustForce;
+    //public float forwardThrustForce;
     public float extendCableSpeed;
 
     [Header("Prediction")]
@@ -38,14 +38,15 @@ public class Swinging : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(swingKey) && swingTimer > 0) StartSwing();
-        if (Input.GetKeyUp(swingKey) || swingTimer <= 0) StopSwing();
+        print(IsSwingOver());
+        if (Input.GetKeyDown(swingKey) && !IsSwingOver()) StartSwing();
+        if (Input.GetKeyUp(swingKey) || IsSwingOver()) StopSwing();
 
         CheckForSwingPoints();
     }
     private void FixedUpdate()
     {
-        if (joint != null) OdmGearMovement();
+        if (joint != null) SwingMovement();
     }
 
     private void LateUpdate()
@@ -94,7 +95,6 @@ public class Swinging : MonoBehaviour
         predictionHit = raycastHit.point == Vector3.zero ? sphereCastHit : raycastHit;
     }
 
-
     private void StartSwing()
     {
         // return if predictionHit not found
@@ -115,11 +115,11 @@ public class Swinging : MonoBehaviour
         float distanceFromPoint = Vector3.Distance(player.position, swingPoint);
 
         // the distance grapple will try to keep from grapple point. 
-        joint.maxDistance = distanceFromPoint * 0.8f;
-        joint.minDistance = distanceFromPoint * 0.25f;
+        //joint.maxDistance = distanceFromPoint * 0.8f;
+        //joint.minDistance = distanceFromPoint * 0.25f;
 
         // customize values as you like
-        joint.spring = 4.5f;
+        //joint.spring = 4.5f;
         joint.damper = 7f;
         joint.massScale = 4.5f;
 
@@ -135,19 +135,20 @@ public class Swinging : MonoBehaviour
 
         lr.positionCount = 0;
 
+
         Destroy(joint);
     }
 
-    private void OdmGearMovement()
+    private void SwingMovement()
     {
         swingTimer -= Time.deltaTime;
-        Vector3 forceHorizontal = orientation.forward + (swingPoint - player.position).normalized * horizontalThrustForce;
+        Vector3 forceHorizontal = orientation.forward * Mathf.Pow(swingTimer/swingDuration, 2) + (swingPoint - player.position).normalized;
         // right
         if (Input.GetKey(KeyCode.D)) forceHorizontal += orientation.right;
         // left
-        if (Input.GetKey(KeyCode.A)) forceHorizontal -= orientation.right;
+        if (Input.GetKey(KeyCode.A)) forceHorizontal -= orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
 
-        rb.AddForce(forceHorizontal * horizontalThrustForce * Time.deltaTime, ForceMode.Force);
+        rb.AddForce(forceHorizontal.normalized * horizontalThrustForce * Time.deltaTime/2, ForceMode.Force);
 
         // forward
         //if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * horizontalThrustForce * Time.deltaTime);
@@ -172,7 +173,11 @@ public class Swinging : MonoBehaviour
         //    joint.minDistance = extendedDistanceFromPoint * 0.25f;
         //}
     }
-
+    private bool IsSwingOver()
+    {
+        //print(Vector3.Angle(orientation.forward, (predictionHit.point - player.position).normalized) + " " + swingTimer);
+        return swingTimer <= 0f || Vector3.Angle(orientation.forward, (predictionHit.point - player.position).normalized) > 120f;
+    }
     private Vector3 currentGrapplePosition;
 
     private void DrawRope()
