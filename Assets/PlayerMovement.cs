@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -230,6 +231,7 @@ public class PlayerMovement : MonoBehaviour
             || activeGrapple || isSwinging) return;
 
         moveDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        bool wallTouch = Physics.OverlapSphere(transform.position,0.75f, whatIsGround).Count() > 0;
 
         if (IsOnSlope() && !isExitingSlope)
         {
@@ -240,7 +242,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if(isGrounded)
             rb.AddForce(10f * moveSpeed * moveDir.normalized, ForceMode.Force);
-        else if (!isGrounded)
+        else if (!isGrounded && !wallTouch)
             rb.AddForce(10f * airMultiplier * moveSpeed * moveDir.normalized, ForceMode.Force);
 
         if(!isWallrunning) rb.useGravity = !IsOnSlope();
