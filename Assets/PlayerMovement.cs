@@ -188,8 +188,7 @@ public class PlayerMovement : MonoBehaviour
         {
             state = MovementState.air;
         }
-
-        if (state != MovementState.dashing && state != MovementState.swinging && (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0))
+        if (state != MovementState.dashing && state != MovementState.swinging && Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f)
         {
             StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
@@ -210,6 +209,11 @@ public class PlayerMovement : MonoBehaviour
 
         while (time < difference)
         {
+            Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+            if (flatVel.magnitude < walkSpeed)
+                break;
+
             moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
             if (IsOnSlope())
             {
@@ -259,6 +263,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
+            print(moveSpeed);
             if (flatVel.magnitude > moveSpeed)
             {
                 Vector3 limitedVel = flatVel.normalized * moveSpeed;
