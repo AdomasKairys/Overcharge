@@ -251,7 +251,6 @@ public class PlayerMovement : MonoBehaviour
 
         if(!isWallrunning) rb.useGravity = !IsOnSlope();
     }
-
     private void SpeedControl()
     {
         if (IsOnSlope() && !isExitingSlope)
