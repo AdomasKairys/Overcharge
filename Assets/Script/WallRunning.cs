@@ -43,12 +43,11 @@ public class WallRunning : MonoBehaviour
     public float minJumpHeight;
     private RaycastHit leftWallHit;
     private RaycastHit rightWallHit;
-    private bool isWallLeft;
-    private bool isWallRight;
+    public bool isWallLeft;
+    public bool isWallRight;
 
     [Header("References")]
     public Transform orientation;
-    public ThirdPersonCam cam; //type can be change to first person script
     private PlayerMovement pm;
     private Rigidbody rb;
 
@@ -147,11 +146,6 @@ public class WallRunning : MonoBehaviour
         //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         wallRemembered = false;
-
-        cam.DoFov(highFov);
-        if (isWallLeft) cam.DoTilt(-5f);
-        if (isWallRight) cam.DoTilt(5f);
-
     }
     private void RememberLastWall()
     {
@@ -218,9 +212,6 @@ public class WallRunning : MonoBehaviour
     private void StopWallRun()
     {
         pm.isWallrunning = false;
-
-        cam.DoFov(defaultFov);
-        cam.DoTilt(0f);
     }
     private void WallJump()
     {

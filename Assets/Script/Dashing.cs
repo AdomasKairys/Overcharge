@@ -16,10 +16,7 @@ public class Dashing : MonoBehaviour
     public float maxDashYSpeed;
     public float dashDuration;
 
-    [Header("CameraEffects")]
-    public ThirdPersonCam cam;
-    public float defaultFov = 50f;
-    public float highFov = 60f;
+    
 
     [Header("Settings")]
     public bool useCameraForward = true;
@@ -57,7 +54,6 @@ public class Dashing : MonoBehaviour
         pm.isDashing = true;
         pm.maxYSpeed = maxDashYSpeed;
 
-        cam.DoFov(highFov);
 
         Transform forwardT;
 
@@ -93,7 +89,6 @@ public class Dashing : MonoBehaviour
         pm.isDashing = false;
         pm.maxYSpeed = 0;
 
-        cam.DoFov(defaultFov);
 
         if (disableGravity)
             rb.useGravity = true;
