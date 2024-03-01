@@ -52,13 +52,14 @@ public class ThirdPersonCam : MonoBehaviour
 
         Vector3 inputDir = orientation.forward * verticallInput + orientation.right * horizontalInput;
 
-        if (inputDir != Vector3.zero)
-            playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
+        //if (inputDir != Vector3.zero)
+        //    playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
+         
 
     }
     private void CameraEffects()
     {
-        if (rb.velocity.magnitude > 11 && !isFovChanged)
+        if (rb.velocity.magnitude > 15 && !isFovChanged)
         {
             isFovChanged = true;
             DoFov(defaultFov+2*((rb.velocity.magnitude - 20f > maxFovChange)?maxFovChange:(rb.velocity.magnitude - 20f)));

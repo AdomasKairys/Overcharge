@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isExitingSlope;
 
     [Header("References")]
-    public Climbing climbingScript;
+    public Climbing climbingSc;
     public ThirdPersonCam cam;
 
     float horizontalInput;
@@ -98,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
-
+        print(isGrounded);
         MyInput();
         StateHandler();
 
@@ -231,11 +231,11 @@ public class PlayerMovement : MonoBehaviour
     }
     private void MovePlayer()
     {
-        if (climbingScript.isExitingWall || state == MovementState.dashing
+        if (climbingSc.isExitingWall || state == MovementState.dashing
             || activeGrapple || isSwinging) return;
 
         moveDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        bool wallTouch = Physics.OverlapSphere(transform.position,0.75f, whatIsGround).Count() > 0;
+        bool wallTouch = Physics.OverlapSphere(transform.position,climbingSc.detectionLength, whatIsGround).Count() > 0;
 
         if (IsOnSlope() && !isExitingSlope)
         {
