@@ -31,11 +31,6 @@ public class PlayerMovement : MonoBehaviour
     public float airMultiplier;
     bool isReadyToJump;
 
-    [Header("Crouching")]
-    public float crouchSpeed;
-    public float crouchYScale;
-    private float startYScale;
-
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
     public KeyCode crouchKey = KeyCode.LeftControl;
@@ -82,7 +77,6 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isSliding;
     public bool isWallrunning;
-    public bool isCrouching;
     public bool isClimbing;
     public bool isDashing;
 
@@ -93,7 +87,6 @@ public class PlayerMovement : MonoBehaviour
 
         isReadyToJump = true;
 
-        startYScale = transform.localScale.y;
     }
     private void Update()
     {
@@ -128,20 +121,6 @@ public class PlayerMovement : MonoBehaviour
             Invoke(nameof(ResetJump), jumpCooldown);
         }
 
-        if (Input.GetKeyDown(crouchKey) && horizontalInput == 0 && verticalInput == 0)
-        {
-            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
-            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
-            isCrouching = true;
-
-        }
-
-        if (Input.GetKeyUp(crouchKey))
-        {
-            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
-            isCrouching = false;
-
-        }
     }
     private MovementState lastState;
     private void StateHandler()
@@ -174,11 +153,6 @@ public class PlayerMovement : MonoBehaviour
             else
                 desiredMoveSpeed = walkSpeed;
         }
-        else if (isCrouching)
-        {
-            state = MovementState.crouching;
-            desiredMoveSpeed = crouchSpeed;
-        }
         else if (isGrounded)
         {
             state = MovementState.walking;
@@ -190,8 +164,9 @@ public class PlayerMovement : MonoBehaviour
         }
         if (state != MovementState.dashing && state != MovementState.swinging && Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f)
         {
-            StopAllCoroutines();
-            StartCoroutine(SmoothlyLerpMoveSpeed());
+            IEnumerator lerpMoveSpeed = SmoothlyLerpMoveSpeed();
+            StopCoroutine(lerpMoveSpeed);
+            StartCoroutine(lerpMoveSpeed);
         }
         else
         {
@@ -253,21 +228,13 @@ public class PlayerMovement : MonoBehaviour
     }
     private void SpeedControl()
     {
-        if (IsOnSlope() && !isExitingSlope)
-        {
-            if (rb.velocity.magnitude > moveSpeed)
-                rb.velocity = rb.velocity.normalized * moveSpeed;
-        }
-        else
-        {
-            Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-            print(moveSpeed);
-            if (flatVel.magnitude > moveSpeed)
-            {
-                Vector3 limitedVel = flatVel.normalized * moveSpeed;
-                rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
-            }
+        print(moveSpeed);
+        if (flatVel.magnitude > moveSpeed)
+        {
+            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
         //if (maxYSpeed != 0 && rb.velocity.y > maxYSpeed)
         //    rb.velocity = new Vector3(rb.velocity.x, maxYSpeed, rb.velocity.z);
@@ -301,56 +268,4 @@ public class PlayerMovement : MonoBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
-    //public void GrappleToPoint(Vector3 targetPos)
-    //{
-    //    activeGrapple = true;
-    //    Vector3 direction = targetPos + cam.transform.forward;
-    //    rb.AddForce(direction.normalized * 50f, ForceMode.Force);
-    //}
-    //private bool enableMovementOnNextTouch;
-    //public void JumpToPosition(Vector3 targetPosition, float trajectoryHeight)
-    //{
-    //    activeGrapple = true;
-
-    //    velocityToSet = CalculateJumpVelocity(transform.position, targetPosition, trajectoryHeight);
-    //    Invoke(nameof(SetVelocity), 0.1f);
-
-    //    Invoke(nameof(ResetRestrictions), 3f);
-    //}
-    //private Vector3 velocityToSet;
-    //private void SetVelocity()
-    //{
-    //    enableMovementOnNextTouch = true;
-    //    rb.velocity = velocityToSet;
-
-    //    cam.DoFov(55f);
-    //}
-    ////TODO: change magic numbers for fov to variables
-    //public void ResetRestrictions()
-    //{
-    //    activeGrapple = false;
-    //    cam.DoFov(50f);
-    //}
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    if (enableMovementOnNextTouch)
-    //    {
-    //        enableMovementOnNextTouch = false;
-    //        ResetRestrictions();
-
-    //        GetComponent<Grappling>().StopGrapple();
-    //    }
-    //}
-    //public Vector3 CalculateJumpVelocity(Vector3 startPoint, Vector3 endPoint, float trajectoryHeight)
-    //{
-    //    float gravity = Physics.gravity.y;
-    //    float displacementY = endPoint.y - startPoint.y;
-    //    Vector3 displacementXZ = new Vector3(endPoint.x - startPoint.x, 0f, endPoint.z - startPoint.z);
-
-    //    Vector3 velocityY = Vector3.up * Mathf.Sqrt(-2 * gravity * trajectoryHeight);
-    //    Vector3 velocityXZ = displacementXZ / (Mathf.Sqrt(-2 * trajectoryHeight / gravity)
-    //        + Mathf.Sqrt(2 * (displacementY - trajectoryHeight) / gravity));
-
-    //    return velocityXZ + velocityY;
-    //}
 }

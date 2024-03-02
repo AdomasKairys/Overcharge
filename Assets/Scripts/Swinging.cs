@@ -6,7 +6,8 @@ public class Swinging : MonoBehaviour
 {
     [Header("References")]
     public LineRenderer lr;
-    public Transform gunTip, cam, player;
+    public MeshRenderer gun;
+    public Transform gunHolder, gunTip, cam, player;
     public LayerMask whatIsGrappleable;
     public PlayerMovement pm;
 
@@ -35,6 +36,7 @@ public class Swinging : MonoBehaviour
     private void Start()
     {
         swingTimer = swingDuration;
+        gun.enabled = false;
     }
     private void Update()
     {
@@ -131,7 +133,7 @@ public class Swinging : MonoBehaviour
         swingTimer = swingDuration;
 
         pm.isSwinging = false;
-
+        gun.enabled = false;
         lr.positionCount = 0;
 
 
@@ -149,32 +151,9 @@ public class Swinging : MonoBehaviour
 
         rb.AddForce(forceHorizontal.normalized * horizontalThrustForce, ForceMode.Force);
 
-        // forward
-        //if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * horizontalThrustForce * Time.deltaTime);
-
-        //// shorten cable
-        //if (Input.GetKey(KeyCode.Space))
-        //{
-        //    Vector3 directionToPoint = swingPoint - transform.position;
-        //    rb.AddForce(directionToPoint.normalized * forwardThrustForce * Time.deltaTime);
-
-        //    float distanceFromPoint = Vector3.Distance(transform.position, swingPoint);
-
-        //    joint.maxDistance = distanceFromPoint * 0.8f;
-        //    joint.minDistance = distanceFromPoint * 0.25f;
-        //}
-        //// extend cable
-        //if (Input.GetKey(KeyCode.S))
-        //{
-        //    float extendedDistanceFromPoint = Vector3.Distance(transform.position, swingPoint) + extendCableSpeed;
-
-        //    joint.maxDistance = extendedDistanceFromPoint * 0.8f;
-        //    joint.minDistance = extendedDistanceFromPoint * 0.25f;
-        //}
     }
     private bool IsSwingOver()
     {
-        //print(Vector3.Angle(orientation.forward, (predictionHit.point - player.position).normalized) + " " + swingTimer);
         return swingTimer <= 0f || Vector3.Angle(cam.forward, (predictionHit.point - cam.position).normalized) > 90f;
     }
     private Vector3 currentGrapplePosition;
@@ -183,6 +162,10 @@ public class Swinging : MonoBehaviour
     {
         // if not grappling, don't draw rope
         if (!joint) return;
+
+        
+        gunHolder.forward = (swingPoint - player.position).normalized;
+        gun.enabled = true;
 
         lr.enabled = true;
 
