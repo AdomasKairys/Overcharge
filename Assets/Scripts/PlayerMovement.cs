@@ -83,6 +83,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        moveSpeed = walkSpeed;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
@@ -159,15 +160,13 @@ public class PlayerMovement : MonoBehaviour
         }
         if (state != MovementState.dashing && state != MovementState.swinging && Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f)
         {
-            IEnumerator lerpMoveSpeed = SmoothlyLerpMoveSpeed();
-            StopCoroutine(lerpMoveSpeed);
-            StartCoroutine(lerpMoveSpeed);
+            StopAllCoroutines();
+            StartCoroutine(SmoothlyLerpMoveSpeed());
         }
-        else
+        else 
         {
             moveSpeed = desiredMoveSpeed;
         }
-
         lastDesiredMoveSpeed = desiredMoveSpeed;
         lastState = state;
     }
@@ -182,10 +181,9 @@ public class PlayerMovement : MonoBehaviour
 
             Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-            //bug here
-            if (flatVel.magnitude < walkSpeed)
+            //bug here fixed (?)
+            if (flatVel.magnitude < walkSpeed && desiredMoveSpeed <= startValue)
             {
-                print(rb.velocity.magnitude);
                 break;
             }
 
