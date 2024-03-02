@@ -45,6 +45,7 @@ public class PlayerMovement : MonoBehaviour
     public float maxSlopeAngle;
     private RaycastHit slopeHit;
     private bool isExitingSlope;
+    public float slideForce;
 
     [Header("References")]
     public Climbing climbingSc;
@@ -91,7 +92,6 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
-        print(isGrounded);
         MyInput();
         StateHandler();
 
@@ -145,18 +145,13 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.wallrunning;
             desiredMoveSpeed = wallRunSpeed;
         }
-        else if(isSliding)
-        {
-            state = MovementState.sliding;
-            if (IsOnSlope() && rb.velocity.y < 0.1f)
-                desiredMoveSpeed = slideSpeed;
-            else
-                desiredMoveSpeed = walkSpeed;
-        }
         else if (isGrounded)
         {
             state = MovementState.walking;
-            desiredMoveSpeed = walkSpeed;
+            if (IsOnSlope() && rb.velocity.y < -0.1f)
+                desiredMoveSpeed = slideSpeed;
+            else
+                desiredMoveSpeed = walkSpeed;
         }
         else
         {
@@ -184,10 +179,15 @@ public class PlayerMovement : MonoBehaviour
 
         while (time < difference)
         {
+
             Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
+            //bug here
             if (flatVel.magnitude < walkSpeed)
+            {
+                print(rb.velocity.magnitude);
                 break;
+            }
 
             moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
             if (IsOnSlope())
@@ -214,10 +214,14 @@ public class PlayerMovement : MonoBehaviour
 
         if (IsOnSlope() && !isExitingSlope)
         {
-            rb.AddForce(20f * moveSpeed * GetSlopeMoveDirection(moveDir), ForceMode.Force);
+            if(rb.velocity.y > -0.1f)
+                rb.AddForce(20f * moveSpeed * GetSlopeMoveDirection(moveDir), ForceMode.Force);
 
             if (rb.velocity.y > 0)
                 rb.AddForce(Vector3.down * 80f, ForceMode.Force);
+
+            if (rb.velocity.y < -0.1f)
+                rb.AddForce(GetSlopeMoveDirection(moveDir) * slideForce, ForceMode.Force);
         }
         else if(isGrounded)
             rb.AddForce(10f * moveSpeed * moveDir.normalized, ForceMode.Force);
@@ -230,7 +234,6 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        print(moveSpeed);
         if (flatVel.magnitude > moveSpeed)
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
