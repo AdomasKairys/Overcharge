@@ -145,7 +145,7 @@ public class Swinging : MonoBehaviour
         swingTimer -= Time.deltaTime;
         Vector3 forceHorizontal = orientation.forward * Mathf.Pow(swingTimer/swingDuration, 2) + (swingPoint - player.position).normalized;
         // right
-        if (Input.GetKey(KeyCode.D)) forceHorizontal += orientation.right;
+        if (Input.GetKey(KeyCode.D)) forceHorizontal += orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
         // left
         if (Input.GetKey(KeyCode.A)) forceHorizontal -= orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
 

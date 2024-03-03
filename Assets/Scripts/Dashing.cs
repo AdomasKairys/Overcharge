@@ -19,17 +19,17 @@ public class Dashing : MonoBehaviour
     
 
     [Header("Settings")]
-    public bool useCameraForward = true;
+    public bool useCameraForward = false;
     public bool allowAllDirections = true;
     public bool disableGravity = false;
-    public bool resetVel = true;
+    public bool resetVel = false;
 
     [Header("Cooldown")]
     public float dashCd;
     private float dashCdTimer;
 
     [Header("Input")]
-    public KeyCode dashKey = KeyCode.E;
+    public KeyCode dashKey = KeyCode.LeftShift;
 
     private void Start()
     {
@@ -63,8 +63,8 @@ public class Dashing : MonoBehaviour
             forwardT = orientation; /// where you're facing (no up or down)
 
         Vector3 direction = GetDirection(forwardT);
-
         Vector3 forceToApply = direction * dashForce + orientation.up * dashUpwardForce;
+        print(forceToApply);
 
         if (disableGravity)
             rb.useGravity = false;
@@ -99,7 +99,7 @@ public class Dashing : MonoBehaviour
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         float verticalInput = Input.GetAxisRaw("Vertical");
 
-        Vector3 direction = new Vector3();
+        Vector3 direction;
 
         if (allowAllDirections)
             direction = forwardT.forward * verticalInput + forwardT.right * horizontalInput;
