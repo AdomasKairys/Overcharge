@@ -33,7 +33,6 @@ public class UIController : MonoBehaviour
         {
             // Retrieve the player state information
             playerStateController = player.GetComponent<PlayerStateController>();
-            Debug.Log("The controler is: " + playerStateController);
         }
 
         // Setup the charge bar

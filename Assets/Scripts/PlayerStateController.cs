@@ -12,10 +12,13 @@ public enum PlayerState
 public class PlayerStateController : MonoBehaviour
 {
     [Header("Player State")]
-    public PlayerState currState = PlayerState.Runner; // Current state of the player
+    public PlayerState currState = PlayerState.Runner; // Current state of the player, default is Runner TODO: later make private
     public float currCharge = 0.0f; // Current value of charge the player has
     public float chargeRate = 1.0f; // The rate in which the palyer's charge increases
     public float overcharge = 100.0f; // The maximum value of charge at which the player dies
+
+    //[Header("Tagging")]
+    //public GameObject tagTrigger;
 
     // Start is called before the first frame update
     void Start()
