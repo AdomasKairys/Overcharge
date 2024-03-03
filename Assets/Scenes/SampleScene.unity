@@ -2654,7 +2654,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 490027784}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.32435665, y: 0.00000004276686, z: 0.00000001651518, w: 0.94593495}
+  m_LocalRotation: {x: 0.32435668, y: 0.00000005649786, z: 0.00000002181765, w: 0.94593495}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2728,6 +2728,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e90f286fccf124ea243317497139b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tagCooldown: 5
 --- !u!1 &540962032
 GameObject:
   m_ObjectHideFlags: 0
@@ -5776,7 +5777,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.34236088, y: 0.00000003362652, z: 0.000000012252863, w: 0.9395686}
+  m_LocalRotation: {x: -0.34236088, y: 0.000000033674944, z: 0.000000012270508, w: 0.9395686}
   m_LocalPosition: {x: 0, y: -0.00999999, z: 7.62}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -8118,7 +8119,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1279749295}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5242842, y: -0.000000076805954, z: -0.000000011371139, w: 0.8515433}
+  m_LocalRotation: {x: 0.52428424, y: 0.000000062065126, z: 0.00000000918876, w: 0.85154337}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11356,7 +11357,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1708041375}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000029802319, y: 0.00000003982337, z: 0.000000033465017, w: 1}
+  m_LocalRotation: {x: 0.000000059604638, y: 0.000000051052858, z: 0.000000042901565, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11430,6 +11431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e90f286fccf124ea243317497139b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tagCooldown: 5
 --- !u!1 &1787148606
 GameObject:
   m_ObjectHideFlags: 3
