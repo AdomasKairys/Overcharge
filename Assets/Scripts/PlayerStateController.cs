@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 // Define the possible player states
 public enum PlayerState
 {
     Chaser,
-    Runner
+    Runner,
+    Dead
 }
 
 public class PlayerStateController : MonoBehaviour
@@ -16,6 +18,8 @@ public class PlayerStateController : MonoBehaviour
     public float currCharge = 0.0f; // Current value of charge the player has
     public float chargeRate = 1.0f; // The rate in which the palyer's charge increases
     public float overcharge = 100.0f; // The maximum value of charge at which the player dies
+
+    public UnityEvent onPlayerDeath;
 
     //[Header("Tagging")]
     //public GameObject tagTrigger;
@@ -46,7 +50,7 @@ public class PlayerStateController : MonoBehaviour
         {
             if(currCharge >= overcharge)
             {
-                // TODO: Kill the player when charge reaches max value
+                Die();
             }
             // Increase charge for the chaser
             currCharge += chargeRate * Time.deltaTime;
@@ -63,5 +67,20 @@ public class PlayerStateController : MonoBehaviour
     public PlayerState GetState()
     {
         return currState;
+    }
+
+    private void Die()
+    {
+        onPlayerDeath.Invoke();
+        this.gameObject.SetActive(false); // deactivate the player object
+    }
+
+    public void Respawn()
+    {
+        // Reset player's health or other states as necessary
+        currState = PlayerState.Runner;
+        currCharge = 0.0f;
+        this.transform.position = new Vector3(0, 0, 0);
+        this.gameObject.SetActive(true);
     }
 }

@@ -8,12 +8,14 @@ public class TagController : MonoBehaviour
     public float tagCooldown = 2.0f;
     
     private PlayerStateController thisStateController;
+    private PlayerMovement thisMovementController;
     private bool blocked; // whether the tagging functionality for this player is blocked
 
     // Start is called before the first frame update
     void Start()
     {
         thisStateController = GetComponentInParent<PlayerStateController>();
+        thisMovementController = GetComponentInParent<PlayerMovement>();
         blocked = false;
         Debug.Log(transform.parent.gameObject.name + ": " + thisStateController);
     }
@@ -44,6 +46,7 @@ public class TagController : MonoBehaviour
                     otherTagController.Block();
                     thisStateController.SetState(PlayerState.Runner);
                     otherStateController.SetState(PlayerState.Chaser);
+                    thisMovementController.PushAwayFromTagged(other.gameObject.GetComponentInParent<Rigidbody>().transform.position);
                     Debug.Log(transform.parent.gameObject.name + " tagged " + other.gameObject.name + " State changed to " + thisStateController.GetState());
                 }
             }
