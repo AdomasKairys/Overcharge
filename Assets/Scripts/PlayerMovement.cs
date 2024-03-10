@@ -268,4 +268,11 @@ public class PlayerMovement : MonoBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
+
+    public void PushAwayFromTagged(Vector3 otherPosition)
+    {
+        Debug.Log("Pushing away");
+        Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
+        rb.AddForce(pushDirection * 200, ForceMode.Impulse);
+    }
 }
