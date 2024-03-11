@@ -49,6 +49,9 @@ public class Climbing : MonoBehaviour
         WallCheck();
         StateMachine();
 
+    }
+    private void FixedUpdate()
+    {
         if (isClimbing && !isExitingWall) ClimbingMovement();
     }
     private void StateMachine()
