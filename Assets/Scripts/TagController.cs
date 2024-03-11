@@ -32,27 +32,23 @@ public class TagController : MonoBehaviour
         if (other.CompareTag("TagTrigger")) // reduntant check for future proofing
         {
             PlayerState thisState = thisStateController.GetState();
+            PlayerStateController otherStateController = other.gameObject.GetComponentInParent<PlayerStateController>();
+            //TagController otherTagController = other.GetComponentInParent<TagController>();
+            PlayerState otherState = otherStateController.GetState();
+            //bool otherBlocked = otherTagController.IsBlocked();
             // Tag control is performed only when this player is an unblocked chaser
-            if(!blocked && thisState == PlayerState.Chaser)
+            if(!blocked && otherState != thisState)
             {
-                PlayerStateController otherStateController = other.gameObject.GetComponentInParent<PlayerStateController>();
-                TagController otherTagController = other.GetComponentInParent<TagController>();
-                PlayerState otherState = otherStateController.GetState();
-                bool otherBlocked = otherTagController.IsBlocked();
                 // If the tagged player is an unblocked runner
-                if (!otherBlocked && otherState == PlayerState.Runner)
-                {
-                    Block();
-                    otherTagController.Block();
-                    thisStateController.SetState(PlayerState.Runner);
-                    otherStateController.SetState(PlayerState.Chaser);
-                    thisMovementController.PushAwayFromTagged(other.gameObject.GetComponentInParent<Rigidbody>().transform.position);
-                    Debug.Log(transform.parent.gameObject.name + " tagged " + other.gameObject.name + " State changed to " + thisStateController.GetState());
-                }
+                Block();
+                //otherTagController.Block();
+                thisStateController.SetState(otherState);
+                otherStateController.SetState(thisState);
+                thisMovementController.PushAwayFromTagged(other.gameObject.GetComponentInParent<Rigidbody>().transform.position);
+                Debug.Log(transform.parent.gameObject.name + " tagged " + other.gameObject.name + " State changed to " + thisStateController.GetState());
             }
         }
     }
-
     public bool IsBlocked()
     {
         return blocked;
@@ -61,6 +57,7 @@ public class TagController : MonoBehaviour
     public void Block()
     {
         blocked = true;
+        thisMovementController.isDashing = true;
         StartCoroutine(UnblockAfterCooldown());
     }
 
@@ -68,5 +65,6 @@ public class TagController : MonoBehaviour
     {
         yield return new WaitForSeconds(tagCooldown); // Wait for the cooldown time.
         blocked = false; // Unblock the player.
+        thisMovementController.isDashing = false;
     }
 }

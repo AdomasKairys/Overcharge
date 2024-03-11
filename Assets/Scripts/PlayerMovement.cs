@@ -75,7 +75,6 @@ public class PlayerMovement : MonoBehaviour
 
     public bool activeGrapple;
     public bool isSwinging;
-
     public bool isSliding;
     public bool isWallrunning;
     public bool isClimbing;
@@ -273,6 +272,6 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("Pushing away");
         Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
-        rb.AddForce(pushDirection * 200, ForceMode.Impulse);
+        rb.AddForce(pushDirection * 100, ForceMode.Impulse);
     }
 }

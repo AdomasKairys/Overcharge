@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748171, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2656,7 +2656,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 490027784}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.32435665, y: -0.000000046466123, z: -0.000000017943716, w: 0.94593495}
+  m_LocalRotation: {x: 0.32435668, y: 0.00000005649786, z: 0.00000002181765, w: 0.94593495}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2674,7 +2674,6 @@ GameObject:
   m_Component:
   - component: {fileID: 513477147}
   - component: {fileID: 513477148}
-  - component: {fileID: 513477149}
   m_Layer: 9
   m_Name: EnemyTagTrigger
   m_TagString: TagTrigger
@@ -2718,19 +2717,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &513477149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 513477146}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24e90f286fccf124ea243317497139b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tagCooldown: 5
 --- !u!1 &540962032
 GameObject:
   m_ObjectHideFlags: 0
@@ -5916,7 +5902,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.3423609, y: -0.000000043949136, z: -0.000000016014228, w: 0.9395686}
+  m_LocalRotation: {x: -0.34236088, y: 0.000000033674944, z: 0.000000012270508, w: 0.9395686}
   m_LocalPosition: {x: 0, y: 0.01999998, z: 7.62}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7439,7 +7425,7 @@ GameObject:
   - component: {fileID: 1122398581}
   m_Layer: 3
   m_Name: Enemy
-  m_TagString: Player
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8261,7 +8247,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1279749295}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.52428424, y: 0.000000026653131, z: 0.0000000039460035, w: 0.85154337}
+  m_LocalRotation: {x: 0.52428424, y: -0.000000035403428, z: -0.000000005241486, w: 0.85154337}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11803,7 +11789,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1708041375}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.000000042931976, z: -0.000000036077292, w: 1}
+  m_LocalRotation: {x: 0.000000059604638, y: 0.000000051052858, z: 0.000000042901565, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11877,7 +11863,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e90f286fccf124ea243317497139b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tagCooldown: 5
+  tagCooldown: 2
 --- !u!1 &1787148606
 GameObject:
   m_ObjectHideFlags: 3
