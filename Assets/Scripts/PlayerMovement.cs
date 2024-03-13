@@ -200,13 +200,22 @@ public class PlayerMovement : MonoBehaviour
         }
         moveSpeed = desiredMoveSpeed;
     }
+    private float detectionLength = 1.25f;
+    private float sphereCastRadius = 0.25f;
     private void MovePlayer()
     {
         if (climbingSc.isExitingWall || state == MovementState.dashing
             || activeGrapple || isSwinging) return;
 
         moveDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        bool wallTouch = Physics.OverlapSphere(transform.position,climbingSc.detectionLength, whatIsGround).Count() > 0;
+
+        bool isWallFront = Physics.SphereCast(transform.position, sphereCastRadius, orientation.forward, out RaycastHit wallFrontHit, detectionLength, whatIsGround);
+        if (isWallFront && !isClimbing)
+        {
+            float wallLookAngle = Vector3.Angle(moveDir, -wallFrontHit.normal);
+
+            moveDir = wallLookAngle > 15f ? Vector3.ProjectOnPlane(moveDir, wallFrontHit.normal).normalized : Vector3.zero;
+        }
 
         if (IsOnSlope() && !isExitingSlope)
         {
@@ -221,7 +230,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if(isGrounded)
             rb.AddForce(10f * moveSpeed * moveDir.normalized, ForceMode.Force);
-        else if (!isGrounded && !wallTouch)
+        else if (!isGrounded)
             rb.AddForce(10f * airMultiplier * moveSpeed * moveDir.normalized, ForceMode.Force);
 
         if(!isWallrunning) rb.useGravity = !IsOnSlope();
