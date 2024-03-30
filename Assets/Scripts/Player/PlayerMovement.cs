@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -87,7 +88,6 @@ public class PlayerMovement : MonoBehaviour
         rb.freezeRotation = true;
 
         isReadyToJump = true;
-
     }
     private void Update()
     {
@@ -95,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
         MyInput();
         StateHandler();
         rb.drag = isGrounded && state != MovementState.dashing && !isSwinging ? groundDrag : 0;
+        
     }
     private void LateUpdate()
     {
@@ -103,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        MovePlayer(); 
     }
 
     private void MyInput()

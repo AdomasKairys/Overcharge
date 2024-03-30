@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using Cinemachine;
 using System;
+using Unity.Netcode;
 
 public class ThirdPersonCam : MonoBehaviour
 {
@@ -17,17 +18,13 @@ public class ThirdPersonCam : MonoBehaviour
 
     public float rotationSpeed;
 
-    public Transform combatLookAt;
-
     public GameObject thirdPersonCam;
-    public GameObject combatCam;
 
     private bool isFovChanged;
     private bool isTiltChanged;
 
     public float defaultFov = 50f;
     public float maxFovChange = 20f;
-
 
     // Start is called before the first frame update
     void Start()
@@ -51,7 +48,7 @@ public class ThirdPersonCam : MonoBehaviour
         float verticallInput = Input.GetAxis("Vertical");
 
         Vector3 inputDir = orientation.forward * verticallInput + orientation.right * horizontalInput;
-
+        
         //if (inputDir != Vector3.zero)
         //    playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
          

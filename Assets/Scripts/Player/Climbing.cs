@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Climbing : MonoBehaviour
@@ -42,7 +43,7 @@ public class Climbing : MonoBehaviour
     public bool isExitingWall;
     public float exitWallTime;
     private float exitWallTimer;
-    
+
     // Update is called once per frame
     void Update()
     {
@@ -54,6 +55,7 @@ public class Climbing : MonoBehaviour
     {
         if (isClimbing && !isExitingWall) ClimbingMovement();
     }
+
     private void StateMachine()
     {
         
