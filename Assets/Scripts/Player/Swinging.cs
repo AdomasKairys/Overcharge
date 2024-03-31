@@ -4,9 +4,10 @@ using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Swinging : MonoBehaviour
+public class Swinging : NetworkBehaviour
 {
     [Header("References")]
+    public NetworkObject pc;
     public LineRenderer lr;
     public MeshRenderer gun;
     public Transform gunHolder, gunTip, cam, player;
@@ -54,8 +55,49 @@ public class Swinging : MonoBehaviour
 
     private void LateUpdate()
     {
-        DrawRope();
+        if (joint) DrawRopeServerRPC(pc, swingPoint, currentGrapplePosition, gunTip.position);
     }
+
+    [ServerRpc]
+    private void DrawRopeServerRPC(NetworkObjectReference pc, Vector3 swingPoint, Vector3 currGrapplePos, Vector3 gunTipPos)
+    {
+        DrawRopeClientRPC(pc, swingPoint, currGrapplePos, gunTipPos);
+    }
+    [ServerRpc]
+    private void SetLineRendererServerRPC(NetworkObjectReference pc, int count, bool enabled)
+    {
+        SetLineRendererClientRPC(pc, count ,enabled);
+    }
+    [ClientRpc]
+    private void SetLineRendererClientRPC(NetworkObjectReference pc, int count, bool enabled)
+    {
+        if (!pc.TryGet(
+            out NetworkObject networkObject))
+            return;
+        var player = networkObject.transform.Find("Player");
+        var gunHolder = player.Find("GunHolder");
+        var gun = gunHolder.Find("GrapplingGun");
+
+        gun.GetComponent<LineRenderer>().positionCount = count;
+        gun.GetComponent<MeshRenderer>().enabled = enabled;
+    }
+    [ClientRpc]
+    private void DrawRopeClientRPC(NetworkObjectReference pc, Vector3 swingPoint, Vector3 currGrapplePos, Vector3 gunTipPos)
+    {
+        if (!pc.TryGet(out NetworkObject networkObject))
+            return;
+        
+        var player = networkObject.transform.Find("Player");
+        var gunHolder = player.Find("GunHolder");
+        var gun = gunHolder.Find("GrapplingGun");
+
+        var lineRenderer = gun.GetComponent<LineRenderer>();
+        player.GetComponent<Swinging>().currentGrapplePosition = currGrapplePos;
+
+        DrawRope(player, lineRenderer, gunHolder, ref player.GetComponent<Swinging>().currentGrapplePosition, swingPoint, gunTipPos);
+    }
+
+
     private void CheckForSwingPoints()
     {
         if (joint != null) return;
@@ -110,6 +152,7 @@ public class Swinging : MonoBehaviour
         pm.isSwinging = true;
 
         swingPoint = predictionHit.point;
+
         joint = player.gameObject.AddComponent<SpringJoint>();
         joint.autoConfigureConnectedAnchor = false;
         joint.connectedAnchor = swingPoint;
@@ -125,7 +168,7 @@ public class Swinging : MonoBehaviour
         joint.damper = 7f;
         joint.massScale = 4.5f;
 
-        lr.positionCount = 2;
+        SetLineRendererServerRPC(pc, 2, true);
         currentGrapplePosition = gunTip.position;
     }
 
@@ -134,9 +177,7 @@ public class Swinging : MonoBehaviour
         swingTimer = swingDuration;
 
         pm.isSwinging = false;
-        gun.enabled = false;
-        lr.positionCount = 0;
-
+        SetLineRendererServerRPC(pc, 0, false);
 
         Destroy(joint);
     }
@@ -157,23 +198,19 @@ public class Swinging : MonoBehaviour
     {
         return swingTimer <= 0f || Vector3.Angle(cam.forward, (predictionHit.point - cam.position).normalized) > 90f;
     }
-    private Vector3 currentGrapplePosition;
+    public Vector3 currentGrapplePosition;
 
-    private void DrawRope()
+    private void DrawRope(Transform player, LineRenderer lineRenderer, Transform gunHolder, ref Vector3 currentGrapplePosition, Vector3 swingPoint, Vector3 gunTipPos)
     {
         // if not grappling, don't draw rope
-        if (!joint) return;
-
-        
         gunHolder.forward = (swingPoint - player.position).normalized;
-        gun.enabled = true;
 
-        lr.enabled = true;
+        lineRenderer.enabled = true;
 
         currentGrapplePosition =
             Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
 
-        lr.SetPosition(0, gunTip.position);
-        lr.SetPosition(1, currentGrapplePosition);
+        lineRenderer.SetPosition(0, gunTipPos);
+        lineRenderer.SetPosition(1, swingPoint);
     }
 }

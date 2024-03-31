@@ -12,21 +12,24 @@ public class PlayerController : NetworkBehaviour
     public WallRunning wr;
     public CinemachineFreeLook fl;
     public Dashing ds;
+    public GameObject predictionPoint;
     // Start is called before the first frame update
     void Start()
     {
         if (!IsOwner)
         {
+            fl.Priority = 0;
             pm.enabled = false;
             cl.enabled = false;
             sw.enabled = false;
             wr.enabled = false;
             ds.enabled = false;
-            fl.Priority = 0;
+            predictionPoint.GetComponent<MeshRenderer>().enabled = false;
         }
         else
         {
             fl.Priority = 10;
         }
     }
+    
 }
