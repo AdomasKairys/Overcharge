@@ -55,13 +55,13 @@ public class Swinging : NetworkBehaviour
 
     private void LateUpdate()
     {
-        if (joint) DrawRopeServerRPC(pc, swingPoint, currentGrapplePosition, gunTip.position);
+        if (joint) DrawRopeServerRPC(pc);
     }
 
     [ServerRpc]
-    private void DrawRopeServerRPC(NetworkObjectReference pc, Vector3 swingPoint, Vector3 currGrapplePos, Vector3 gunTipPos)
+    private void DrawRopeServerRPC(NetworkObjectReference pc)
     {
-        DrawRopeClientRPC(pc, swingPoint, currGrapplePos, gunTipPos);
+        DrawRopeClientRPC(pc);
     }
     [ServerRpc]
     private void SetLineRendererServerRPC(NetworkObjectReference pc, int count, bool enabled)
@@ -71,30 +71,32 @@ public class Swinging : NetworkBehaviour
     [ClientRpc]
     private void SetLineRendererClientRPC(NetworkObjectReference pc, int count, bool enabled)
     {
-        if (!pc.TryGet(
-            out NetworkObject networkObject))
+        if (!pc.TryGet(out NetworkObject networkObject))
             return;
         var player = networkObject.transform.Find("Player");
         var gunHolder = player.Find("GunHolder");
         var gun = gunHolder.Find("GrapplingGun");
 
         gun.GetComponent<LineRenderer>().positionCount = count;
+        player.GetComponent<Swinging>().currentGrapplePosition = gunTip.position;
         gun.GetComponent<MeshRenderer>().enabled = enabled;
+
     }
     [ClientRpc]
-    private void DrawRopeClientRPC(NetworkObjectReference pc, Vector3 swingPoint, Vector3 currGrapplePos, Vector3 gunTipPos)
+    private void DrawRopeClientRPC(NetworkObjectReference pc)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
-        
+
+        var predictionPoint = networkObject.transform.Find("PredictionPoint");
         var player = networkObject.transform.Find("Player");
         var gunHolder = player.Find("GunHolder");
         var gun = gunHolder.Find("GrapplingGun");
+        var gunTip = gun.Find("GunTip");
 
         var lineRenderer = gun.GetComponent<LineRenderer>();
-        player.GetComponent<Swinging>().currentGrapplePosition = currGrapplePos;
 
-        DrawRope(player, lineRenderer, gunHolder, ref player.GetComponent<Swinging>().currentGrapplePosition, swingPoint, gunTipPos);
+        DrawRope(player, lineRenderer, gunHolder, ref player.GetComponent<Swinging>().currentGrapplePosition, predictionPoint.position, gunTip.position);
     }
 
 
@@ -205,12 +207,9 @@ public class Swinging : NetworkBehaviour
         // if not grappling, don't draw rope
         gunHolder.forward = (swingPoint - player.position).normalized;
 
-        lineRenderer.enabled = true;
-
-        currentGrapplePosition =
-            Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
+        currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
 
         lineRenderer.SetPosition(0, gunTipPos);
-        lineRenderer.SetPosition(1, swingPoint);
+        lineRenderer.SetPosition(1, currentGrapplePosition);
     }
 }

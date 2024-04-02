@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,7 +12,7 @@ public enum PlayerState
     Dead
 }
 
-public class PlayerStateController : MonoBehaviour
+public class PlayerStateController : NetworkBehaviour
 {
     [Header("Player State")]
     public PlayerState currState = PlayerState.Runner; // Current state of the player, default is Runner TODO: later make private
@@ -21,14 +22,10 @@ public class PlayerStateController : MonoBehaviour
 
     public UnityEvent onPlayerDeath;
 
+    public NetworkObject pc;
     //[Header("Tagging")]
     //public GameObject tagTrigger;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -60,7 +57,21 @@ public class PlayerStateController : MonoBehaviour
     // Method for setting the state of the player
     public void SetState(PlayerState newState)
     {
-        currState = newState;
+        SetStateServerRPC(pc, newState);
+    }
+
+    [ServerRpc]
+    private void SetStateServerRPC(NetworkObjectReference pc, PlayerState newState)
+    {
+        SetStateClientRPC(pc, newState);
+    }
+    [ClientRpc]
+    private void SetStateClientRPC(NetworkObjectReference pc, PlayerState newState)
+    {
+        if (!pc.TryGet(out NetworkObject networkObject))
+            return;
+        var player = networkObject.transform.Find("Player");
+        player.GetComponent<PlayerStateController>().currState = newState;
     }
 
     // Method for getting the state of the player

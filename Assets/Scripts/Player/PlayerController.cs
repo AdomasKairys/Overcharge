@@ -12,6 +12,7 @@ public class PlayerController : NetworkBehaviour
     public WallRunning wr;
     public CinemachineFreeLook fl;
     public Dashing ds;
+    public GameObject ui;
     public GameObject predictionPoint;
     // Start is called before the first frame update
     void Start()
@@ -24,6 +25,7 @@ public class PlayerController : NetworkBehaviour
             sw.enabled = false;
             wr.enabled = false;
             ds.enabled = false;
+            ui.SetActive(false);
             predictionPoint.GetComponent<MeshRenderer>().enabled = false;
         }
         else
