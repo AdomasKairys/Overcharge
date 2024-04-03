@@ -12,7 +12,7 @@ public enum PlayerState
     Dead
 }
 
-public class PlayerStateController : NetworkBehaviour
+public class PlayerStateController : MonoBehaviour
 {
     [Header("Player State")]
     public PlayerState currState = PlayerState.Runner; // Current state of the player, default is Runner TODO: later make private

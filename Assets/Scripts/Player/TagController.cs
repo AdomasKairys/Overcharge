@@ -19,12 +19,7 @@ public class TagController : MonoBehaviour
         blocked = false;
         Debug.Log(transform.parent.gameObject.name + ": " + thisStateController);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+  
 
     private void OnTriggerEnter(Collider other)
     {
