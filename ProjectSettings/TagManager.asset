@@ -6,6 +6,7 @@ TagManager:
   tags:
   - TagTrigger
   - Enemy
+  - SpeedBoost
   layers:
   - Default
   - TransparentFX

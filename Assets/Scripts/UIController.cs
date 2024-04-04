@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -23,6 +24,9 @@ public class UIController : MonoBehaviour
 
     [Header("Player Death Menu")]
     public GameObject deathMenu;
+
+    [Header("Pick Up Inventory")]
+    public TextMeshProUGUI pickUpInventoryTextMesh;
 
 
     TextMeshProUGUI textMesh_playerState;
@@ -83,5 +87,20 @@ public class UIController : MonoBehaviour
         playerChargeBar.SetActive(true);
         velocityText.SetActive(true);
         playerStateController.Respawn();
+    }
+
+    public void UpdatePickUp(Type pickUpType)
+    {
+        if( pickUpType == null)
+        {
+            pickUpInventoryTextMesh.text = "No pick up";
+            return;
+        }
+
+        if (pickUpType == typeof(SpeedBoost))
+        {
+            pickUpInventoryTextMesh.text = "SpeedBoost";
+            return;
+        }
     }
 }
