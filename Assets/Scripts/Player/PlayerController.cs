@@ -33,5 +33,12 @@ public class PlayerController : NetworkBehaviour
             fl.Priority = 10;
         }
     }
-    
+    private void Update()
+    {
+        if (GameManager.Instance.IsGamePlaying())
+        {
+
+        }
+    }
+
 }

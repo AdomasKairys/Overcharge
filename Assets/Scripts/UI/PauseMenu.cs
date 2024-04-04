@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PauseMenu : MonoBehaviour
+public class PauseMenu : NetworkBehaviour
 {
     public static bool isPaused = false;
-    public GameObject PauseMenuUI;
+    [SerializeField] private GameObject pauseMenu;
     public GameObject[] NotPauseMenuUI;
+    private void Start()
+    {
+        pauseMenu.SetActive(false);
+    }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab))
@@ -24,7 +29,7 @@ public class PauseMenu : MonoBehaviour
     }
     public void Resume()
 	{
-        PauseMenuUI.SetActive(false);
+        pauseMenu.SetActive(false);
         isPaused = false;
         setTo(true);
         Cursor.lockState = CursorLockMode.Locked;
@@ -32,7 +37,7 @@ public class PauseMenu : MonoBehaviour
     }
     void Pause()
 	{
-        PauseMenuUI.SetActive(true);
+        pauseMenu.SetActive(true);
         isPaused = true;
         setTo(false);
         Cursor.lockState = CursorLockMode.Confined;
@@ -50,14 +55,11 @@ public class PauseMenu : MonoBehaviour
 
     public void LoadMenu()
     {
-        SceneManager.LoadSceneAsync(0);
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString());
     }
     public void Quit()
 	{
         Application.Quit();
-    }
-    public void Restart()
-    {
-        SceneManager.LoadSceneAsync(1);
     }
 }
