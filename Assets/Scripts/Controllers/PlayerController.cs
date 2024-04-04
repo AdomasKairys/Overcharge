@@ -14,6 +14,7 @@ public class PlayerController : NetworkBehaviour
     public Dashing ds;
     public GameObject ui;
     public GameObject predictionPoint;
+    public PlayerVisual playerVisual;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +33,8 @@ public class PlayerController : NetworkBehaviour
         {
             fl.Priority = 10;
         }
+        PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
     }
     private void Update()
     {

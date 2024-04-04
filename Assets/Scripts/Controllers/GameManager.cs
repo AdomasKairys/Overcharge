@@ -72,5 +72,5 @@ public class GameManager : NetworkBehaviour
     public bool IsGamePlaying() => state.Value == State.GamePlaying;
     public bool IsCountdownToStartActive() => state.Value == State.CountdownToStart;
     public float GetCountdownToStartTimer() => countDownToStartTimer.Value;
-    
+
 }

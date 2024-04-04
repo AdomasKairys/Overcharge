@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class HostDisconnectUI : MonoBehaviour
 {
+    [SerializeField] private bool isCameraSeparate = true;
     [SerializeField] private Button playAgainButton;
     [SerializeField] private Camera cam;
 
@@ -18,9 +19,9 @@ public class HostDisconnectUI : MonoBehaviour
         Hide();
     }
 
-    private void NetworkManager_OnClientDisconnectCallback(ulong clientIds)
+    private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
-        if(clientIds == NetworkManager.ServerClientId)
+        if(clientId == NetworkManager.ServerClientId)
         {
             Show();
         }
@@ -28,14 +29,20 @@ public class HostDisconnectUI : MonoBehaviour
 
     private void Show()
     {
-        cam.enabled = true;
+        if(isCameraSeparate)
+            cam.enabled = true;
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
         gameObject.SetActive(true);
     }
     private void Hide()
     {
-        cam.enabled = false;
+        if (isCameraSeparate)
+            cam.enabled = false;
         gameObject.SetActive(false);
+    }
+    private void OnDestroy()
+    {
+        NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
     }
 }

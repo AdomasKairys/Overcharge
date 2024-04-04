@@ -55,7 +55,7 @@ public class PauseMenu : NetworkBehaviour
 
     public void LoadMenu()
     {
-        NetworkManager.Singleton.Shutdown();
+        GameMultiplayer.Instance.Shutdown(NetworkManager.Singleton.LocalClientId);
         SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString());
     }
     public void Quit()
