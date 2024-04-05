@@ -41,6 +41,7 @@ public class PlayerReady : NetworkBehaviour
         }
         if(allClientsReady)
         {
+            GameLobby.Instance.DeleteLobby();
             SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
         }
     }

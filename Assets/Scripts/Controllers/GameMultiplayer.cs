@@ -2,14 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameMultiplayer : NetworkBehaviour
 {
 
-    private const int MAX_PLAYER_AMOUNT = 4;
+    public const int MAX_PLAYER_AMOUNT = 4;
+    public const string PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
     public static GameMultiplayer Instance { get; private set; }
+    public int NetworkManager_Server_OnClientConnectCallback { get; private set; }
 
     public event EventHandler OnTryinToJoinGame;
     public event EventHandler OnFailToJoinGame;
@@ -18,15 +21,26 @@ public class GameMultiplayer : NetworkBehaviour
     [SerializeField] private List<Color> playerColors;
 
     private NetworkList<PlayerData> playerDataNetworkList = null;
+    private string playerName;
     private void Awake()
     {
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        playerName = PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, "PlayerName"+UnityEngine.Random.Range(10,1000));
+
         playerDataNetworkList = new NetworkList<PlayerData>();
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
     }
 
+
+    public string GetPlayerName() => playerName;
+    public void SetPlayerName(string playerName)
+    {
+        this.playerName = playerName;
+
+        PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
+    }
     private void PlayerDataNetworkList_OnListChanged(NetworkListEvent<PlayerData> changeEvent)
     {
         OnPlayerDataNetworkListChanged?.Invoke(this, EventArgs.Empty);
@@ -37,10 +51,36 @@ public class GameMultiplayer : NetworkBehaviour
         OnTryinToJoinGame?.Invoke(this, EventArgs.Empty);
 
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
+        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectedCallback;
         NetworkManager.Singleton.StartClient();
     }
 
-    private void NetworkManager_Client_OnClientDisconnectCallback(ulong obj)
+    private void NetworkManager_Client_OnClientConnectedCallback(ulong clientId)
+    {
+        SetPlayerNameServerRPC(GetPlayerName());
+        SetPlayerIdServerRPC(AuthenticationService.Instance.PlayerId);
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerNameServerRPC(string playerName, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.playerName = playerName;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerIdServerRPC(string playerId, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.playerId = playerId;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+    private void NetworkManager_Client_OnClientDisconnectCallback(ulong clientId)
     {
         OnFailToJoinGame?.Invoke(this, EventArgs.Empty);
     }
@@ -87,10 +127,17 @@ public class GameMultiplayer : NetworkBehaviour
         NetworkManager.Singleton.Shutdown();
 
     }
+    public void KickPlayer(ulong clientId)
+    {
+        NetworkManager.Singleton.DisconnectClient(clientId);
+        NetworkManager_Host_OnClientDisconnectCallback(clientId);
+        SetPlayerIdServerRPC(AuthenticationService.Instance.PlayerId);
+    }
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)
     {
         playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() });
+        SetPlayerNameServerRPC(GetPlayerName());
     }
 
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest, NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
