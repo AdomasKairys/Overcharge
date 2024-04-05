@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -15,6 +16,8 @@ public class PlayerController : NetworkBehaviour
     public GameObject ui;
     public GameObject predictionPoint;
     public PlayerVisual playerVisual;
+    public PlayerStateController psc;
+    public TagController tc;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +29,8 @@ public class PlayerController : NetworkBehaviour
             sw.enabled = false;
             wr.enabled = false;
             ds.enabled = false;
+            psc.enabled = false;
+            tc.enabled = false;
             ui.SetActive(false);
             predictionPoint.GetComponent<MeshRenderer>().enabled = false;
         }

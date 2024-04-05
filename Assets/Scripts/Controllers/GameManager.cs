@@ -7,6 +7,7 @@ using UnityEngine.Rendering.PostProcessing;
 public class GameManager : NetworkBehaviour
 {
     [SerializeField] private Transform playerPrefab;
+
     public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
@@ -47,6 +48,7 @@ public class GameManager : NetworkBehaviour
                 break;
         }
     }
+
     public override void OnNetworkSpawn()
     {
         state.OnValueChanged += State_OnValueChanged;

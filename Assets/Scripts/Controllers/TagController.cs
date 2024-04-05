@@ -1,21 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class TagController : MonoBehaviour
 {
     [Header("Tag cooldown in seconds")]
     public float tagCooldown = 2.0f;
-    
-    private PlayerStateController thisStateController;
-    private PlayerMovement thisMovementController;
+
+    [SerializeField] private PlayerStateController thisStateController;
+    [SerializeField] private PlayerMovement thisMovementController;
     private bool blocked; // whether the tagging functionality for this player is blocked
 
     // Start is called before the first frame update
     void Start()
     {
-        thisStateController = GetComponentInParent<PlayerStateController>();
-        thisMovementController = GetComponentInParent<PlayerMovement>();
         blocked = false;
         Debug.Log(transform.parent.gameObject.name + ": " + thisStateController);
     }
@@ -37,12 +37,38 @@ public class TagController : MonoBehaviour
                 // If the tagged player is an unblocked runner
                 Block();
                 //otherTagController.Block();
-                thisStateController.SetState(otherState);
-                otherStateController.SetState(thisState);
+
+                if (thisState == PlayerState.Runner)
+                    ChangeStateServerRCP(other.gameObject.GetComponentInParent<NetworkObject>(), gameObject.GetComponentInParent<NetworkObject>());
+                else
+                    ChangeStateServerRCP(gameObject.GetComponentInParent<NetworkObject>(), other.gameObject.GetComponentInParent<NetworkObject>());
+
                 thisMovementController.PushAwayFromTagged(other.gameObject.GetComponentInParent<Rigidbody>().transform.position);
                 Debug.Log(transform.parent.gameObject.name + " tagged " + other.gameObject.name + " State changed to " + thisStateController.GetState());
             }
         }
+    }
+    [ServerRpc]
+    private void ChangeStateServerRCP(NetworkObjectReference chaser, NetworkObjectReference runner)
+    {
+        ChangeStateClientRCP(chaser, runner);
+    }
+    [ClientRpc]
+    private void ChangeStateClientRCP(NetworkObjectReference chaser, NetworkObjectReference runner) 
+    {
+        if (!chaser.TryGet(out NetworkObject chaserObject))
+            return;
+        if (!runner.TryGet(out NetworkObject runnerObject))
+            return;
+
+        if (gameObject.GetComponentInParent<NetworkObject>() == chaserObject)
+        {
+            Debug.Log("OK");
+            chaserObject.GetComponentInChildren<PlayerStateController>().SetState(PlayerState.Runner);
+        }
+        else
+            runnerObject.GetComponentInChildren<PlayerStateController>().SetState(PlayerState.Chaser);
+
     }
     public bool IsBlocked()
     {

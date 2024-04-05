@@ -12,7 +12,7 @@ public enum PlayerState
     Dead
 }
 
-public class PlayerStateController : MonoBehaviour
+public class PlayerStateController : NetworkBehaviour
 {
     [Header("Player State")]
     public PlayerState currState = PlayerState.Runner; // Current state of the player, default is Runner TODO: later make private
@@ -35,11 +35,11 @@ public class PlayerStateController : MonoBehaviour
         {
             if(currState == PlayerState.Runner)
             {
-                SetState(PlayerState.Chaser);
+                SetStateServerRPC(pc, PlayerState.Chaser);
             }
             else
             {
-                SetState(PlayerState.Runner);
+                SetStateServerRPC(pc, PlayerState.Runner);
             }
         }
 
@@ -57,7 +57,7 @@ public class PlayerStateController : MonoBehaviour
     // Method for setting the state of the player
     public void SetState(PlayerState newState)
     {
-        SetStateServerRPC(pc, newState);
+        currState = newState;
     }
 
     [ServerRpc]
@@ -82,16 +82,42 @@ public class PlayerStateController : MonoBehaviour
 
     private void Die()
     {
+        DieServerRPC(pc); // deactivate the player object
+    }
+    [ServerRpc]
+    private void DieServerRPC(NetworkObjectReference pc)
+    {
+        DieClientRPC(pc);
+    }
+    [ClientRpc]
+    private void DieClientRPC(NetworkObjectReference pc)
+    {
+        if (!pc.TryGet(out NetworkObject networkObject))
+            return;
         onPlayerDeath.Invoke();
-        this.gameObject.SetActive(false); // deactivate the player object
+        var player = networkObject.transform.Find("Player");
+        player.gameObject.SetActive(false);
     }
 
     public void Respawn()
     {
         // Reset player's health or other states as necessary
-        currState = PlayerState.Runner;
-        currCharge = 0.0f;
-        this.transform.position = new Vector3(0, 0, 0);
-        this.gameObject.SetActive(true);
+        RespawnServerRPC(pc);
+    }
+    [ServerRpc]
+    private void RespawnServerRPC(NetworkObjectReference pc)
+    {
+        RespawnClientRPC(pc);
+    }
+    [ClientRpc]
+    private void RespawnClientRPC(NetworkObjectReference pc)
+    {
+        if (!pc.TryGet(out NetworkObject networkObject))
+            return;
+        var player = networkObject.transform.Find("Player");
+        player.position = new Vector3(0, 0, 0);
+        player.gameObject.SetActive(true);
+        player.GetComponent<PlayerStateController>().currState = PlayerState.Runner;
+        player.GetComponent<PlayerStateController>().currCharge = 0.0f;
     }
 }
