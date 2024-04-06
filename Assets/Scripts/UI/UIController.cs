@@ -26,7 +26,12 @@ public class UIController : MonoBehaviour
     public GameObject deathMenu;
 
     [Header("Pick Up Inventory")]
-    public TextMeshProUGUI pickUpInventoryTextMesh;
+    [SerializeField] private TextMeshProUGUI pickupName;
+    [SerializeField] private Image pickupImage;
+    [SerializeField] private Sprite[] pickupSprites;
+    [SerializeField] private Sprite noPickupSprite;
+    [SerializeField] private InventoryController inventoryController;
+    private bool shufflePickups = true;
 
 
     TextMeshProUGUI textMesh_playerState;
@@ -65,6 +70,8 @@ public class UIController : MonoBehaviour
         // Update the text boxes
         textMesh_velocity.text = player.GetComponent<Rigidbody>().velocity.magnitude.ToString();
         textMesh_playerState.text = playerStateController.currState.ToString();
+
+        UpdatePickup();
     }
 
     private void ShowDeathMenu()
@@ -89,18 +96,37 @@ public class UIController : MonoBehaviour
         playerStateController.Respawn();
     }
 
-    public void UpdatePickUp(Type pickUpType)
+    private void UpdatePickup()
     {
-        if( pickUpType == null)
+        if(inventoryController.currentPickup == null)
         {
-            pickUpInventoryTextMesh.text = "No pick up";
-            return;
+            if (inventoryController.pickingUp)
+            {
+                pickupName.text = "...";
+                if (shufflePickups)
+                {
+                    Invoke("ShufflePickups", 0.2f);
+                    shufflePickups = false;
+                }    
+            }
+            else
+            {
+                // TODO: not the most effiecent solution to update this every frame
+                pickupImage.sprite = noPickupSprite;
+                pickupName.text = "None";
+            }
         }
+        else
+        {
+            // TODO: not the most effiecent solution to update this every frame
+            pickupImage.sprite = pickupSprites[inventoryController.currentPickup.Sprite];
+            pickupName.text = inventoryController.currentPickup.Name;
+        }
+    }
 
-        if (pickUpType == typeof(SpeedBoost))
-        {
-            pickUpInventoryTextMesh.text = "SpeedBoost";
-            return;
-        }
+    private void ShufflePickups()
+    {
+        pickupImage.sprite = pickupSprites[UnityEngine.Random.Range(0, pickupSprites.Length)];
+        shufflePickups = true;
     }
 }

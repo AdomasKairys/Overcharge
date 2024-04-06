@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpeedBoost : Pickup
 {
-    public SpeedBoost() : base("Speed Boost", "Increases player speed for a short duration.", 3/*, Sprite*/)
+    public SpeedBoost() : base("Speed Boost", "Increases player speed for a short duration.", 3, 0)
     {
     }
 

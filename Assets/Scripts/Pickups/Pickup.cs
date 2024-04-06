@@ -7,16 +7,14 @@ public abstract class Pickup : ScriptableObject
     public string Name { get; private set; }
     public string Description { get; private set; }
     public int Uses { get; private set; }
+    public int Sprite { get; private set; }
 
-    // TODO: implement different sprites for different pickups
-    //public Sprite Sprite { get; private set; }
-
-    protected Pickup(string name, string description, int uses/*, Sprite sprite*/)
+    protected Pickup(string name, string description, int uses, int sprite)
     {
         Name = name;
         Description = description;
         Uses = uses;
-        //Sprite = sprite;
+        Sprite = sprite;
     }
 
     protected void ReduceUses()
