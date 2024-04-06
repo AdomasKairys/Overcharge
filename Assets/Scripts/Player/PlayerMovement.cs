@@ -282,6 +282,6 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("Pushing away");
         Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
-        rb.AddForce(pushDirection * 100, ForceMode.Impulse);
+        rb.AddForce(pushDirection * 75, ForceMode.Impulse);
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,8 +16,8 @@ public enum PlayerState
 public class PlayerStateController : NetworkBehaviour
 {
     [Header("Player State")]
-    public PlayerState currState = PlayerState.Runner; // Current state of the player, default is Runner TODO: later make private
-    public float currCharge = 0.0f; // Current value of charge the player has
+    public NetworkVariable<PlayerState> currState = new NetworkVariable<PlayerState>(PlayerState.Runner); // Current state of the player, default is Runner TODO: later make private
+    public NetworkVariable<float> currCharge = new NetworkVariable<float>(0.0f); // Current value of charge the player has
     public float chargeRate = 1.0f; // The rate in which the palyer's charge increases
     public float overcharge = 100.0f; // The maximum value of charge at which the player dies
 
@@ -33,51 +34,55 @@ public class PlayerStateController : NetworkBehaviour
         // Change the player state if Enter is presed (for debugging)
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            if(currState == PlayerState.Runner)
-            {
-                SetStateServerRPC(pc, PlayerState.Chaser);
-            }
-            else
-            {
-                SetStateServerRPC(pc, PlayerState.Runner);
-            }
+            SetStateServerRPC(gameObject.GetComponentInParent<NetworkObject>());
         }
 
-        if (currState == PlayerState.Chaser)
+        if (currState.Value == PlayerState.Chaser)
         {
-            if(currCharge >= overcharge)
+            ChangeChargeValueServerRPC(gameObject.GetComponentInParent<NetworkObject>());
+
+            if(currCharge.Value >= overcharge)
             {
                 Die();
             }
             // Increase charge for the chaser
-            currCharge += chargeRate * Time.deltaTime;
         }
     }
+    [ServerRpc]
+    private void ChangeChargeValueServerRPC(NetworkObjectReference target)
+    {
+        if (!target.TryGet(out NetworkObject targetObject))
+            return;
 
+        targetObject.GetComponentInChildren<PlayerStateController>().currCharge.Value += chargeRate * Time.deltaTime;
+    }
     // Method for setting the state of the player
+    [ServerRpc]
+    private void SetStateServerRPC(NetworkObjectReference target)
+    {
+        if (!target.TryGet(out NetworkObject targetObject))
+            return;
+
+        var currState = targetObject.GetComponentInChildren<PlayerStateController>().currState.Value;
+
+        if (currState == PlayerState.Runner)
+        {
+            targetObject.GetComponentInChildren<PlayerStateController>().currState.Value = PlayerState.Chaser;
+        }
+        else
+        {
+            targetObject.GetComponentInChildren<PlayerStateController>().currState.Value = PlayerState.Runner;
+        }
+    }
     public void SetState(PlayerState newState)
     {
-        currState = newState;
-    }
-
-    [ServerRpc]
-    private void SetStateServerRPC(NetworkObjectReference pc, PlayerState newState)
-    {
-        SetStateClientRPC(pc, newState);
-    }
-    [ClientRpc]
-    private void SetStateClientRPC(NetworkObjectReference pc, PlayerState newState)
-    {
-        if (!pc.TryGet(out NetworkObject networkObject))
-            return;
-        var player = networkObject.transform.Find("Player");
-        player.GetComponent<PlayerStateController>().currState = newState;
+        currState.Value = newState;
     }
 
     // Method for getting the state of the player
     public PlayerState GetState()
     {
-        return currState;
+        return currState.Value;
     }
 
     private void Die()
@@ -107,6 +112,11 @@ public class PlayerStateController : NetworkBehaviour
     [ServerRpc]
     private void RespawnServerRPC(NetworkObjectReference pc)
     {
+        if (!pc.TryGet(out NetworkObject networkObject))
+            return;
+        var player = networkObject.transform.Find("Player");
+        player.GetComponent<PlayerStateController>().currState.Value = PlayerState.Runner;
+        player.GetComponent<PlayerStateController>().currCharge.Value = 0.0f;
         RespawnClientRPC(pc);
     }
     [ClientRpc]
@@ -117,7 +127,5 @@ public class PlayerStateController : NetworkBehaviour
         var player = networkObject.transform.Find("Player");
         player.position = new Vector3(0, 0, 0);
         player.gameObject.SetActive(true);
-        player.GetComponent<PlayerStateController>().currState = PlayerState.Runner;
-        player.GetComponent<PlayerStateController>().currCharge = 0.0f;
     }
 }

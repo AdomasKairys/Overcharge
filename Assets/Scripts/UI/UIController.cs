@@ -46,21 +46,21 @@ public class UIController : MonoBehaviour
         playerChargeBarSlider = playerChargeBar.GetComponent<Slider>();
         playerChargeBarSlider.minValue = 0;
         playerChargeBarSlider.maxValue = playerStateController.overcharge;
-        playerChargeBarSlider.value = playerStateController.currCharge;
+        playerChargeBarSlider.value = playerStateController.currCharge.Value;
     }
 
     // Update is called once per frame
     void Update()
     {
         // Update the player state information
-        if(playerStateController.currState == PlayerState.Chaser)
+        if(playerStateController.currState.Value == PlayerState.Chaser)
         {
-            playerChargeBarSlider.value = playerStateController.currCharge;
+            playerChargeBarSlider.value = playerStateController.currCharge.Value;
         }        
 
         // Update the text boxes
         textMesh_velocity.text = player.GetComponent<Rigidbody>().velocity.magnitude.ToString();
-        textMesh_playerState.text = playerStateController.currState.ToString();
+        textMesh_playerState.text = playerStateController.currState.Value.ToString();
     }
 
     private void ShowDeathMenu()

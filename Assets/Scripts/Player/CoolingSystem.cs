@@ -41,13 +41,13 @@ public class CoolingSystem : MonoBehaviour
         if (collider.CompareTag(coolingStationTag) && !isCoolingStationCooldown)
         {
             //Heal();
-            if (playerStateController.currCharge - coolValue <= 0)
+            if (playerStateController.currCharge.Value - coolValue <= 0)
             {
-                playerStateController.currCharge = 0;
+                playerStateController.currCharge.Value = 0;
             }
             else
             {
-                playerStateController.currCharge = playerStateController.currCharge - coolValue;
+                playerStateController.currCharge.Value -= coolValue;
             }
             isCoolingStationCooldown = true;
             currentCoolingStationCooldown = coolingStationCooldown;  
