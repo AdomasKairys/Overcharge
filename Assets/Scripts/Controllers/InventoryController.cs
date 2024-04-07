@@ -8,10 +8,7 @@ using UnityEngine.UIElements;
 public class InventoryController : NetworkBehaviour
 {
     [SerializeField]
-    private PlayerMovement movementController;
-    
-    [SerializeField]
-    private UIController uiController;
+    private PlayerMovement _playerMovement;
 
     /// <summary>
     /// Stores the current pickup, null if no pickup is picked up
@@ -40,7 +37,7 @@ public class InventoryController : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Q))
         {
             // Use the pick up
-            if(currentPickup != null && currentPickup.Uses > 0)
+            if(currentPickup != null && currentPickup.Uses > 0 && currentPickup.CanUse)
             {
                 UseCurrentPickUp();
             }
@@ -98,8 +95,11 @@ public class InventoryController : NetworkBehaviour
             // Remove the pickup from inventory if fully used up
             currentPickup = null;
         }
-
-        // TODO: update the UI
+        else
+        {
+            // Initiate cooldown if not fully used up
+            StartCoroutine(currentPickup.WaitCooldown());
+        }
     }
 
     /// <summary>
@@ -118,7 +118,9 @@ public class InventoryController : NetworkBehaviour
     /// <returns>A new pickup</returns>
     private Pickup GetNewPickup()
     {
-        return ScriptableObject.CreateInstance<SpeedBoost>();
+        var speedBoost = ScriptableObject.CreateInstance<SpeedBoost>();
+        speedBoost.SetPlayerMovement(_playerMovement);
+        return speedBoost;
     }
 
     /// <summary>

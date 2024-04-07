@@ -30,6 +30,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private Image pickupImage;
     [SerializeField] private Sprite[] pickupSprites;
     [SerializeField] private Sprite noPickupSprite;
+    [SerializeField] private GameObject cooldownPickupImage;
     [SerializeField] private InventoryController inventoryController;
     private bool shufflePickups = true;
 
@@ -103,12 +104,13 @@ public class UIController : MonoBehaviour
     {
         if(inventoryController.currentPickup == null)
         {
+            cooldownPickupImage.SetActive(false);
             if (inventoryController.pickingUp)
             {
                 pickupName.text = "...";
                 if (shufflePickups)
                 {
-                    Invoke("ShufflePickups", 0.2f);
+                    Invoke("ShufflePickups", 0.1f);
                     shufflePickups = false;
                 }    
             }
@@ -121,9 +123,18 @@ public class UIController : MonoBehaviour
         }
         else
         {
-            // TODO: not the most effiecent solution to update this every frame
-            pickupImage.sprite = pickupSprites[inventoryController.currentPickup.Sprite];
-            pickupName.text = inventoryController.currentPickup.Name;
+            if (inventoryController.currentPickup.CanUse)
+            {
+                // TODO: not the most effiecent solution to update this every frame
+                pickupImage.sprite = pickupSprites[inventoryController.currentPickup.Sprite];
+                pickupName.text = inventoryController.currentPickup.Name;
+                cooldownPickupImage.SetActive(false);
+            }
+            else
+            {
+                // TODO: same here
+                cooldownPickupImage.SetActive(true);
+            }
         }
     }
 

@@ -287,10 +287,10 @@ public class PlayerMovement : MonoBehaviour
         rb.AddForce(pushDirection * 75, ForceMode.Impulse);
     }
 
-    public IEnumerator UseSpeedUp()
+    public IEnumerator UseSpeedBoost(float boostSpeedMultiplier, float boostDuration)
     {
-        moveSpeedMultiplier = 2f;
-        yield return new WaitForSeconds(2f);
+        moveSpeedMultiplier = boostSpeedMultiplier;
+        yield return new WaitForSeconds(boostDuration);
         moveSpeedMultiplier = 1f;
     }
 }
