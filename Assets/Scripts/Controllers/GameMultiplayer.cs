@@ -49,7 +49,7 @@ public class GameMultiplayer : NetworkBehaviour
     public void StartClient()
     {
         OnTryinToJoinGame?.Invoke(this, EventArgs.Empty);
-
+        RemoveNetworkManagerCallbacks();
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
         NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectedCallback;
         NetworkManager.Singleton.StartClient();
@@ -104,8 +104,10 @@ public class GameMultiplayer : NetworkBehaviour
         if (netMan != null)
         {
             netMan.ConnectionApprovalCallback -= NetworkManager_ConnectionApprovalCallback;
-            NetworkManager.Singleton.OnClientConnectedCallback -= NetworkManager_OnClientConnectedCallback;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_Host_OnClientDisconnectCallback;
+            netMan.OnClientConnectedCallback -= NetworkManager_OnClientConnectedCallback;
+            netMan.OnClientDisconnectCallback -= NetworkManager_Host_OnClientDisconnectCallback;
+            netMan.OnClientDisconnectCallback -= NetworkManager_Client_OnClientDisconnectCallback;
+            netMan.OnClientConnectedCallback -= NetworkManager_Client_OnClientConnectedCallback;
         }
     }
 
