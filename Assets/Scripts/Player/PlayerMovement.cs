@@ -216,8 +216,12 @@ public class PlayerMovement : MonoBehaviour
         if (isWallFront && !isClimbing)
         {
             float wallLookAngle = Vector3.Angle(moveDir, -wallFrontHit.normal);
+            Debug.Log(wallLookAngle);
 
-            moveDir = wallLookAngle > 15f ? Vector3.ProjectOnPlane(moveDir, wallFrontHit.normal).normalized : Vector3.zero;
+            if(wallLookAngle < 90f)
+            {
+                moveDir = wallLookAngle > 15f ? Vector3.ProjectOnPlane(moveDir, wallFrontHit.normal).normalized : Vector3.zero;
+            }
         }
 
         if (IsOnSlope() && !isExitingSlope)
