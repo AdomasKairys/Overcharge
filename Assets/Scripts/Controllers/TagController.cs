@@ -1,13 +1,10 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class TagController : MonoBehaviour
+public class TagController : NetworkBehaviour
 {
-    [Header("Tag cooldown in seconds")]
-    public float tagCooldown = 2.0f;
+    private float tagCooldown = 0.5f;
 
     [SerializeField] private PlayerStateController thisStateController;
     [SerializeField] private PlayerMovement thisMovementController;
@@ -24,7 +21,7 @@ public class TagController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Trigger objects on the player should have the tagTrigger layer so only collisions inbetween tag triggers are registered here
-        if (other.CompareTag("TagTrigger")) // reduntant check for future proofing
+        if (other.CompareTag("TagTrigger") && IsOwner) // reduntant check for future proofing
         {
             PlayerState thisState = thisStateController.GetState();
             PlayerStateController otherStateController = other.gameObject.GetComponentInParent<PlayerStateController>();
@@ -37,38 +34,24 @@ public class TagController : MonoBehaviour
                 // If the tagged player is an unblocked runner
                 Block();
                 //otherTagController.Block();
+                ChangeStateServerRPC(gameObject.GetComponentInParent<NetworkObject>(), otherStateController.gameObject.GetComponentInParent<NetworkObject>());
 
-                if (thisState == PlayerState.Runner)
-                    ChangeStateServerRCP(other.gameObject.GetComponentInParent<NetworkObject>(), gameObject.GetComponentInParent<NetworkObject>());
-                else
-                    ChangeStateServerRCP(gameObject.GetComponentInParent<NetworkObject>(), other.gameObject.GetComponentInParent<NetworkObject>());
-
-                thisMovementController.PushAwayFromTagged(other.gameObject.GetComponentInParent<Rigidbody>().transform.position);
+                thisMovementController.PushAwayFromTagged(other.gameObject.GetComponentInParent<Transform>().position);
                 Debug.Log(transform.parent.gameObject.name + " tagged " + other.gameObject.name + " State changed to " + thisStateController.GetState());
             }
         }
     }
     [ServerRpc]
-    private void ChangeStateServerRCP(NetworkObjectReference chaser, NetworkObjectReference runner)
+    private void ChangeStateServerRPC(NetworkObjectReference thisObjectRef, NetworkObjectReference otherObjectRef)
     {
-        ChangeStateClientRCP(chaser, runner);
-    }
-    [ClientRpc]
-    private void ChangeStateClientRCP(NetworkObjectReference chaser, NetworkObjectReference runner) 
-    {
-        if (!chaser.TryGet(out NetworkObject chaserObject))
+        if (!thisObjectRef.TryGet(out NetworkObject thisObject))
             return;
-        if (!runner.TryGet(out NetworkObject runnerObject))
+        if (!otherObjectRef.TryGet(out NetworkObject otherObject))
             return;
 
-        if (gameObject.GetComponentInParent<NetworkObject>() == chaserObject)
-        {
-            Debug.Log("OK");
-            chaserObject.GetComponentInChildren<PlayerStateController>().SetState(PlayerState.Runner);
-        }
-        else
-            runnerObject.GetComponentInChildren<PlayerStateController>().SetState(PlayerState.Chaser);
-
+        var temp = thisObject.GetComponentInChildren<PlayerStateController>().currState.Value;
+        thisObject.GetComponentInChildren<PlayerStateController>().SetState(otherObject.GetComponentInChildren<PlayerStateController>().currState.Value);
+        otherObject.GetComponentInChildren<PlayerStateController>().SetState(temp);
     }
     public bool IsBlocked()
     {

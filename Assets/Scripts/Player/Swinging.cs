@@ -51,6 +51,10 @@ public class Swinging : NetworkBehaviour
     private void FixedUpdate()
     {
         if (joint != null) SwingMovement();
+        //check because when player dies joint is set to null but spring joint isn't destroyed
+        //could also remove spring joint when player dies
+        if (joint == null && GetComponent<SpringJoint>() != null)
+            Destroy(GetComponent<SpringJoint>());
     }
 
     private void LateUpdate()
@@ -87,16 +91,16 @@ public class Swinging : NetworkBehaviour
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
-
-        var predictionPoint = networkObject.transform.Find("PredictionPoint");
         var player = networkObject.transform.Find("Player");
-        var gunHolder = player.Find("GunHolder");
-        var gun = gunHolder.Find("GrapplingGun");
-        var gunTip = gun.Find("GunTip");
 
-        var lineRenderer = gun.GetComponent<LineRenderer>();
-
-        DrawRope(player, lineRenderer, gunHolder, ref player.GetComponent<Swinging>().currentGrapplePosition, predictionPoint.position, gunTip.position);
+        DrawRope(
+            player, 
+            player.GetComponent<Swinging>().lr, 
+            player.GetComponent<Swinging>().gunHolder,
+            ref player.GetComponent<Swinging>().currentGrapplePosition,
+            player.GetComponent<Swinging>().predictionPoint.position, 
+            player.GetComponent<Swinging>().gunTip.position
+            );
     }
 
 
@@ -210,6 +214,7 @@ public class Swinging : NetworkBehaviour
         currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
 
         lineRenderer.SetPosition(0, gunTipPos);
+        Debug.Log(gunTipPos);
         lineRenderer.SetPosition(1, currentGrapplePosition);
     }
 }
