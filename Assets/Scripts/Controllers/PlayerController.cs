@@ -17,6 +17,8 @@ public class PlayerController : NetworkBehaviour
     public PlayerVisual playerVisual;
     public PlayerStateController psc;
     public TagController tc;
+    public InventoryController inventoryController;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +32,7 @@ public class PlayerController : NetworkBehaviour
             ds.enabled = false;
             psc.enabled = false;
             tc.enabled = false;
+            inventoryController.enabled = false;
             ui.SetActive(false);
             predictionPoint.GetComponent<MeshRenderer>().enabled = false;
         }

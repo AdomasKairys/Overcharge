@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     private float moveSpeed;
+    private float moveSpeedMultiplier;
     public float walkSpeed;
     public float sprintSpeed;
     public float slideSpeed;
@@ -84,6 +85,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         moveSpeed = walkSpeed;
+        moveSpeedMultiplier = 1f;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
@@ -240,7 +242,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        if (flatVel.magnitude > moveSpeed)
+        if (flatVel.magnitude > moveSpeed * moveSpeedMultiplier)
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
@@ -283,5 +285,12 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("Pushing away");
         Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
         rb.AddForce(pushDirection * 75, ForceMode.Impulse);
+    }
+
+    public IEnumerator UseSpeedBoost(float boostSpeedMultiplier, float boostDuration)
+    {
+        moveSpeedMultiplier = boostSpeedMultiplier;
+        yield return new WaitForSeconds(boostDuration);
+        moveSpeedMultiplier = 1f;
     }
 }

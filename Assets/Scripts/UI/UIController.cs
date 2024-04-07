@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -23,6 +24,15 @@ public class UIController : MonoBehaviour
 
     [Header("Player Death Menu")]
     public GameObject deathMenu;
+
+    [Header("Pick Up Inventory")]
+    [SerializeField] private TextMeshProUGUI pickupName;
+    [SerializeField] private Image pickupImage;
+    [SerializeField] private Sprite[] pickupSprites;
+    [SerializeField] private Sprite noPickupSprite;
+    [SerializeField] private GameObject cooldownPickupImage;
+    [SerializeField] private InventoryController inventoryController;
+    private bool shufflePickups = true;
 
 
     TextMeshProUGUI textMesh_playerState;
@@ -61,6 +71,8 @@ public class UIController : MonoBehaviour
         // Update the text boxes
         textMesh_velocity.text = player.GetComponent<Rigidbody>().velocity.magnitude.ToString();
         textMesh_playerState.text = playerStateController.currState.Value.ToString();
+
+        UpdatePickup();
     }
 
     private void ShowDeathMenu()
@@ -83,5 +95,52 @@ public class UIController : MonoBehaviour
         playerChargeBar.SetActive(true);
         velocityText.SetActive(true);
         playerStateController.Respawn();
+    }
+
+    /// <summary>
+    /// Updates the inventory pickup slot text and sprite
+    /// </summary>
+    private void UpdatePickup()
+    {
+        if(inventoryController.currentPickup == null)
+        {
+            cooldownPickupImage.SetActive(false);
+            if (inventoryController.pickingUp)
+            {
+                pickupName.text = "...";
+                if (shufflePickups)
+                {
+                    Invoke("ShufflePickups", 0.1f);
+                    shufflePickups = false;
+                }    
+            }
+            else
+            {
+                // TODO: not the most effiecent solution to update this every frame
+                pickupImage.sprite = noPickupSprite;
+                pickupName.text = "None";
+            }
+        }
+        else
+        {
+            if (inventoryController.currentPickup.CanUse)
+            {
+                // TODO: not the most effiecent solution to update this every frame
+                pickupImage.sprite = pickupSprites[inventoryController.currentPickup.Sprite];
+                pickupName.text = inventoryController.currentPickup.Name;
+                cooldownPickupImage.SetActive(false);
+            }
+            else
+            {
+                // TODO: same here
+                cooldownPickupImage.SetActive(true);
+            }
+        }
+    }
+
+    private void ShufflePickups()
+    {
+        pickupImage.sprite = pickupSprites[UnityEngine.Random.Range(0, pickupSprites.Length)];
+        shufflePickups = true;
     }
 }
