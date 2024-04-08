@@ -118,9 +118,20 @@ public class InventoryController : NetworkBehaviour
     /// <returns>A new pickup</returns>
     private Pickup GetNewPickup()
     {
-        var speedBoost = ScriptableObject.CreateInstance<SpeedBoost>();
-        speedBoost.SetPlayerMovement(_playerMovement);
-        return speedBoost;
+        int randomIndex = UnityEngine.Random.Range(0, 2);
+
+        if(randomIndex == 0)
+        {
+            var speedBoost = ScriptableObject.CreateInstance<SpeedBoost>();
+            speedBoost.SetPlayerMovement(_playerMovement);
+            return speedBoost;
+        }
+        else
+        {
+            var pushBomb = ScriptableObject.CreateInstance<PushBomb>();
+            pushBomb.SetPlayerObject(gameObject);
+            return pushBomb;
+        }
     }
 
     /// <summary>

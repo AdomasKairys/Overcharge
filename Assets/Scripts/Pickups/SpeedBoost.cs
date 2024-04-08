@@ -39,8 +39,7 @@ public class SpeedBoost : Pickup
     {
         if(Uses > 0)
         {
-            // TODO: access the player movement and increase speed here
-            Debug.Log("Speed boost used");
+            // Debug.Log("Speed boost used");
             _playerMovement.StartCoroutine(_playerMovement.UseSpeedBoost(_boostSpeedMultiplier, _boostDuration));
             ReduceUses();
         }
