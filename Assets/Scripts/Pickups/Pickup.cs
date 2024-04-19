@@ -1,62 +1,59 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public abstract class Pickup : ScriptableObject
+/// <summary>
+/// Component on the pickup prefab that handles the detection of collisions with player and disabling
+/// </summary>
+public class Pickup : NetworkBehaviour
 {
-    /// <summary>
-    /// The name of the pickup
-    /// </summary>
-    public string Name { get; private set; }
+    [SerializeField]
+    private GameObject pickupBlock;
 
-    /// <summary>
-    /// The description of the pickup's effects
-    /// </summary>
-    public string Description { get; private set; }
-
-    /// <summary>
-    /// Number of uses that the pickup has
-    /// </summary>
-    public int Uses { get; private set; }
-
-    /// <summary>
-    /// If a pickup has more than one use, this property determines how long a player needs to wait before using it repeatedly
-    /// </summary>
-    public float Cooldown { get; private set; }
-
-    /// <summary>
-    /// Determines if the pickup can be used at the moment (is it not on cooldown)
-    /// </summary>
-    public bool CanUse {  get; private set; }
-
-    /// <summary>
-    /// The index of the pickup sprite in the UIController array for pickup sprites
-    /// </summary>
-    public int Sprite { get; private set; }    
-
-    protected Pickup(string name, string description, int uses, float cooldown, int sprite)
+    private void OnTriggerEnter(Collider other)
     {
-        Name = name;
-        Description = description;
-        Uses = uses;
-        Cooldown = cooldown;
-        Sprite = sprite;
-        CanUse = true;
-    }
-
-    protected void ReduceUses()
-    {
-        if (Uses > 0)
+        if (other.gameObject.CompareTag("Player"))
         {
-            Uses--;
+            Debug.Log("A player has collided wit da pickup");
+            RequestDisableServerRpc();
+            var playerInventoryController = other.gameObject.GetComponent<InventoryController>();
+            if (playerInventoryController != null)
+            {
+                playerInventoryController.HandlePickup();
+            }
+            else
+            {
+                Debug.Log("Inventory controller was null");
+            }
         }
     }
 
-    public IEnumerator WaitCooldown()
+    private void Disable()
     {
-        CanUse = false;
-        yield return new WaitForSeconds(Cooldown);
-        CanUse = true;
+        pickupBlock.SetActive(false);
+        StartCoroutine(Reenable());
     }
 
-    public abstract void Use();
+    [ClientRpc]
+    private void DisableClientRpc()
+    {
+        if (IsOwner) return; // Prevent the owner from running this again if they're also the server.
+
+        Disable();
+    }
+
+    [ServerRpc]
+    public void RequestDisableServerRpc()
+    {
+        if (!IsServer) return;
+
+        Disable();
+        DisableClientRpc();
+    }
+
+    private IEnumerator Reenable()
+    {
+        yield return new WaitForSeconds(7.0f);
+        pickupBlock.SetActive(true);
+    }
 }
