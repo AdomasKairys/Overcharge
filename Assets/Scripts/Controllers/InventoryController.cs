@@ -1,86 +1,114 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class InventoryController : NetworkBehaviour
 {
     [SerializeField]
     private PlayerMovement _playerMovement;
 
-    /// <summary>
-    /// Stores the current pickup, null if no pickup is picked up
-    /// </summary>
-    public Pickup currentPickup { get; private set; }
+    [SerializeField]
+    private PlayerStateController _playerStateController;
 
-    /// <summary>
-    /// Determines if the player is currently picking up an item TODO: use this to play the animation
-    /// </summary>
+    public PickupType currentPickup = PickupType.None;
+
+    private int currentPickupUses = 0;
+
+    private float currentPickupCooldown = 0f;
+
+    public bool canUseCurrentPickup = false;
+
     public bool pickingUp = false;
 
-    /// <summary>
-    /// Determines the time it takes to choose a pickup (delay between collision with pickup and input of a new pickup into inventory)
-    /// </summary>
     private float pickingUpDelay = 3f;
-
-
-    /// <summary>
-    /// The amount of time a pickup is disabled for after being picked up
-    /// </summary>
-    private float pickupDisableTime = 8f;
 
  
     void Update()
     {
+        if(!IsOwner) return;
+
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            // Use the pick up
-            if(currentPickup != null && currentPickup.Uses > 0 && currentPickup.CanUse)
+            if(currentPickup != PickupType.None && canUseCurrentPickup)
             {
                 UseCurrentPickUp();
             }
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    /// <summary>
+    /// Handles the picking up of a pickup block, called by the pickup object
+    /// </summary>
+    public void HandlePickup()
     {
-        var otherGameObject = other.gameObject;
-        if (IsPickup(otherGameObject))
+        if (!IsOwner) return;
+
+        if (!pickingUp)
         {
-            // Initiates the pickup process
-            StartCoroutine(Pickup(other.gameObject));
-            // TODO: implement UI
-            //uiController.UpdatePickUp(typeof(SpeedBoost));
+            pickingUp = true;
+            currentPickup = PickupType.None;
+            RequestNewPickupServerRpc((int)OwnerClientId);
         }
+    }
+
+    [ServerRpc]
+    private void RequestNewPickupServerRpc(int clientId)
+    {
+        if (!IsServer) return;
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { (ulong)clientId }
+            }
+        };
+
+        Debug.Log("Somebody asked for a new pickup");
+
+        int randPickupIndex = UnityEngine.Random.Range(1, 3);
+        GetNewPickupClientRpc(randPickupIndex, clientRpcParams);
+    }
+
+    [ClientRpc]
+    private void GetNewPickupClientRpc(int pickupIndex, ClientRpcParams clientRpcParams = default)
+    {
+        if(!IsOwner) return;
+
+        StartCoroutine(Pickup(pickupIndex));
     }
 
     /// <summary>
     /// Method that handles picking up a new pickup
     /// </summary>
-    private IEnumerator Pickup(GameObject pickupObj)
+    private IEnumerator Pickup(int pickupIndex)
     {
-        if (!pickingUp) // prevents repeated pickups
+        // Waits the delay
+        yield return new WaitForSeconds(pickingUpDelay);
+
+        switch (pickupIndex)
         {
-            pickingUp = true;
-
-            // Clears the current pickup
-            currentPickup = null;
-
-            // Initiates the disabling of the pickup
-            StartCoroutine(DisablePickUp(pickupObj));
-
-            // Waits the delay
-            yield return new WaitForSeconds(pickingUpDelay);
-
-            // Gets a new pickup
-            currentPickup = GetNewPickup();
-
-            pickingUp = false;
-
-            Debug.Log("A new pickup picked up: " + currentPickup.Name);
+            case 1:
+                currentPickup = PickupType.SpeedBoost; 
+                currentPickupUses = 3; 
+                currentPickupCooldown = 1.5f; 
+                break;
+            case 2:
+                currentPickup = PickupType.GravityBomb;
+                currentPickupUses = 1;
+                currentPickupCooldown = 0f;
+                break;
+            default:
+                currentPickup = PickupType.None;
+                break;
         }
+
+        pickingUp = false;
+        canUseCurrentPickup = true;
+
+        Debug.Log("A new pickup picked up: " + currentPickup.ToString());
     }
     
     /// <summary>
@@ -88,51 +116,147 @@ public class InventoryController : NetworkBehaviour
     /// </summary>
     private void UseCurrentPickUp()
     {
-        currentPickup.Use();
+        if (!IsOwner) return;
 
-        if(currentPickup.Uses <= 0)
+        if (currentPickup == PickupType.None)
         {
-            // Remove the pickup from inventory if fully used up
-            currentPickup = null;
+            return;
+        }
+
+        canUseCurrentPickup = false;
+        currentPickupUses -= 1;
+
+        switch (currentPickup)
+        {
+            case PickupType.SpeedBoost:
+                RequestUseSpeedBoostServerRpc((int)OwnerClientId); 
+                break;
+            case PickupType.GravityBomb:
+                //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
+                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.currState.Value == PlayerState.Chaser, (int)OwnerClientId); 
+                break;
+        }
+
+        if(currentPickupUses <= 0)
+        {
+            currentPickup = PickupType.None;
         }
         else
         {
-            // Initiate cooldown if not fully used up
-            StartCoroutine(currentPickup.WaitCooldown());
+            StartCoroutine(WaitPickupCooldown(currentPickupCooldown));
         }
     }
 
-    /// <summary>
-    /// Checks if the object is a pickup
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    private bool IsPickup(GameObject obj)
+    [ServerRpc]
+    private void RequestUseSpeedBoostServerRpc(int clientId)
     {
-        return obj.CompareTag("Pickup");
+        if (!IsServer) return;
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { (ulong)clientId }
+            }
+        };
+
+        UseSpeedBoostClientRpc(clientRpcParams);
     }
 
-    /// <summary>
-    /// Gets a new random pickup TODO: implement logic for randomly choosing from an array of pickups
-    /// </summary>
-    /// <returns>A new pickup</returns>
-    private Pickup GetNewPickup()
+    [ClientRpc]
+    private void UseSpeedBoostClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        var speedBoost = ScriptableObject.CreateInstance<SpeedBoost>();
-        speedBoost.SetPlayerMovement(_playerMovement);
-        return speedBoost;
+        if (!IsOwner) return;
+
+        if (currentPickupUses > 0)
+        {
+            Debug.Log("Speed boost used");
+            _playerMovement.StartCoroutine(_playerMovement.UseSpeedBoost(2, 2));
+        }
     }
 
-    /// <summary>
-    /// Disables the pickup
-    /// NOTE: this is synced up, but idk why or how :) 
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    private IEnumerator DisablePickUp(GameObject obj)
+    [ServerRpc]
+    private void RequestUseGravityBombServerRpc(Vector3 userPosition, bool chaser, int clientId)
     {
-        obj.SetActive(false);
-        yield return new WaitForSeconds(pickupDisableTime);
-        obj.SetActive(true);
+        if (!IsServer) return;
+
+        //Debug.Log("Client " + clientId + " requested to use the gravity bomb at position " + userPosition);
+
+        if (!IsServer) return;
+
+        // Iterate through all connected clients
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            if ((int)client.ClientId == clientId)
+            {
+
+            }
+            else
+            {
+                var playerObject = client.PlayerObject;
+                if (playerObject != null)
+                {
+                    var inventoryController = playerObject.transform.Find("Player").GetComponent<InventoryController>();
+                    if (inventoryController != null)
+                    {
+                        // Call the ClientRpc on the InventoryController that the client owns
+                        inventoryController.HandleGravityBombClientRpc(userPosition, chaser);
+                    }
+                    else
+                    {
+                        Debug.LogError("InventoryController not found on the player object.");
+                    }
+                }
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void HandleGravityBombClientRpc(Vector3 bombUserPosition, bool chaser)
+    {
+        if(!IsOwner) return;
+
+        //Debug.Log("Client " + OwnerClientId + " had its ClientRpc called");
+
+        float pushForce = 100f;
+        float effectiveRange = 8.0f;
+
+        // Calculate distance from the current player to the bomb user
+        float distance = Vector3.Distance(transform.position, bombUserPosition);
+
+        Debug.Log("Client " + OwnerClientId + " distance to bomber: " + distance);
+
+        if (distance <= effectiveRange)
+        {
+            if (chaser)
+            {
+                //Debug.Log("Client " + OwnerClientId + " uses its PushTo method");
+                // Push other players towards the player who used the gravity bomb
+                _playerMovement.PushTo(bombUserPosition, pushForce);
+            }
+            else
+            {
+                //Debug.Log("Client " + OwnerClientId + " uses its PushFrom method");
+                // Push other players away from the player who used the gravity bomb
+                _playerMovement.PushFrom(bombUserPosition, pushForce);
+            }
+        }
+        else
+        {
+            Debug.Log("Client " + OwnerClientId + " is too far away from bomber");
+        }
+    }
+
+    private IEnumerator WaitPickupCooldown(float cooldown)
+    {
+        yield return new WaitForSeconds(cooldown);
+        canUseCurrentPickup = true;
+    }
+
+    public enum PickupType
+    {
+        None = 0,
+        SpeedBoost = 1,
+        GravityBomb = 2
     }
 }

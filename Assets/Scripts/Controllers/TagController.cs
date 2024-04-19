@@ -36,7 +36,7 @@ public class TagController : NetworkBehaviour
                 //otherTagController.Block();
                 ChangeStateServerRPC(gameObject.GetComponentInParent<NetworkObject>(), otherStateController.gameObject.GetComponentInParent<NetworkObject>());
 
-                thisMovementController.PushAwayFromTagged(other.gameObject.GetComponentInParent<Transform>().position);
+                thisMovementController.PushFrom(other.gameObject.GetComponentInParent<Transform>().position, 75f);
                 Debug.Log(transform.parent.gameObject.name + " tagged " + other.gameObject.name + " State changed to " + thisStateController.GetState());
             }
         }

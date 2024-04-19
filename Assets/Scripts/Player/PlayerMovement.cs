@@ -280,11 +280,18 @@ public class PlayerMovement : MonoBehaviour
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
 
-    public void PushAwayFromTagged(Vector3 otherPosition)
+    public void PushFrom(Vector3 otherPosition, float pushForce)
     {
-        Debug.Log("Pushing away");
+        Debug.Log("Getting pushed from " + otherPosition + " with force of " + pushForce);
         Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
-        rb.AddForce(pushDirection * 75, ForceMode.Impulse);
+        rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
+    }
+
+    public void PushTo(Vector3 otherPosition, float pushForce)
+    {
+        Debug.Log("Getting pushed towards " + otherPosition + " with force of " +  pushForce);
+        Vector3 pushDirection = (otherPosition - rb.transform.position).normalized;
+        rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
     }
 
     public IEnumerator UseSpeedBoost(float boostSpeedMultiplier, float boostDuration)

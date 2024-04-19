@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// This script that handles the rotation of the pickup blocks
+/// This script handles the rotation of the pickup blocks
 /// </summary>
 public class PickupRotator : MonoBehaviour
 {
