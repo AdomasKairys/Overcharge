@@ -8,7 +8,10 @@ using UnityEngine;
 public class Pickup : NetworkBehaviour
 {
     [SerializeField]
-    private GameObject pickupBlock;
+    private GameObject _pickupBlock;
+
+    [SerializeField]
+    private Collider _trigger;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -30,7 +33,8 @@ public class Pickup : NetworkBehaviour
 
     private void Disable()
     {
-        pickupBlock.SetActive(false);
+        _pickupBlock.SetActive(false);
+        _trigger.enabled = false;
         StartCoroutine(Reenable());
     }
 
@@ -54,6 +58,7 @@ public class Pickup : NetworkBehaviour
     private IEnumerator Reenable()
     {
         yield return new WaitForSeconds(7.0f);
-        pickupBlock.SetActive(true);
+        _pickupBlock.SetActive(true);
+        _trigger.enabled = true;
     }
 }

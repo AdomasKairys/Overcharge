@@ -68,7 +68,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 324f5a893c5e7824a8c8716269e896a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pickupBlock: {fileID: 6473198083259729617}
+  _pickupBlock: {fileID: 6473198083259729617}
+  _trigger: {fileID: 8200499055615164295}
 --- !u!65 &8200499055615164295
 BoxCollider:
   m_ObjectHideFlags: 0
