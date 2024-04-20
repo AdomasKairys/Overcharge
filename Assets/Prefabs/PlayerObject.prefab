@@ -833,6 +833,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pm: {fileID: 4375474895832565972}
+  prjc: {fileID: 5854099085188014459}
   cl: {fileID: 3233911490611355447}
   sw: {fileID: 6985016645005820006}
   wr: {fileID: 1196146231943892938}
@@ -2661,6 +2662,7 @@ GameObject:
   - component: {fileID: 6767623379712817156}
   - component: {fileID: 5106752071764181503}
   - component: {fileID: 2515348113318348897}
+  - component: {fileID: 3290406463868392576}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -2730,6 +2732,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 1715462873840805213}
   pfRocket: {fileID: 297782522620805522, guid: 765230f229ae90b489a048ea0994e651, type: 3}
+  predictionPoint: {fileID: 2772026833983178272}
 --- !u!114 &4375474895832565972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2775,6 +2778,7 @@ MonoBehaviour:
   isWallrunning: 0
   isClimbing: 0
   isDashing: 0
+  isKnockedBack: 0
 --- !u!114 &268782608315915819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2980,6 +2984,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerMovement: {fileID: 4375474895832565972}
   pickingUp: 0
+--- !u!114 &3290406463868392576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4396995675694076079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4636959591734027952
 GameObject:
   m_ObjectHideFlags: 0
