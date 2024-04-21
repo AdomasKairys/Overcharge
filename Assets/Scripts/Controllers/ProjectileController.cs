@@ -6,9 +6,8 @@ using UnityEngine;
 
 public class ProjectileController : NetworkBehaviour
 {
-    [SerializeField] private Transform cam;
+    [SerializeField] private Camera cam;
     [SerializeField] private Transform pfRocket;
-    [SerializeField] private GameObject predictionPoint;
 
     private float cooldownTimer;
     public event EventHandler<OnShootEventArgs> OnShoot;
@@ -40,9 +39,11 @@ public class ProjectileController : NetworkBehaviour
         {
             float maxCooldownTimer = 0.5f;
             cooldownTimer = maxCooldownTimer;
+            Vector3 mousePosWorld = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 25));
+            Vector3 shootDir = (mousePosWorld - transform.position).normalized;
             OnShoot?.Invoke(this, new OnShootEventArgs { 
                 spawnPos = transform.position,
-                shootDir = predictionPoint.activeSelf ? (predictionPoint.transform.position - transform.position).normalized : cam.forward
+                shootDir = shootDir
             });
         }
         else if (cooldownTimer > 0f)

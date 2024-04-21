@@ -14,7 +14,6 @@ public class PlayerController : NetworkBehaviour
     public CinemachineFreeLook fl;
     public Dashing ds;
     public GameObject ui;
-    public GameObject predictionPoint;
     public PlayerVisual playerVisual;
     public PlayerStateController psc;
     public TagController tc;
@@ -36,7 +35,6 @@ public class PlayerController : NetworkBehaviour
             prjc.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
-            predictionPoint.GetComponent<MeshRenderer>().enabled = false;
         }
         else
         {
