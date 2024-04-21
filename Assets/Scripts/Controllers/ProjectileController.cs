@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class ProjectileController : NetworkBehaviour
+public class ProjectileController : EquipmentController
 {
     [SerializeField] private Transform cam;
     [SerializeField] private Transform pfRocket;
@@ -36,7 +36,7 @@ public class ProjectileController : NetworkBehaviour
 
     private void Update()
     {
-        if(Input.GetMouseButtonDown(0) && cooldownTimer <= 0f)
+        if(Input.GetKeyDown(UseKey) && cooldownTimer <= 0f)
         {
             float maxCooldownTimer = 0.5f;
             cooldownTimer = maxCooldownTimer;

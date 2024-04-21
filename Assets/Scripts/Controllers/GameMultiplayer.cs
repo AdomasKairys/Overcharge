@@ -217,4 +217,27 @@ public class GameMultiplayer : NetworkBehaviour
         }
         return -1;
     }
+
+    #region Equipment management
+
+    public void ChangePlayerEquipment(int primaryEquipmentId, int secondaryEquipmentId)
+    {
+        ChangePlayerEquipmentServerRpc(primaryEquipmentId, secondaryEquipmentId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ChangePlayerEquipmentServerRpc(int primaryEquipmentId, int secondaryEquipmentId, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        if (playerDataIndex == -1) return;
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.primaryEquipment = (EquipmentType)primaryEquipmentId;
+        playerData.secondaryEquipment = (EquipmentType)secondaryEquipmentId;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+
+    #endregion
 }

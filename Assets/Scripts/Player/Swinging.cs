@@ -4,7 +4,7 @@ using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Swinging : NetworkBehaviour
+public class Swinging : EquipmentController
 {
     [Header("References")]
     public NetworkObject pc;
@@ -33,8 +33,8 @@ public class Swinging : NetworkBehaviour
     public float predictionSphereCastRadius;
     public Transform predictionPoint;
 
-    [Header("Input")]
-    public KeyCode swingKey = KeyCode.Mouse0;
+    //[Header("Input")]
+    //public KeyCode swingKey = KeyCode.Mouse0;
 
     private void Start()
     {
@@ -43,8 +43,8 @@ public class Swinging : NetworkBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(swingKey) && !IsSwingOver()) StartSwing();
-        if (Input.GetKeyUp(swingKey) || IsSwingOver()) StopSwing();
+        if (Input.GetKeyDown(UseKey) && !IsSwingOver()) StartSwing();
+        if (Input.GetKeyUp(UseKey) || IsSwingOver()) StopSwing();
 
         CheckForSwingPoints();
     }
