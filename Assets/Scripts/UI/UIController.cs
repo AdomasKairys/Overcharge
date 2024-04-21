@@ -102,7 +102,7 @@ public class UIController : MonoBehaviour
     /// </summary>
     private void UpdatePickup()
     {
-        if(inventoryController.currentPickup == null)
+        if(inventoryController.currentPickup == InventoryController.PickupType.None)
         {
             cooldownPickupImage.SetActive(false);
             if (inventoryController.pickingUp)
@@ -123,11 +123,17 @@ public class UIController : MonoBehaviour
         }
         else
         {
-            if (inventoryController.currentPickup.CanUse)
+            if (inventoryController.canUseCurrentPickup)
             {
                 // TODO: not the most effiecent solution to update this every frame
-                pickupImage.sprite = pickupSprites[inventoryController.currentPickup.Sprite];
-                pickupName.text = inventoryController.currentPickup.Name;
+                switch (inventoryController.currentPickup)
+                {
+                    case InventoryController.PickupType.SpeedBoost:
+                        pickupImage.sprite = pickupSprites[0]; break;
+                    case InventoryController.PickupType.GravityBomb:
+                        pickupImage.sprite = pickupSprites[1]; break;
+                }
+                pickupName.text = inventoryController.currentPickup.ToString();
                 cooldownPickupImage.SetActive(false);
             }
             else
