@@ -292,23 +292,21 @@ public class PlayerMovement : NetworkBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
-    public void PushAwayFromTagged(Vector3 otherPosition, ulong targetId)
+    public void RocketKnockback(Vector3 otherPosition, ulong targetId)
     {
-        PushAwayFromTaggedServerRPC(otherPosition, targetId);
+        RocketKnockbackServerRPC(otherPosition, targetId);
     }
     [ServerRpc(RequireOwnership=false)]
-    private void PushAwayFromTaggedServerRPC(Vector3 otherPosition, ulong targetId)
+    private void RocketKnockbackServerRPC(Vector3 otherPosition, ulong targetId)
     {
-        PushAwayFromTaggedClientRPC(otherPosition, targetId);
+        RocketKnockbackClientRPC(otherPosition, targetId);
     }
     [ClientRpc]
-    private void PushAwayFromTaggedClientRPC(Vector3 otherPosition, ulong targetId)
+    private void RocketKnockbackClientRPC(Vector3 otherPosition, ulong targetId)
     {
         if (OwnerClientId != targetId)
             return;
         isKnockedBack = true;
-        Debug.Log("Pushing away");
-        Debug.Log(rb == null);
         var thisRb = GetComponent<Rigidbody>();
         Vector3 pushDirection = (thisRb.transform.position - otherPosition).normalized;
         thisRb.AddForce(pushDirection * 75, ForceMode.Impulse);
@@ -317,7 +315,7 @@ public class PlayerMovement : NetworkBehaviour
     private void stopKnockback()
     {
         isKnockedBack = false;
-
+    }
     public void PushFrom(Vector3 otherPosition, float pushForce)
     {
         Debug.Log("Getting pushed from " + otherPosition + " with force of " + pushForce);
