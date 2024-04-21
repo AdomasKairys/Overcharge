@@ -92,9 +92,16 @@ public class Climbing : MonoBehaviour
 
         bool newWall = frontWallHit.transform != lastWall || Mathf.Abs(Vector3.Angle(lastWallNormal, frontWallHit.normal)) > minWallNormalAngleChange;
 
-        if ((wallFront && newWall) || pm.isGrounded)
+        if ((wallFront && newWall) || pm.isGrounded || (lastWall!= null && lastWall.CompareTag("Magnet")))
         {
-            climbTimer = maxClimbTime;
+			if (frontWallHit.collider.CompareTag("Magnet"))
+			{
+                climbTimer = float.MaxValue;
+            }
+            else
+			{
+                climbTimer = maxClimbTime;
+            }
             climbJumpsLeft = climbJumps;
         }
     }
@@ -109,7 +116,14 @@ public class Climbing : MonoBehaviour
 
     private void ClimbingMovement()
     {
-        rb.velocity = new Vector3(rb.velocity.x, climbSpeed, rb.velocity.z);
+		if (lastWall.CompareTag("Magnet"))
+		{
+            rb.velocity = new Vector3(rb.velocity.x, pm.VerticalMagnetClimbSpeed, rb.velocity.z);
+        }
+		else
+		{
+            rb.velocity = new Vector3(rb.velocity.x, climbSpeed, rb.velocity.z);
+        }
     }
 
     private void StopClimbing()

@@ -2869,6 +2869,8 @@ MonoBehaviour:
   isWallrunning: 0
   isClimbing: 0
   isDashing: 0
+  VerticalMagnetRunSpeed: 10
+  VerticalMagnetClimbSpeed: 20
   isKnockedBack: 0
 --- !u!114 &268782608315915819
 MonoBehaviour:

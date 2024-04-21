@@ -193,9 +193,28 @@ public class WallRunning : MonoBehaviour
         rb.AddForce(wallForward * wallRunForce, ForceMode.Force);
 
         if (upwardsRunning)
-            rb.velocity = new Vector3(rb.velocity.x, wallClimbSpeed, rb.velocity.z);
+        {
+            if (lastWall.CompareTag("Magnet"))
+            {
+                rb.velocity = new Vector3(rb.velocity.x, pm.VerticalMagnetRunSpeed, rb.velocity.z);
+            }
+            else
+            {
+                rb.velocity = new Vector3(rb.velocity.x, wallClimbSpeed, rb.velocity.z);
+            }
+        }
         if (downwardsRunning)
-            rb.velocity = new Vector3(rb.velocity.x, -wallClimbSpeed, rb.velocity.z);
+		{
+            if (lastWall.CompareTag("Magnet"))
+            {
+                rb.velocity = new Vector3(rb.velocity.x, -wallClimbSpeed, rb.velocity.z);
+
+            }
+            else
+            {
+                rb.velocity = new Vector3(rb.velocity.x, -wallClimbSpeed, rb.velocity.z);
+            }
+        }
 
         if (!isExitingWall && !(isWallLeft && horizontalInput > 0) && !(isWallRight && horizontalInput < 0))
             rb.AddForce(-wallNormal * 100, ForceMode.Force);
