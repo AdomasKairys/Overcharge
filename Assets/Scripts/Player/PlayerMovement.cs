@@ -116,9 +116,11 @@ public class PlayerMovement : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+        Debug.Log("waht");
 
         if (Input.GetKey(jumpKey) && isReadyToJump && isGrounded)
         {
+
             isReadyToJump = false;
 
             Jump();
@@ -210,14 +212,17 @@ public class PlayerMovement : MonoBehaviour
     private float sphereCastRadius = 0.25f;
     private void MovePlayer()
     {
+
+
         if (climbingSc.isExitingWall || state == MovementState.dashing
             || activeGrapple || isSwinging) return;
-
         moveDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         bool isWallFront = Physics.SphereCast(transform.position, sphereCastRadius, orientation.forward, out RaycastHit wallFrontHit, detectionLength, whatIsGround);
         if (isWallFront && !isClimbing)
         {
+            Debug.Log("waht1");
+
             float wallLookAngle = Vector3.Angle(moveDir, -wallFrontHit.normal);
 
             moveDir = wallLookAngle > 15f ? Vector3.ProjectOnPlane(moveDir, wallFrontHit.normal).normalized : Vector3.zero;
@@ -225,7 +230,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (IsOnSlope() && !isExitingSlope)
         {
-            if(rb.velocity.y > -0.1f)
+            Debug.Log("waht2");
+
+            if (rb.velocity.y > -0.1f)
                 rb.AddForce(20f * moveSpeed * GetSlopeMoveDirection(moveDir), ForceMode.Force);
 
             if (rb.velocity.y > 0)
@@ -234,10 +241,18 @@ public class PlayerMovement : MonoBehaviour
             if (rb.velocity.y < -0.1f)
                 rb.AddForce(GetSlopeMoveDirection(moveDir) * slideForce, ForceMode.Force);
         }
-        else if(isGrounded)
+        else if (isGrounded)
+        {
+            Debug.Log("waht3");
+
             rb.AddForce(10f * moveSpeed * moveDir.normalized, ForceMode.Force);
+        }
         else if (!isGrounded)
+        {
+            Debug.Log("waht4");
+
             rb.AddForce(10f * airMultiplier * moveSpeed * moveDir.normalized, ForceMode.Force);
+        }
 
         if(!isWallrunning) rb.useGravity = !IsOnSlope();
     }

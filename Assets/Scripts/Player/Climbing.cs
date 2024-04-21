@@ -92,7 +92,7 @@ public class Climbing : MonoBehaviour
 
         bool newWall = frontWallHit.transform != lastWall || Mathf.Abs(Vector3.Angle(lastWallNormal, frontWallHit.normal)) > minWallNormalAngleChange;
 
-        if ((wallFront && newWall) || pm.isGrounded || lastWall.CompareTag("Magnet"))
+        if ((wallFront && newWall) || pm.isGrounded || (lastWall!= null && lastWall.CompareTag("Magnet")))
         {
 			if (frontWallHit.collider.CompareTag("Magnet"))
 			{
