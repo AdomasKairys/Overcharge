@@ -7,6 +7,7 @@ using UnityEngine;
 public class PlayerController : NetworkBehaviour
 {
     public PlayerMovement pm;
+    public ProjectileController prjc;
     public Climbing cl;
     public Swinging sw;
     public WallRunning wr;
@@ -32,6 +33,7 @@ public class PlayerController : NetworkBehaviour
             ds.enabled = false;
             psc.enabled = false;
             tc.enabled = false;
+            prjc.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
             predictionPoint.GetComponent<MeshRenderer>().enabled = false;
