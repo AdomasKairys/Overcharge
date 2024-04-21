@@ -4,7 +4,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     [Header("Movement")]
     private float moveSpeed;
@@ -71,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
         swinging,
         grappling,
         dashing,
+        knockback,
         air
     }
 
@@ -81,6 +82,8 @@ public class PlayerMovement : MonoBehaviour
     public bool isWallrunning;
     public bool isClimbing;
     public bool isDashing;
+    public bool isKnockedBack;
+
 
     [Header("Magnet wall speed")]
     public float VerticalMagnetRunSpeed;
@@ -99,7 +102,8 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
         MyInput();
         StateHandler();
-        rb.drag = isGrounded && state != MovementState.dashing && !isSwinging ? groundDrag : 0;
+        Debug.Log(isKnockedBack);
+        rb.drag = isGrounded && state != MovementState.dashing && state != MovementState.knockback && !isSwinging ? groundDrag : 0;
         
     }
     private void LateUpdate()
@@ -132,7 +136,12 @@ public class PlayerMovement : MonoBehaviour
     private MovementState lastState;
     private void StateHandler()
     {
-        if (isSwinging)
+        if (isKnockedBack)
+        {
+            state = MovementState.knockback;
+            desiredMoveSpeed = dashSpeed;
+        }
+        else if (isSwinging)
         {
             state = MovementState.swinging;
             desiredMoveSpeed = swingSpeed;
@@ -164,7 +173,7 @@ public class PlayerMovement : MonoBehaviour
         {
             state = MovementState.air;
         }
-        if (state != MovementState.dashing && state != MovementState.swinging && Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f)
+        if (state != MovementState.dashing && state != MovementState.knockback && state != MovementState.swinging && Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f)
         {
             StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
@@ -212,9 +221,7 @@ public class PlayerMovement : MonoBehaviour
     private float sphereCastRadius = 0.25f;
     private void MovePlayer()
     {
-
-
-        if (climbingSc.isExitingWall || state == MovementState.dashing
+        if (climbingSc.isExitingWall || state == MovementState.dashing || state == MovementState.knockback
             || activeGrapple || isSwinging) return;
         moveDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
@@ -224,8 +231,12 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("waht1");
 
             float wallLookAngle = Vector3.Angle(moveDir, -wallFrontHit.normal);
+            Debug.Log(wallLookAngle);
 
-            moveDir = wallLookAngle > 15f ? Vector3.ProjectOnPlane(moveDir, wallFrontHit.normal).normalized : Vector3.zero;
+            if(wallLookAngle < 90f)
+            {
+                moveDir = wallLookAngle > 15f ? Vector3.ProjectOnPlane(moveDir, wallFrontHit.normal).normalized : Vector3.zero;
+            }
         }
 
         if (IsOnSlope() && !isExitingSlope)
@@ -297,12 +308,42 @@ public class PlayerMovement : MonoBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
-
-    public void PushAwayFromTagged(Vector3 otherPosition)
+    public void RocketKnockback(Vector3 otherPosition, ulong targetId)
     {
-        Debug.Log("Pushing away");
+        RocketKnockbackServerRPC(otherPosition, targetId);
+    }
+    [ServerRpc(RequireOwnership=false)]
+    private void RocketKnockbackServerRPC(Vector3 otherPosition, ulong targetId)
+    {
+        RocketKnockbackClientRPC(otherPosition, targetId);
+    }
+    [ClientRpc]
+    private void RocketKnockbackClientRPC(Vector3 otherPosition, ulong targetId)
+    {
+        if (OwnerClientId != targetId)
+            return;
+        isKnockedBack = true;
+        var thisRb = GetComponent<Rigidbody>();
+        Vector3 pushDirection = (thisRb.transform.position - otherPosition).normalized;
+        thisRb.AddForce(pushDirection * 75, ForceMode.Impulse);
+        Invoke(nameof(stopKnockback), 0.25f);
+    }
+    private void stopKnockback()
+    {
+        isKnockedBack = false;
+    }
+    public void PushFrom(Vector3 otherPosition, float pushForce)
+    {
+        Debug.Log("Getting pushed from " + otherPosition + " with force of " + pushForce);
         Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
-        rb.AddForce(pushDirection * 75, ForceMode.Impulse);
+        rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
+    }
+
+    public void PushTo(Vector3 otherPosition, float pushForce)
+    {
+        Debug.Log("Getting pushed towards " + otherPosition + " with force of " +  pushForce);
+        Vector3 pushDirection = (otherPosition - rb.transform.position).normalized;
+        rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
     }
 
     public IEnumerator UseSpeedBoost(float boostSpeedMultiplier, float boostDuration)

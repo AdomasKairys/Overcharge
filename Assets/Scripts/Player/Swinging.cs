@@ -78,7 +78,7 @@ public class Swinging : NetworkBehaviour
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
         var player = networkObject.transform.Find("Player");
-        var gunHolder = player.Find("GunHolder");
+        var gunHolder = player.Find("GrapplingGunHolder");
         var gun = gunHolder.Find("GrapplingGun");
 
         gun.GetComponent<LineRenderer>().positionCount = count;

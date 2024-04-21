@@ -7,13 +7,13 @@ using UnityEngine;
 public class PlayerController : NetworkBehaviour
 {
     public PlayerMovement pm;
+    public ProjectileController prjc;
     public Climbing cl;
     public Swinging sw;
     public WallRunning wr;
     public CinemachineFreeLook fl;
     public Dashing ds;
     public GameObject ui;
-    public GameObject predictionPoint;
     public PlayerVisual playerVisual;
     public PlayerStateController psc;
     public TagController tc;
@@ -32,9 +32,9 @@ public class PlayerController : NetworkBehaviour
             ds.enabled = false;
             psc.enabled = false;
             tc.enabled = false;
+            prjc.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
-            predictionPoint.GetComponent<MeshRenderer>().enabled = false;
         }
         else
         {

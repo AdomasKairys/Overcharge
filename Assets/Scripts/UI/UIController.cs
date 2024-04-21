@@ -25,6 +25,9 @@ public class UIController : MonoBehaviour
     [Header("Player Death Menu")]
     public GameObject deathMenu;
 
+    [Header("Crosshair image")]
+    [SerializeField] private Image crosshair;
+
     [Header("Pick Up Inventory")]
     [SerializeField] private TextMeshProUGUI pickupName;
     [SerializeField] private Image pickupImage;
@@ -71,7 +74,7 @@ public class UIController : MonoBehaviour
         // Update the text boxes
         textMesh_velocity.text = player.GetComponent<Rigidbody>().velocity.magnitude.ToString();
         textMesh_playerState.text = playerStateController.currState.Value.ToString();
-
+        UpdateCrosshair();
         UpdatePickup();
     }
 
@@ -96,13 +99,17 @@ public class UIController : MonoBehaviour
         velocityText.SetActive(true);
         playerStateController.Respawn();
     }
+    private void UpdateCrosshair()
+    {
+        crosshair.transform.position = Input.mousePosition;
+    }
 
     /// <summary>
     /// Updates the inventory pickup slot text and sprite
     /// </summary>
     private void UpdatePickup()
     {
-        if(inventoryController.currentPickup == null)
+        if(inventoryController.currentPickup == InventoryController.PickupType.None)
         {
             cooldownPickupImage.SetActive(false);
             if (inventoryController.pickingUp)
@@ -123,11 +130,17 @@ public class UIController : MonoBehaviour
         }
         else
         {
-            if (inventoryController.currentPickup.CanUse)
+            if (inventoryController.canUseCurrentPickup)
             {
                 // TODO: not the most effiecent solution to update this every frame
-                pickupImage.sprite = pickupSprites[inventoryController.currentPickup.Sprite];
-                pickupName.text = inventoryController.currentPickup.Name;
+                switch (inventoryController.currentPickup)
+                {
+                    case InventoryController.PickupType.SpeedBoost:
+                        pickupImage.sprite = pickupSprites[0]; break;
+                    case InventoryController.PickupType.GravityBomb:
+                        pickupImage.sprite = pickupSprites[1]; break;
+                }
+                pickupName.text = inventoryController.currentPickup.ToString();
                 cooldownPickupImage.SetActive(false);
             }
             else
