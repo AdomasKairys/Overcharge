@@ -39,7 +39,7 @@ public class ProjectileController : NetworkBehaviour
         {
             float maxCooldownTimer = 0.5f;
             cooldownTimer = maxCooldownTimer;
-            Vector3 mousePosWorld = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 25));
+            Vector3 mousePosWorld = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 50f));
             Vector3 shootDir = (mousePosWorld - transform.position).normalized;
             OnShoot?.Invoke(this, new OnShootEventArgs { 
                 spawnPos = transform.position,
