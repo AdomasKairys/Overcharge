@@ -297,12 +297,12 @@ public class PlayerMovement : NetworkBehaviour
         PushAwayFromTaggedServerRPC(otherPosition, targetId);
     }
     [ServerRpc(RequireOwnership=false)]
-    public void PushAwayFromTaggedServerRPC(Vector3 otherPosition, ulong targetId)
+    private void PushAwayFromTaggedServerRPC(Vector3 otherPosition, ulong targetId)
     {
         PushAwayFromTaggedClientRPC(otherPosition, targetId);
     }
     [ClientRpc]
-    public void PushAwayFromTaggedClientRPC(Vector3 otherPosition, ulong targetId)
+    private void PushAwayFromTaggedClientRPC(Vector3 otherPosition, ulong targetId)
     {
         if (OwnerClientId != targetId)
             return;
@@ -314,7 +314,7 @@ public class PlayerMovement : NetworkBehaviour
         thisRb.AddForce(pushDirection * 75, ForceMode.Impulse);
         Invoke(nameof(stopKnockback), 0.25f);
     }
-    void stopKnockback()
+    private void stopKnockback()
     {
         isKnockedBack = false;
     }

@@ -9,18 +9,24 @@ public class Rocket : NetworkBehaviour
     [SerializeField] private LayerMask collisionLayerMask;
     [SerializeField] private LayerMask playerLayerMask;
     [SerializeField] private Transform rocket;
+    [SerializeField] private ParticleController particleController;
+    private NetworkVariable<bool> isCollided = new NetworkVariable<bool>(false);
+    private Rigidbody ridgidBody;
     public void Setup(Vector3 shootDir)
     {
         rocket.up = shootDir;
 
-        Rigidbody ridgidBody = GetComponent<Rigidbody>();
+        ridgidBody = GetComponent<Rigidbody>();
         float moveSpeed = 95f;
         ridgidBody.AddForce(shootDir * moveSpeed, ForceMode.Impulse);
         Destroy(gameObject, 5f);
     }
     public void FixedUpdate()
     {
-        rocket.Rotate(new Vector3(0f, 100f, 0f), Space.Self);
+        if(!isCollided.Value)
+            rocket.Rotate(new Vector3(0f, 100f, 0f), Space.Self);
+        else 
+            rocket.gameObject.GetComponent<MeshRenderer>().enabled = false;
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -28,9 +34,13 @@ public class Rocket : NetworkBehaviour
         if (collisionLayerMask == (collisionLayerMask | (1 << other.gameObject.layer)))
         {
             KnockBackPlayer();
-
+            particleController.PlayParticles();
+            ridgidBody.velocity = Vector3.zero;
             if (IsServer)
-                Destroy(gameObject);
+            {
+                isCollided.Value = true;
+                Destroy(gameObject, 1f);
+            }
         }
     }
     private void KnockBackPlayer()
