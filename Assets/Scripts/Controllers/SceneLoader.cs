@@ -11,7 +11,8 @@ public class SceneLoader : NetworkBehaviour
         CharacterSelectScene,
         GameScene,
         LobbyScene,
-        MainMenu
+        MainMenu,
+        map1
     }
     public static void LoadScene(Scene scene)
     {

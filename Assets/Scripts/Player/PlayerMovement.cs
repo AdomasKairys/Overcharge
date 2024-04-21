@@ -82,6 +82,9 @@ public class PlayerMovement : MonoBehaviour
     public bool isClimbing;
     public bool isDashing;
 
+    [Header("Magnet wall speed")]
+    public float VerticalMagnetRunSpeed;
+    public float VerticalMagnetClimbSpeed;
     private void Start()
     {
         moveSpeed = walkSpeed;

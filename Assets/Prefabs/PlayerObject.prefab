@@ -2580,6 +2580,8 @@ MonoBehaviour:
   isWallrunning: 0
   isClimbing: 0
   isDashing: 0
+  VerticalMagnetRunSpeed: 10
+  VerticalMagnetClimbSpeed: 20
 --- !u!114 &268782608315915819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3684,7 +3686,7 @@ Transform:
   m_GameObject: {fileID: 6981099671181752950}
   serializedVersion: 2
   m_LocalRotation: {x: -0.18958393, y: 0.2601095, z: 0.0132652875, w: 0.94669163}
-  m_LocalPosition: {x: -0.00000018853288, y: 0.000000029518038, z: 0.00000014292466}
+  m_LocalPosition: {x: -0.00000037706576, y: 0.000000059036076, z: 0.00000028584932}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
