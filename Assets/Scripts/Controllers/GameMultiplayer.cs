@@ -133,7 +133,6 @@ public class GameMultiplayer : NetworkBehaviour
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
         NetworkManager_Host_OnClientDisconnectCallback(clientId);
-        SetPlayerIdServerRPC(AuthenticationService.Instance.PlayerId);
     }
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)

@@ -25,6 +25,9 @@ public class UIController : MonoBehaviour
     [Header("Player Death Menu")]
     public GameObject deathMenu;
 
+    [Header("Crosshair image")]
+    [SerializeField] private Image crosshair;
+
     [Header("Pick Up Inventory")]
     [SerializeField] private TextMeshProUGUI pickupName;
     [SerializeField] private Image pickupImage;
@@ -71,7 +74,7 @@ public class UIController : MonoBehaviour
         // Update the text boxes
         textMesh_velocity.text = player.GetComponent<Rigidbody>().velocity.magnitude.ToString();
         textMesh_playerState.text = playerStateController.currState.Value.ToString();
-
+        UpdateCrosshair();
         UpdatePickup();
     }
 
@@ -95,6 +98,10 @@ public class UIController : MonoBehaviour
         playerChargeBar.SetActive(true);
         velocityText.SetActive(true);
         playerStateController.Respawn();
+    }
+    private void UpdateCrosshair()
+    {
+        crosshair.transform.position = Input.mousePosition;
     }
 
     /// <summary>

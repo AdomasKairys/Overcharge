@@ -32,13 +32,54 @@ public class GameLobby : MonoBehaviour
     private Lobby joinedLobby;
     private float heartBeatTimer=1f;
     private float listLobbiesTimer = 1f;
+    private LobbyEventCallbacks callbacks = new LobbyEventCallbacks();
 
     private void Awake()
     {
         Instance = this;
+        callbacks.PlayerLeft += Callbacks_PlayerLeft;
+        callbacks.KickedFromLobby += Callbacks_KickedFromLobby;
         DontDestroyOnLoad(gameObject);
         InitializeUnityAuthentication();
     }
+
+    private void Callbacks_KickedFromLobby()
+    {
+        joinedLobby = null;
+    }
+
+    private async void Callbacks_PlayerLeft(List<int> obj)
+    {
+        try
+        {
+            foreach (var item in obj)
+            {
+                await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, item.ToString());
+            }
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log(e);
+        }
+    }
+    public async Task SubscribeToEvents()
+    {
+        try
+        {
+            await Lobbies.Instance.SubscribeToLobbyEventsAsync(joinedLobby.Id, callbacks);
+        }
+        catch (LobbyServiceException ex)
+        {
+            switch (ex.Reason)
+            {
+                case LobbyExceptionReason.AlreadySubscribedToLobby: Debug.LogWarning($"Already subscribed to lobby[{joinedLobby.Id}]. We did not need to try and subscribe again. Exception Message: {ex.Message}"); break;
+                case LobbyExceptionReason.SubscriptionToLobbyLostWhileBusy: Debug.LogError($"Subscription to lobby events was lost while it was busy trying to subscribe. Exception Message: {ex.Message}"); throw;
+                case LobbyExceptionReason.LobbyEventServiceConnectionError: Debug.LogError($"Failed to connect to lobby events. Exception Message: {ex.Message}"); throw;
+                default: throw;
+            }
+        }
+    }
+
     private async void InitializeUnityAuthentication()
     {
         InitializationOptions options = new InitializationOptions();
@@ -46,16 +87,19 @@ public class GameLobby : MonoBehaviour
         await UnityServices.InitializeAsync(options);
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
     }
 
     private void Update()
     {
+        Debug.Log(joinedLobby!= null ? joinedLobby.Players.Count : -1);
         HandleHeartbeat();
         HandlePeriodicListLobbies();
     }
     private void HandlePeriodicListLobbies()
     {
         if (joinedLobby == null &&
+            UnityServices.State == ServicesInitializationState.Initialized &&
             AuthenticationService.Instance.IsSignedIn &&
             SceneManager.GetActiveScene().name == SceneLoader.Scene.LobbyScene.ToString())
         {
@@ -169,6 +213,7 @@ public class GameLobby : MonoBehaviour
 
             GameMultiplayer.Instance.StartHost();
             SceneLoader.LoadScene(SceneLoader.Scene.CharacterSelectScene);
+            await SubscribeToEvents();
         }
         catch (LobbyServiceException e)
         {
@@ -190,6 +235,7 @@ public class GameLobby : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
 
             GameMultiplayer.Instance.StartClient();
+            await SubscribeToEvents();
         }
         catch (LobbyServiceException e)
         {
@@ -210,6 +256,7 @@ public class GameLobby : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
 
             GameMultiplayer.Instance.StartClient();
+            await SubscribeToEvents();
         }
         catch (LobbyServiceException e)
         {
@@ -231,6 +278,7 @@ public class GameLobby : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
 
             GameMultiplayer.Instance.StartClient();
+            await SubscribeToEvents();
         }
         catch (LobbyServiceException e)
         {
