@@ -74,6 +74,7 @@ public class PlayerController : NetworkBehaviour
                 prjc.UseKey = KeyCode.Mouse1;
                 break;
         }
+        ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
     }
     private void Update()
     {

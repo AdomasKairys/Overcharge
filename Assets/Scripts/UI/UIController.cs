@@ -63,10 +63,6 @@ public class UIController : MonoBehaviour
         playerChargeBarSlider.minValue = 0;
         playerChargeBarSlider.maxValue = playerStateController.overcharge;
         playerChargeBarSlider.value = playerStateController.currCharge.Value;
-
-        // Initialise equipment
-        _primaryText.text = "None";
-        _secondaryText.text = "None";
     }
 
     // Update is called once per frame
