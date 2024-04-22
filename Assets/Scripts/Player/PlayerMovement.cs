@@ -225,10 +225,9 @@ public class PlayerMovement : NetworkBehaviour
             || activeGrapple || isSwinging) return;
         moveDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        bool isWallFront = Physics.SphereCast(transform.position, sphereCastRadius, orientation.forward, out RaycastHit wallFrontHit, detectionLength, whatIsGround);
-        if (isWallFront && !isClimbing)
+        bool isWallInDir = Physics.SphereCast(transform.position, sphereCastRadius, moveDir, out RaycastHit wallFrontHit, detectionLength, whatIsGround);
+        if (isWallInDir && !isClimbing)
         {
-            Debug.Log("waht1");
 
             float wallLookAngle = Vector3.Angle(moveDir, -wallFrontHit.normal);
             Debug.Log(wallLookAngle);

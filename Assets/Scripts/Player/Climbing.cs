@@ -89,12 +89,12 @@ public class Climbing : MonoBehaviour
     {
         wallFront = Physics.SphereCast(transform.position, sphereCastRadius, orientation.forward, out frontWallHit, detectionLength, whatIsWall);
         wallLookAngle = Vector3.Angle(orientation.forward, -frontWallHit.normal);
-
         bool newWall = frontWallHit.transform != lastWall || Mathf.Abs(Vector3.Angle(lastWallNormal, frontWallHit.normal)) > minWallNormalAngleChange;
 
         if ((wallFront && newWall) || pm.isGrounded || (lastWall!= null && lastWall.CompareTag("Magnet")))
         {
-			if (frontWallHit.collider.CompareTag("Magnet"))
+
+            if (wallFront && frontWallHit.collider.CompareTag("Magnet"))
 			{
                 climbTimer = float.MaxValue;
             }
