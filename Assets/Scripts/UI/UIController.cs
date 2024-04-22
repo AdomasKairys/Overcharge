@@ -166,11 +166,10 @@ public class UIController : MonoBehaviour
                 switch (inventoryController.currentPickup)
                 {
                     case InventoryController.PickupType.SpeedBoost:
-                        pickupImage.sprite = pickupSprites[0]; break;
+                        pickupImage.sprite = pickupSprites[0]; pickupName.text = "Speed boost"; break;
                     case InventoryController.PickupType.GravityBomb:
-                        pickupImage.sprite = pickupSprites[1]; break;
+                        pickupImage.sprite = pickupSprites[1]; pickupName.text = "Gravity bomb"; break;
                 }
-                pickupName.text = inventoryController.currentPickup.ToString();
                 cooldownPickupImage.SetActive(false);
             }
             else
