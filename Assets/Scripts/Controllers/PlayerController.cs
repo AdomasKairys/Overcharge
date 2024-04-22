@@ -39,9 +39,41 @@ public class PlayerController : NetworkBehaviour
         else
         {
             fl.Priority = 10;
+
+            // Initially disable all equipment
+            sw.enabled = false;
+            prjc.enabled = false;
         }
         PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
+
+        // Enable equipment based on selection
+        switch(playerData.primaryEquipment)
+        {
+            case EquipmentType.None:
+                break;
+            case EquipmentType.GrapplingHook:
+                sw.enabled = true;
+                sw.UseKey = KeyCode.Mouse0;
+                break;
+            case EquipmentType.RocketLauncher:
+                prjc.enabled = true;
+                prjc.UseKey = KeyCode.Mouse0;
+                break;
+        }
+        switch (playerData.secondaryEquipment)
+        {
+            case EquipmentType.None:
+                break;
+            case EquipmentType.GrapplingHook:
+                sw.enabled = true;
+                sw.UseKey = KeyCode.Mouse1;
+                break;
+            case EquipmentType.RocketLauncher:
+                prjc.enabled = true;
+                prjc.UseKey = KeyCode.Mouse1;
+                break;
+        }
     }
     private void Update()
     {
