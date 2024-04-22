@@ -180,6 +180,8 @@ public class GameMultiplayer : NetworkBehaviour
     public PlayerData GetPlayerDataFrompLayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];
     public Color GetPlayerColor(int colorId) => playerColors[colorId];
 
+    #region Color management
+
     public void ChangePlayerColor(int colorId)
     {
         ChangePlayerColorServerRPC(colorId);
@@ -216,6 +218,8 @@ public class GameMultiplayer : NetworkBehaviour
         }
         return -1;
     }
+
+    #endregion
 
     #region Equipment management
 

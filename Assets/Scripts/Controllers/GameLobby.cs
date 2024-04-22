@@ -92,7 +92,7 @@ public class GameLobby : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(joinedLobby!= null ? joinedLobby.Players.Count : -1);
+        //Debug.Log(joinedLobby != null ? joinedLobby.Players.Count : -1);
         HandleHeartbeat();
         HandlePeriodicListLobbies();
     }
@@ -127,7 +127,7 @@ public class GameLobby : MonoBehaviour
             }
         }
     }
-    private bool IsLobbyHost() => joinedLobby != null && joinedLobby.HostId == AuthenticationService.Instance.PlayerId;
+    public bool IsLobbyHost() => joinedLobby != null && joinedLobby.HostId == AuthenticationService.Instance.PlayerId;
     private async void ListLobbies()
     {
         try

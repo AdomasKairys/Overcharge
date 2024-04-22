@@ -37,6 +37,9 @@ public class UIController : MonoBehaviour
     [SerializeField] private InventoryController inventoryController;
     private bool shufflePickups = true;
 
+    [Header("Equipment Inventory")]
+    [SerializeField] private TextMeshProUGUI _primaryText;
+    [SerializeField] private TextMeshProUGUI _secondaryText;
 
     TextMeshProUGUI textMesh_playerState;
     TextMeshProUGUI textMesh_velocity;
@@ -60,6 +63,10 @@ public class UIController : MonoBehaviour
         playerChargeBarSlider.minValue = 0;
         playerChargeBarSlider.maxValue = playerStateController.overcharge;
         playerChargeBarSlider.value = playerStateController.currCharge.Value;
+
+        // Initialise equipment
+        _primaryText.text = "None";
+        _secondaryText.text = "None";
     }
 
     // Update is called once per frame
@@ -76,6 +83,29 @@ public class UIController : MonoBehaviour
         textMesh_playerState.text = playerStateController.currState.Value.ToString();
         UpdateCrosshair();
         UpdatePickup();
+    }
+
+    public void SetEquipment(EquipmentType primary, EquipmentType secondary)
+    {
+        switch (primary)
+        {
+            case EquipmentType.GrapplingHook:
+                _primaryText.text = "Grappling hook";
+                break;
+            case EquipmentType.RocketLauncher:
+                _primaryText.text = "Rocket launcher";
+                break;
+        }
+
+        switch (secondary)
+        {
+            case EquipmentType.GrapplingHook:
+                _secondaryText.text = "Grappling hook";
+                break;
+            case EquipmentType.RocketLauncher:
+                _secondaryText.text = "Rocket launcher";
+                break;
+        }
     }
 
     private void ShowDeathMenu()
