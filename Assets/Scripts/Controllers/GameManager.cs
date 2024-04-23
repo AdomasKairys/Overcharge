@@ -6,11 +6,6 @@ using UnityEngine.Rendering.PostProcessing;
 
 public class GameManager : NetworkBehaviour
 {
-        [SerializeField] private GameObject scoreboard;
-    [SerializeField] private PlayerCard playCardPrefab;
-    [SerializeField] private Transform playerCardParent;
-
-    private Dictionary<ulong, PlayerCard> _playerCards = new Dictionary<ulong, PlayerCard>();
     [SerializeField] private Transform playerPrefab;
 
     public static GameManager Instance { get; private set; }
@@ -30,7 +25,6 @@ public class GameManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
-        scoreboard.SetActive(false);
     }
     private void Update()
     {
@@ -53,10 +47,6 @@ public class GameManager : NetworkBehaviour
             case State.GameOver:
                 break;
         }
-        if (Input.GetKeyDown(KeyCode.CapsLock))
-            scoreboard.SetActive(true);
-        if (Input.GetKeyUp(KeyCode.CapsLock))
-            scoreboard.SetActive(false);
     }
 
     public override void OnNetworkSpawn()
@@ -84,21 +74,5 @@ public class GameManager : NetworkBehaviour
     public bool IsGamePlaying() => state.Value == State.GamePlaying;
     public bool IsCountdownToStartActive() => state.Value == State.CountdownToStart;
     public float GetCountdownToStartTimer() => countDownToStartTimer.Value;
-
-        public static void PlayerJoined(ulong clientID, string name)
-    {
-        PlayerCard newCard = Instantiate(Instance.playCardPrefab, Instance.playerCardParent);
-        Instance._playerCards.Add(clientID, newCard);
-        newCard.Initialize(name.ToString());
-    }
-
-    public static void PlayerLeft(ulong clientID)
-    {
-       if(Instance._playerCards.TryGetValue(clientID, out PlayerCard playerCard))
-        {
-            Destroy(playerCard.gameObject);
-            Instance._playerCards.Remove(clientID);
-        }
-    }
 
 }
