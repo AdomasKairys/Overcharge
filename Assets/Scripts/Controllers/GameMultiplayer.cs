@@ -127,12 +127,14 @@ public class GameMultiplayer : NetworkBehaviour
             Debug.Log(playerDataNetworkList.Count);
         }
         NetworkManager.Singleton.Shutdown();
+        GameManager.PlayerLeft(clientId);
 
     }
     public void KickPlayer(ulong clientId)
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
         NetworkManager_Host_OnClientDisconnectCallback(clientId);
+        GameManager.PlayerLeft(clientId);
     }
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)
@@ -173,6 +175,7 @@ public class GameMultiplayer : NetworkBehaviour
         {
             if (playerData.clientId == clientId)
                 return playerData;
+                GameManager.PlayerJoined(clientId, playerName);
         }
         return default;
     }
