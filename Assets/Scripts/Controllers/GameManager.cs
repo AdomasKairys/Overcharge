@@ -43,6 +43,8 @@ public class GameManager : NetworkBehaviour
                 }
                 break;
             case State.GamePlaying:
+                if(GameMultiplayer.Instance.IsGameOver())
+                    state.Value = State.GameOver;
                 break;
             case State.GameOver:
                 break;
@@ -73,6 +75,8 @@ public class GameManager : NetworkBehaviour
     }
     public bool IsGamePlaying() => state.Value == State.GamePlaying;
     public bool IsCountdownToStartActive() => state.Value == State.CountdownToStart;
+    public bool IsGameOver() => state.Value == State.GameOver;
+
     public float GetCountdownToStartTimer() => countDownToStartTimer.Value;
 
 }

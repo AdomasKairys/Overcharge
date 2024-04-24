@@ -92,7 +92,14 @@ public class PlayerStateController : NetworkBehaviour
     [ServerRpc]
     private void DieServerRPC(NetworkObjectReference pc)
     {
+        if (!pc.TryGet(out NetworkObject networkObject))
+            return;
+
+        var player = networkObject.transform.Find("Player");
+        player.GetComponent<PlayerStateController>().currState.Value = PlayerState.Dead;
         DieClientRPC(pc);
+        GameMultiplayer.Instance.KillPlayerServerRPC(networkObject.OwnerClientId);
+
     }
     [ClientRpc]
     private void DieClientRPC(NetworkObjectReference pc)

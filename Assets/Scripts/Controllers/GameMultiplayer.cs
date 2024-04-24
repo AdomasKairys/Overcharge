@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Services.Authentication;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -80,6 +81,16 @@ public class GameMultiplayer : NetworkBehaviour
 
         playerDataNetworkList[playerDataIndex] = playerData;
     }
+    [ServerRpc(RequireOwnership = false)]
+    public void KillPlayerServerRPC(ulong playerId)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(playerId);
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.isDead = true;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
     private void NetworkManager_Client_OnClientDisconnectCallback(ulong clientId)
     {
         OnFailToJoinGame?.Invoke(this, EventArgs.Empty);
@@ -137,7 +148,7 @@ public class GameMultiplayer : NetworkBehaviour
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)
     {
-        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() });
+        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() , isDead=false});
         SetPlayerNameServerRPC(GetPlayerName());
     }
 
@@ -175,6 +186,16 @@ public class GameMultiplayer : NetworkBehaviour
                 return playerData;
         }
         return default;
+    }
+    public bool IsGameOver()
+    {
+        int aliveCout = 0;
+        foreach(PlayerData playerData in playerDataNetworkList)
+        {
+            if(!playerData.isDead)
+                aliveCout++;
+        }
+        return aliveCout <= 1;
     }
     public PlayerData GetPlayerData() => GetPlayerDataFromClientId(NetworkManager.Singleton.LocalClientId);
     public PlayerData GetPlayerDataFrompLayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];
