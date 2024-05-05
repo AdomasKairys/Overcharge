@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class Swinging : EquipmentController
@@ -12,6 +13,7 @@ public class Swinging : EquipmentController
     public MeshRenderer gun;
     public Transform gunHolder, gunTip, cam, player;
     public LayerMask whatIsGrappleable;
+    public LayerMask playerLayer;
     public PlayerMovement pm;
 
     [Header("Swinging")]
@@ -35,6 +37,8 @@ public class Swinging : EquipmentController
 
     //[Header("Input")]
     //public KeyCode swingKey = KeyCode.Mouse0;
+
+    private bool isPlayerGrappled = false;
 
     private void Start()
     {
@@ -103,7 +107,7 @@ public class Swinging : EquipmentController
             );
     }
 
-
+    private Collider hitPlayerCollider;
     private void CheckForSwingPoints()
     {
         if (joint != null) return;
@@ -116,10 +120,24 @@ public class Swinging : EquipmentController
         Physics.Raycast(cam.position, cam.forward,
                             out raycastHit, maxSwingDistance, whatIsGrappleable);
 
+        RaycastHit raycastHitPlayer;
+        Physics.Raycast(cam.position, cam.forward,
+                            out raycastHitPlayer, maxSwingDistance, playerLayer);
         Vector3 realHitPoint;
 
+        if (raycastHitPlayer.point == Vector3.zero)
+            isPlayerGrappled = false;
+
+        // Option 0 - Hit player
+        if (raycastHitPlayer.point != Vector3.zero)
+        {
+            Debug.Log("Player hit");
+            isPlayerGrappled = true;
+            realHitPoint = raycastHitPlayer.point;
+            hitPlayerCollider = raycastHitPlayer.collider;
+        }
         // Option 1 - Direct Hit
-        if (raycastHit.point != Vector3.zero)
+        else if (raycastHit.point != Vector3.zero)
             realHitPoint = raycastHit.point;
 
         // Option 2 - Indirect (predicted) Hit
@@ -150,6 +168,13 @@ public class Swinging : EquipmentController
         // return if predictionHit not found
         if (predictionHit.point == Vector3.zero) return;
 
+        if (isPlayerGrappled)
+        {
+            Debug.Log("Player hit1");
+            GrapplePlayerServerRPC(hitPlayerCollider.GetComponentInParent<NetworkObject>().OwnerClientId, (transform.position - predictionHit.point).normalized);
+            swingTimer = 0.5f;
+        }
+
         // deactivate active grapple
         //if (GetComponent<Grappling>() != null)
         //    GetComponent<Grappling>().StopGrapple();
@@ -177,7 +202,19 @@ public class Swinging : EquipmentController
         SetLineRendererServerRPC(pc, 2, true);
         currentGrapplePosition = gunTip.position;
     }
-
+    [ServerRpc]
+    private void GrapplePlayerServerRPC(ulong clienId, Vector3 direction)
+    {
+        GrapplePlayerClientRPC(clienId, direction);
+    }
+    [ClientRpc]
+    private void GrapplePlayerClientRPC(ulong clienId, Vector3 direction)
+    {
+        if(OwnerClientId == clienId)
+        {
+            rb.AddForce(transform.forward * 200f, ForceMode.Impulse);
+        }
+    }
     public void StopSwing()
     {
         swingTimer = swingDuration;

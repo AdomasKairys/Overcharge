@@ -11,7 +11,6 @@ public class GameManager : NetworkBehaviour
     public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
-
     private enum State
     {
         WaitingToStart,
@@ -70,6 +69,7 @@ public class GameManager : NetworkBehaviour
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             Transform playerTransform = Instantiate(playerPrefab);
+            playerTransform.position = new Vector3(UnityEngine.Random.value*10, playerTransform.position.y, UnityEngine.Random.value * 10);
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }

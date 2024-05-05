@@ -790,7 +790,7 @@ Transform:
   m_GameObject: {fileID: 1060693353698681763}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.095235914, y: -0.124654785, z: 6.24694}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -876,7 +876,7 @@ Transform:
   m_GameObject: {fileID: 1101542914612667811}
   serializedVersion: 2
   m_LocalRotation: {x: -0.00080486207, y: 0.81477153, z: 0.0011310815, w: 0.57978064}
-  m_LocalPosition: {x: -4.9954457, y: 0.6899917, z: 11.732729}
+  m_LocalPosition: {x: -4.90021, y: 0.56533694, z: 17.97967}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1934,7 +1934,7 @@ Transform:
   m_GameObject: {fileID: 2772026833983178272}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.095235914, y: 0.09465478, z: -3.9969401}
+  m_LocalPosition: {x: 0, y: 0, z: -3.099694}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3062,7 +3062,7 @@ Transform:
   m_GameObject: {fileID: 4396995675694076079}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.095235914, y: 0.124654785, z: -6.24694}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3100,7 +3100,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!135 &4542140306186298867
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3230,6 +3230,9 @@ MonoBehaviour:
   whatIsGrappleable:
     serializedVersion: 2
     m_Bits: 320
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 8
   pm: {fileID: 4375474895832565972}
   swingDuration: 4
   orientation: {fileID: 7305118217604409531}

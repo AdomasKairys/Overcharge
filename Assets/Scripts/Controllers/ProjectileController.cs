@@ -29,7 +29,7 @@ public class ProjectileController : EquipmentController
     public void OnShootServerRPC(Vector3 spawnPos, Vector3 shootDir)
     {
         Transform rocket = Instantiate(pfRocket, spawnPos, Quaternion.identity);
-        rocket.GetComponent<NetworkObject>().Spawn();
+        rocket.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
         rocket.GetComponent<Rocket>().Setup(shootDir);
     }
 
