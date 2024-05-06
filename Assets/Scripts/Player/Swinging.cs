@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class Swinging : EquipmentController
@@ -63,10 +64,15 @@ public class Swinging : EquipmentController
 
     private void LateUpdate()
     {
-        if (joint) DrawRopeRPC(pc);
+        if (joint) DrawRopeServerRPC(pc);
     }
-    [Rpc(SendTo.Everyone)]
-    private void SetLineRendererRPC(NetworkObjectReference pc, int count, bool enabled)
+    [ServerRpc]
+    private void SetLineRendererServerRPC(NetworkObjectReference pc, int count, bool enabled)
+    {
+        SetLineRendererClientRPC(pc, count, enabled);
+    }
+    [ClientRpc]
+    private void SetLineRendererClientRPC(NetworkObjectReference pc, int count, bool enabled)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
@@ -79,8 +85,13 @@ public class Swinging : EquipmentController
         gun.GetComponent<MeshRenderer>().enabled = enabled;
 
     }
-    [Rpc(SendTo.Everyone)]
-    private void DrawRopeRPC(NetworkObjectReference pc)
+    [ServerRpc]
+    private void DrawRopeServerRPC(NetworkObjectReference pc)
+    {
+        DrawRopeClientRPC(pc);
+    }
+        [ClientRpc]
+    private void DrawRopeClientRPC(NetworkObjectReference pc)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
@@ -160,7 +171,7 @@ public class Swinging : EquipmentController
         if (isPlayerGrappled)
         {
             Debug.Log("Player hit1");
-            GrapplePlayerRPC((transform.position - predictionHit.point).normalized, RpcTarget.Single(hitPlayerClientId, RpcTargetUse.Temp));
+            GrapplePlayerServerRpc((transform.position - predictionHit.point).normalized, hitPlayerClientId);
             swingTimer = 0.5f;
         }
 
@@ -188,11 +199,23 @@ public class Swinging : EquipmentController
         joint.damper = 7f;
         joint.massScale = 4.5f;
 
-        SetLineRendererRPC(pc, 2, true);
+        SetLineRendererServerRPC(pc, 2, true);
         currentGrapplePosition = gunTip.position;
     }
-    [Rpc(SendTo.SpecifiedInParams)]
-    private void GrapplePlayerRPC(Vector3 direction, RpcParams rpcParams)
+    [ServerRpc]
+    private void GrapplePlayerServerRpc(Vector3 direction, ulong targetId)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { targetId }
+            }
+        };
+        GrapplePlayerClientRPC(direction, clientRpcParams);
+    }
+    [ClientRpc]
+    private void GrapplePlayerClientRPC(Vector3 direction, ClientRpcParams clientRpcParams = default)
     {
         rb.AddForce(direction * 200f, ForceMode.Impulse);
     }
@@ -201,7 +224,7 @@ public class Swinging : EquipmentController
         swingTimer = swingDuration;
 
         pm.isSwinging = false;
-        SetLineRendererRPC(pc, 0, false);
+        SetLineRendererServerRPC(pc, 0, false);
 
         Destroy(joint);
     }

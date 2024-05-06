@@ -14,24 +14,9 @@ public class HostDisconnectUI : MonoBehaviour
     {
         Debug.Log(NetworkManager.ServerClientId + " " + NetworkManager.Singleton.LocalClientId);
 
-        NetworkManager.Singleton.OnConnectionEvent += NetworkManager_OnConnectionEvent; 
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback; 
         playAgainButton.onClick.AddListener(() => { SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString()); });
         Hide();
-    }
-
-    private void NetworkManager_OnConnectionEvent(NetworkManager arg1, ConnectionEventData arg2)
-    {
-        Debug.Log(NetworkManager.ServerClientId + " " + arg2.ClientId);
-
-        if (arg2.EventType == ConnectionEvent.ClientDisconnected && arg2.ClientId == NetworkManager.ServerClientId)
-        {
-            Show();
-        }
-    }
-
-    private void NetworkManager_OnServerStopped(bool obj)
-    {
-        Show();
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
@@ -61,9 +46,7 @@ public class HostDisconnectUI : MonoBehaviour
     {
         if (NetworkManager.Singleton != null)
         {
-            // NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
-            // NetworkManager.Singleton.OnServerStopped -= NetworkManager_OnServerStopped;
-            NetworkManager.Singleton.OnConnectionEvent -= NetworkManager_OnConnectionEvent;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
         }
     }
 }
