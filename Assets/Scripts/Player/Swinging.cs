@@ -1,9 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using Unity.Netcode;
-using Unity.Netcode.Components;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class Swinging : EquipmentController
@@ -90,7 +85,7 @@ public class Swinging : EquipmentController
     {
         DrawRopeClientRPC(pc);
     }
-        [ClientRpc]
+    [ClientRpc]
     private void DrawRopeClientRPC(NetworkObjectReference pc)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
@@ -171,7 +166,7 @@ public class Swinging : EquipmentController
         if (isPlayerGrappled)
         {
             Debug.Log("Player hit1");
-            GrapplePlayerServerRpc((transform.position - predictionHit.point).normalized, hitPlayerClientId);
+            pm.UniversalKnockback(predictionHit.point, 50f, hitPlayerClientId);
             swingTimer = 0.5f;
         }
 
@@ -201,23 +196,6 @@ public class Swinging : EquipmentController
 
         SetLineRendererServerRPC(pc, 2, true);
         currentGrapplePosition = gunTip.position;
-    }
-    [ServerRpc]
-    private void GrapplePlayerServerRpc(Vector3 direction, ulong targetId)
-    {
-        ClientRpcParams clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new ulong[] { targetId }
-            }
-        };
-        GrapplePlayerClientRPC(direction, clientRpcParams);
-    }
-    [ClientRpc]
-    private void GrapplePlayerClientRPC(Vector3 direction, ClientRpcParams clientRpcParams = default)
-    {
-        rb.AddForce(direction * 200f, ForceMode.Impulse);
     }
     public void StopSwing()
     {

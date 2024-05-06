@@ -49,7 +49,7 @@ public class Rocket : NetworkBehaviour
         foreach(Collider player in players) 
         {
             PlayerMovement pm = player.gameObject.GetComponentInParent<PlayerMovement>();
-            pm.RocketKnockback(transform.position, player.transform.parent.parent.GetComponent<NetworkObject>().OwnerClientId);
+            pm.UniversalKnockback(transform.position, 50f, player.transform.parent.parent.GetComponent<NetworkObject>().OwnerClientId);
         }
     }
 

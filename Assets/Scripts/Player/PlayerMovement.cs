@@ -298,16 +298,28 @@ public class PlayerMovement : NetworkBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
-    public void RocketKnockback(Vector3 otherPosition, ulong targetId)
+    public void UniversalKnockback(Vector3 otherPosition, float strength, ulong targetId)
     {
-        RocketKnockbackRPC(otherPosition, RpcTarget.Single(targetId, RpcTargetUse.Temp));
+        UniversalKnockbackServerRPC(otherPosition, strength, targetId);
     }
-    [Rpc(SendTo.SpecifiedInParams)]
-    private void RocketKnockbackRPC(Vector3 otherPosition, RpcParams rpcParams)
+    [ServerRpc(RequireOwnership=false)]
+    private void UniversalKnockbackServerRPC(Vector3 otherPosition, float strength, ulong targetId)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { targetId }
+            }
+        };
+        UniversalKnockbackClientRPC(otherPosition, strength, clientRpcParams);
+    }
+    [ClientRpc]
+    private void UniversalKnockbackClientRPC(Vector3 otherPosition, float strength, ClientRpcParams clientRpcParams = default)
     {
         isKnockedBack = true;
         Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
-        rb.AddForce(pushDirection * 75, ForceMode.Impulse);
+        rb.AddForce(pushDirection * strength, ForceMode.Impulse);
         Invoke(nameof(stopKnockback), 0.25f);
     }
     private void stopKnockback()
