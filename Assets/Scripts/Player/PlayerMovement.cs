@@ -300,22 +300,14 @@ public class PlayerMovement : NetworkBehaviour
     }
     public void RocketKnockback(Vector3 otherPosition, ulong targetId)
     {
-        RocketKnockbackServerRPC(otherPosition, targetId);
+        RocketKnockbackRPC(otherPosition, RpcTarget.Single(targetId, RpcTargetUse.Temp));
     }
-    [ServerRpc(RequireOwnership=false)]
-    private void RocketKnockbackServerRPC(Vector3 otherPosition, ulong targetId)
+    [Rpc(SendTo.SpecifiedInParams)]
+    private void RocketKnockbackRPC(Vector3 otherPosition, RpcParams rpcParams)
     {
-        RocketKnockbackClientRPC(otherPosition, targetId);
-    }
-    [ClientRpc]
-    private void RocketKnockbackClientRPC(Vector3 otherPosition, ulong targetId)
-    {
-        if (OwnerClientId != targetId)
-            return;
         isKnockedBack = true;
-        var thisRb = GetComponent<Rigidbody>();
-        Vector3 pushDirection = (thisRb.transform.position - otherPosition).normalized;
-        thisRb.AddForce(pushDirection * 75, ForceMode.Impulse);
+        Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
+        rb.AddForce(pushDirection * 75, ForceMode.Impulse);
         Invoke(nameof(stopKnockback), 0.25f);
     }
     private void stopKnockback()

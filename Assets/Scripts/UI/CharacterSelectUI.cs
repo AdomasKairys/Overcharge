@@ -84,7 +84,7 @@ public class CharacterSelect : MonoBehaviour
     public void MainMenu()
     {
         GameLobby.Instance.LeaveLobby();
-        GameMultiplayer.Instance.Shutdown(NetworkManager.Singleton.LocalClientId);
+        GameMultiplayer.Instance.Shutdown();
         SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString());
     }
 

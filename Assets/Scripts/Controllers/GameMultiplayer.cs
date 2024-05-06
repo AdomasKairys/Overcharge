@@ -130,9 +130,9 @@ public class GameMultiplayer : NetworkBehaviour
                 playerDataNetworkList.RemoveAt(i);
         }
     }
-    public void Shutdown(ulong clientId)
+    public void Shutdown()
     {
-        if(clientId ==  NetworkManager.ServerClientId)
+        if(NetworkManager.IsServer)
         {
             playerDataNetworkList.Clear();
             Debug.Log(playerDataNetworkList.Count);

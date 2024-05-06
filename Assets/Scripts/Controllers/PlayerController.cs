@@ -22,28 +22,10 @@ public class PlayerController : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (!IsOwner)
-        {
-            fl.Priority = 0;
-            pm.enabled = false;
-            cl.enabled = false;
-            sw.enabled = false;
-            wr.enabled = false;
-            ds.enabled = false;
-            psc.enabled = false;
-            tc.enabled = false;
-            prjc.enabled = false;
-            inventoryController.enabled = false;
-            ui.SetActive(false);
-        }
-        else
-        {
-            fl.Priority = 10;
-
-            // Initially disable all equipment
-            sw.enabled = false;
-            prjc.enabled = false;
-        }
+        // Initially disable all equipment
+        sw.enabled = false;
+        prjc.enabled = false;
+        
         PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
 
@@ -75,6 +57,24 @@ public class PlayerController : NetworkBehaviour
                 break;
         }
         ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
+        if (!IsOwner)
+        {
+            fl.Priority = 0;
+            pm.enabled = false;
+            cl.enabled = false;
+            sw.enabled = false;
+            wr.enabled = false;
+            ds.enabled = false;
+            psc.enabled = false;
+            tc.enabled = false;
+            prjc.enabled = false;
+            inventoryController.enabled = false;
+            ui.SetActive(false);
+        }
+        else
+        {
+            fl.Priority = 10;
+        }
     }
     private void Update()
     {

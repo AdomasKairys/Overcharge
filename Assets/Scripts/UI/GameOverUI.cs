@@ -21,8 +21,6 @@ public class GameOverUI : MonoBehaviour
             Hide();
         }
     }
-
-
     private void Show()
     {
         gameObject.SetActive(true);
@@ -30,5 +28,9 @@ public class GameOverUI : MonoBehaviour
     private void Hide()
     {
         gameObject.SetActive(false);
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
     }
 }

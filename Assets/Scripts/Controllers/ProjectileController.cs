@@ -23,13 +23,13 @@ public class ProjectileController : EquipmentController
 
     private void ProjectileController_OnShoot(object sender, OnShootEventArgs e)
     {
-        OnShootServerRPC(e.spawnPos, e.shootDir);
+        OnShootRPC(e.spawnPos, e.shootDir);
     }
-    [ServerRpc]
-    public void OnShootServerRPC(Vector3 spawnPos, Vector3 shootDir)
+    [Rpc(SendTo.Server)]
+    public void OnShootRPC(Vector3 spawnPos, Vector3 shootDir)
     {
         Transform rocket = Instantiate(pfRocket, spawnPos, Quaternion.identity);
-        rocket.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+        rocket.GetComponent<NetworkObject>().Spawn();
         rocket.GetComponent<Rocket>().Setup(shootDir);
     }
 
