@@ -102,7 +102,6 @@ public class PlayerMovement : NetworkBehaviour
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
         MyInput();
         StateHandler();
-        Debug.Log(isKnockedBack);
         rb.drag = isGrounded && state != MovementState.dashing && state != MovementState.knockback && !isSwinging ? groundDrag : 0;
         
     }
@@ -318,8 +317,9 @@ public class PlayerMovement : NetworkBehaviour
     private void UniversalKnockbackClientRPC(Vector3 otherPosition, float strength, ClientRpcParams clientRpcParams = default)
     {
         isKnockedBack = true;
-        Vector3 pushDirection = (rb.transform.position - otherPosition).normalized;
-        rb.AddForce(pushDirection * strength, ForceMode.Impulse);
+        var thisRb = GetComponent<Rigidbody>();
+        Vector3 pushDirection = (thisRb.transform.position - otherPosition).normalized;
+        thisRb.AddForce(pushDirection * strength, ForceMode.Impulse);
         Invoke(nameof(stopKnockback), 0.25f);
     }
     private void stopKnockback()

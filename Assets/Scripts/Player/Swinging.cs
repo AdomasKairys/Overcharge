@@ -118,7 +118,10 @@ public class Swinging : EquipmentController
         RaycastHit raycastHitPlayer;
         Physics.Raycast(cam.position, cam.forward,
                             out raycastHitPlayer, maxSwingDistance, playerLayer);
-        Vector3 realHitPoint;
+
+        // Option 3 - Miss
+
+        Vector3 realHitPoint = Vector3.zero;
 
         if (raycastHitPlayer.point == Vector3.zero)
             isPlayerGrappled = false;
@@ -126,10 +129,14 @@ public class Swinging : EquipmentController
         // Option 0 - Hit player
         if (raycastHitPlayer.point != Vector3.zero)
         {
-            Debug.Log("Player hit");
-            isPlayerGrappled = true;
-            realHitPoint = raycastHitPlayer.point;
             hitPlayerClientId = raycastHitPlayer.collider.GetComponentInParent<NetworkObject>().OwnerClientId;
+            if (hitPlayerClientId != OwnerClientId)
+            {
+                Debug.Log("Player hit");
+                isPlayerGrappled = true;
+                realHitPoint = raycastHitPlayer.point;
+                Debug.Log(hitPlayerClientId + " " + OwnerClientId);
+            }
         }
         // Option 1 - Direct Hit
         else if (raycastHit.point != Vector3.zero)
@@ -139,9 +146,6 @@ public class Swinging : EquipmentController
         else if (sphereCastHit.point != Vector3.zero)
             realHitPoint = sphereCastHit.point;
 
-        // Option 3 - Miss
-        else
-            realHitPoint = Vector3.zero;
 
         // realHitPoint found
         if (realHitPoint != Vector3.zero)
@@ -166,7 +170,7 @@ public class Swinging : EquipmentController
         if (isPlayerGrappled)
         {
             Debug.Log("Player hit1");
-            pm.UniversalKnockback(predictionHit.point, 50f, hitPlayerClientId);
+            pm.UniversalKnockback(player.position, 50f, hitPlayerClientId);
             swingTimer = 0.5f;
         }
 

@@ -59,6 +59,7 @@ public class PlayerController : NetworkBehaviour
         ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
         if (!IsOwner)
         {
+            pm.gameObject.layer = LayerMask.NameToLayer("otherPlayer");
             fl.Priority = 0;
             pm.enabled = false;
             cl.enabled = false;

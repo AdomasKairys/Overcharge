@@ -3232,7 +3232,7 @@ MonoBehaviour:
     m_Bits: 320
   playerLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 2048
   pm: {fileID: 4375474895832565972}
   swingDuration: 4
   orientation: {fileID: 7305118217604409531}
