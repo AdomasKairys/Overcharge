@@ -15,7 +15,10 @@ public class HostDisconnectUI : MonoBehaviour
         Debug.Log(NetworkManager.ServerClientId + " " + NetworkManager.Singleton.LocalClientId);
 
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback; 
-        playAgainButton.onClick.AddListener(() => { SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString()); });
+        playAgainButton.onClick.AddListener(() => {
+            GameLobby.Instance.LeaveLobby();
+            SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString()); 
+        });
         Hide();
     }
 

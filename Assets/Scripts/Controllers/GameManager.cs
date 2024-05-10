@@ -24,6 +24,8 @@ public class GameManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
+        if (!IsServer)
+            SetRandomPlayerChaser();
     }
     private void Update()
     {
@@ -58,7 +60,13 @@ public class GameManager : NetworkBehaviour
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
         }
     }
-
+    public void SetRandomPlayerChaser()
+    {
+        var rand = new System.Random();
+        var clientIds = NetworkManager.Singleton.ConnectedClientsIds;
+        if(!GameMultiplayer.Instance.IsGameOver())
+            GameMultiplayer.Instance.ChangePlayerState(clientIds[rand.Next(0, clientIds.Count)], PlayerState.Chaser);
+    }
     private void State_OnValueChanged(State previousValue, State newValue)
     {
         OnStateChanged?.Invoke(this, EventArgs.Empty);

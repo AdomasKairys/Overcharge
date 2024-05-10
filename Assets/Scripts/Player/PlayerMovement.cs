@@ -316,6 +316,7 @@ public class PlayerMovement : NetworkBehaviour
     [ClientRpc]
     private void UniversalKnockbackClientRPC(Vector3 otherPosition, float strength, ClientRpcParams clientRpcParams = default)
     {
+        Debug.Log("hello");
         isKnockedBack = true;
         var thisRb = GetComponent<Rigidbody>();
         Vector3 pushDirection = (thisRb.transform.position - otherPosition).normalized;

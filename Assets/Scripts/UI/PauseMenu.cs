@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,7 +9,10 @@ public class PauseMenu : NetworkBehaviour
 {
     public static bool isPaused = false;
     [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private MonoBehaviour[] player;
     public GameObject[] NotPauseMenuUI;
+    public ThirdPersonCam thirdPersonCam;
+
     private void Start()
     {
         pauseMenu.SetActive(false);
@@ -29,6 +33,7 @@ public class PauseMenu : NetworkBehaviour
     }
     public void Resume()
 	{
+        thirdPersonCam.UnfreezeCamera();
         pauseMenu.SetActive(false);
         isPaused = false;
         setTo(true);
@@ -37,6 +42,7 @@ public class PauseMenu : NetworkBehaviour
     }
     void Pause()
 	{
+        thirdPersonCam.FreezeCamera();
         pauseMenu.SetActive(true);
         isPaused = true;
         setTo(false);
@@ -49,6 +55,10 @@ public class PauseMenu : NetworkBehaviour
         foreach(GameObject o in NotPauseMenuUI)
 		{
             o.SetActive(to);
+        }
+        foreach (MonoBehaviour mb in player)
+        {
+            mb.enabled = to;
         }
         //NotPauseMenuUI.SetActive(to);
     }

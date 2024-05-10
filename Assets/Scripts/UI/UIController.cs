@@ -69,14 +69,14 @@ public class UIController : MonoBehaviour
     void Update()
     {
         // Update the player state information
-        if(playerStateController.currState.Value == PlayerState.Chaser)
+        if(playerStateController.GetState() == PlayerState.Chaser)
         {
             playerChargeBarSlider.value = playerStateController.currCharge.Value;
         }        
 
         // Update the text boxes
         textMesh_velocity.text = player.GetComponent<Rigidbody>().velocity.magnitude.ToString();
-        textMesh_playerState.text = playerStateController.currState.Value.ToString();
+        textMesh_playerState.text = playerStateController.GetState().ToString();
         UpdateCrosshair();
         UpdatePickup();
     }

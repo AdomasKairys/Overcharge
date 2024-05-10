@@ -1,3 +1,4 @@
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -59,15 +60,30 @@ public class Swinging : EquipmentController
 
     private void LateUpdate()
     {
-        if (joint) DrawRopeServerRPC(pc);
+        if (joint) DrawRope(pc);
     }
-    [ServerRpc]
-    private void SetLineRendererServerRPC(NetworkObjectReference pc, int count, bool enabled)
+    
+    private void SetLineRenderer(NetworkObjectReference pc, int count, bool enabled)
     {
-        SetLineRendererClientRPC(pc, count, enabled);
+        lr.positionCount = count;
+        currentGrapplePosition = gunTip.position;
+        gun.enabled = enabled;
+        SetLineRendererServerRPC(pc, count, enabled);
+    }
+   [ServerRpc]
+    private void SetLineRendererServerRPC(NetworkObjectReference pc, int count, bool enabled, ServerRpcParams serverRpcParams = default)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds.Where(id => id != serverRpcParams.Receive.SenderClientId).ToList()
+            }
+        };
+        SetLineRendererClientRPC(pc, count, enabled, clientRpcParams);
     }
     [ClientRpc]
-    private void SetLineRendererClientRPC(NetworkObjectReference pc, int count, bool enabled)
+    private void SetLineRendererClientRPC(NetworkObjectReference pc, int count, bool enabled, ClientRpcParams clientRpcParams = default)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
@@ -80,13 +96,32 @@ public class Swinging : EquipmentController
         gun.GetComponent<MeshRenderer>().enabled = enabled;
 
     }
-    [ServerRpc]
-    private void DrawRopeServerRPC(NetworkObjectReference pc)
+    private void DrawRope(NetworkObjectReference pc)
     {
-        DrawRopeClientRPC(pc);
+        DrawRope(
+            player,
+            lr,
+            gunHolder,
+            ref currentGrapplePosition,
+            predictionPoint.position,
+            gunTip.position
+        );
+        DrawRopeServerRPC(pc);
+    }
+    [ServerRpc]
+    private void DrawRopeServerRPC(NetworkObjectReference pc, ServerRpcParams serverRpcParams = default)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds.Where(id => id != serverRpcParams.Receive.SenderClientId).ToList()
+            }
+        };
+        DrawRopeClientRPC(pc, clientRpcParams);
     }
     [ClientRpc]
-    private void DrawRopeClientRPC(NetworkObjectReference pc)
+    private void DrawRopeClientRPC(NetworkObjectReference pc, ClientRpcParams clientRpcParams = default)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
@@ -198,7 +233,7 @@ public class Swinging : EquipmentController
         joint.damper = 7f;
         joint.massScale = 4.5f;
 
-        SetLineRendererServerRPC(pc, 2, true);
+        SetLineRenderer(pc, 2, true);
         currentGrapplePosition = gunTip.position;
     }
     public void StopSwing()
@@ -206,7 +241,7 @@ public class Swinging : EquipmentController
         swingTimer = swingDuration;
 
         pm.isSwinging = false;
-        SetLineRendererServerRPC(pc, 0, false);
+        SetLineRenderer(pc, 0, false);
 
         Destroy(joint);
     }

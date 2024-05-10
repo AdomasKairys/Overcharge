@@ -49,8 +49,8 @@ public class TagController : NetworkBehaviour
         if (!otherObjectRef.TryGet(out NetworkObject otherObject))
             return;
 
-        var temp = thisObject.GetComponentInChildren<PlayerStateController>().currState.Value;
-        thisObject.GetComponentInChildren<PlayerStateController>().SetState(otherObject.GetComponentInChildren<PlayerStateController>().currState.Value);
+        var temp = thisObject.GetComponentInChildren<PlayerStateController>().GetState();
+        thisObject.GetComponentInChildren<PlayerStateController>().SetState(otherObject.GetComponentInChildren<PlayerStateController>().GetState());
         otherObject.GetComponentInChildren<PlayerStateController>().SetState(temp);
     }
     public bool IsBlocked()

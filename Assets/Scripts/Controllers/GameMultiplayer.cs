@@ -34,7 +34,6 @@ public class GameMultiplayer : NetworkBehaviour
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
     }
 
-
     public string GetPlayerName() => playerName;
     public void SetPlayerName(string playerName)
     {
@@ -82,12 +81,12 @@ public class GameMultiplayer : NetworkBehaviour
         playerDataNetworkList[playerDataIndex] = playerData;
     }
     [ServerRpc(RequireOwnership = false)]
-    public void KillPlayerServerRPC(ulong playerId)
+    private void ChangePlayerStateServerRPC(ulong playerId, PlayerState newState)
     {
         int playerDataIndex = GetPlayerDataIndexFromClientId(playerId);
         PlayerData playerData = playerDataNetworkList[playerDataIndex];
 
-        playerData.isDead = true;
+        playerData.playerState = newState;
 
         playerDataNetworkList[playerDataIndex] = playerData;
     }
@@ -132,7 +131,7 @@ public class GameMultiplayer : NetworkBehaviour
     }
     public void Shutdown()
     {
-        if(NetworkManager.IsServer)
+        if(NetworkManager.Singleton.IsServer)
         {
             playerDataNetworkList.Clear();
             Debug.Log(playerDataNetworkList.Count);
@@ -148,6 +147,10 @@ public class GameMultiplayer : NetworkBehaviour
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)
     {
+        if (NetworkManager.Singleton.ConnectedClientsList.Count < playerDataNetworkList.Count && NetworkManager.Singleton.IsServer)
+        {
+            playerDataNetworkList.Clear();
+        }
         playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() , isDead=false});
         SetPlayerNameServerRPC(GetPlayerName());
     }
@@ -200,6 +203,7 @@ public class GameMultiplayer : NetworkBehaviour
     public PlayerData GetPlayerData() => GetPlayerDataFromClientId(NetworkManager.Singleton.LocalClientId);
     public PlayerData GetPlayerDataFrompLayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];
     public Color GetPlayerColor(int colorId) => playerColors[colorId];
+    public void ChangePlayerState(ulong playerId, PlayerState newState) => ChangePlayerStateServerRPC(playerId, newState);
 
     #region Color management
 

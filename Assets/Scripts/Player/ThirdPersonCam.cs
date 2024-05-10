@@ -5,6 +5,7 @@ using DG.Tweening;
 using Cinemachine;
 using System;
 using Unity.Netcode;
+using System.Linq;
 
 public class ThirdPersonCam : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class ThirdPersonCam : MonoBehaviour
     public Rigidbody rb;
     public WallRunning wr;
     public PlayerMovement pr;
+    public NetworkObject netObj;
 
     public float rotationSpeed;
 
@@ -29,6 +31,7 @@ public class ThirdPersonCam : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        UnfreezeCamera();
         isTiltChanged = false;
         isFovChanged = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -38,9 +41,20 @@ public class ThirdPersonCam : MonoBehaviour
     {
         CameraEffects();
     }
-    // Update is called once per frame
+    private int camIndex = 0;
+
     void Update()
     {
+        if (GameMultiplayer.Instance.GetPlayerDataFromClientId(netObj.OwnerClientId).playerState == PlayerState.Dead)
+        {
+            var thirdPersonCams = GameObject.FindGameObjectsWithTag("ThirdPersonCam");
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                thirdPersonCams[camIndex].GetComponent<CinemachineFreeLook>().Priority = 0;
+                camIndex = (camIndex + 1) % thirdPersonCams.Count();
+                thirdPersonCams[camIndex].GetComponent<CinemachineFreeLook>().Priority = 10;
+            }
+        }
         Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
         orientation.forward = viewDir;
 
@@ -52,6 +66,15 @@ public class ThirdPersonCam : MonoBehaviour
         //if (inputDir != Vector3.zero)
         //    playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
          
+
+    }
+    public void FreezeCamera()
+    {
+        CinemachineCore.GetInputAxis = delegate (string axisName) { return 0; };
+    }
+    public void UnfreezeCamera()
+    {
+        CinemachineCore.GetInputAxis = delegate (string axisName) { return Input.GetAxis(axisName); };
 
     }
     private void CameraEffects()
