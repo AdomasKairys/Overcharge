@@ -24,7 +24,11 @@ public class GameManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
-        if (!IsServer)
+    }
+    private void Start()
+    {
+        Debug.Log(IsServer);
+        if (IsServer)
             SetRandomPlayerChaser();
     }
     private void Update()

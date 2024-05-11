@@ -36,7 +36,7 @@ public class PlayerStateController : NetworkBehaviour
 
         if (GetState() == PlayerState.Chaser)
         {
-            ChangeChargeValueServerRPC(gameObject.GetComponentInParent<NetworkObject>());
+            ChangeChargeValueServerRPC(netObj);
 
             if(currCharge.Value >= overcharge)
             {
@@ -109,25 +109,5 @@ public class PlayerStateController : NetworkBehaviour
     public void Respawn()
     {
         // Reset player's health or other states as necessary
-        RespawnServerRPC(netObj);
-    }
-    [ServerRpc]
-    private void RespawnServerRPC(NetworkObjectReference pc)
-    {
-        if (!pc.TryGet(out NetworkObject networkObject))
-            return;
-        var player = networkObject.transform.Find("Player");
-        player.GetComponent<PlayerStateController>().SetState(PlayerState.Runner);
-        player.GetComponent<PlayerStateController>().currCharge.Value = 0.0f;
-        RespawnClientRPC(pc);
-    }
-    [ClientRpc]
-    private void RespawnClientRPC(NetworkObjectReference pc)
-    {
-        if (!pc.TryGet(out NetworkObject networkObject))
-            return;
-        var player = networkObject.transform.Find("Player");
-        player.position = new Vector3(0, 0, 0);
-        player.gameObject.SetActive(true);
     }
 }

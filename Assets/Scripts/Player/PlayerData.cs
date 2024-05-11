@@ -48,7 +48,7 @@ public enum EquipmentType
 }
 public enum PlayerState
 {
-    Chaser,
-    Runner,
-    Dead
+    Runner = 0,
+    Chaser = 1,
+    Dead = 2
 }

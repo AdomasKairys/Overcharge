@@ -7,7 +7,7 @@ using System;
 using Unity.Netcode;
 using System.Linq;
 
-public class ThirdPersonCam : MonoBehaviour
+public class ThirdPersonCam : NetworkBehaviour
 {
     [Header("References")]
     public Transform orientation;
@@ -45,7 +45,7 @@ public class ThirdPersonCam : MonoBehaviour
 
     void Update()
     {
-        if (GameMultiplayer.Instance.GetPlayerDataFromClientId(netObj.OwnerClientId).playerState == PlayerState.Dead)
+        if (GameMultiplayer.Instance.GetPlayerDataFromClientId(netObj.OwnerClientId).playerState == PlayerState.Dead && IsOwner)
         {
             var thirdPersonCams = GameObject.FindGameObjectsWithTag("ThirdPersonCam");
             if (Input.GetKeyDown(KeyCode.Mouse0))
