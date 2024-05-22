@@ -82,7 +82,7 @@ public class ThirdPersonCam : NetworkBehaviour
         if (rb.velocity.magnitude > 15 && !isFovChanged)
         {
             isFovChanged = true;
-            DoFov(defaultFov+2*((rb.velocity.magnitude - 20f > maxFovChange)?maxFovChange:(rb.velocity.magnitude - 20f)));
+            DoFov(defaultFov+3*((rb.velocity.magnitude - 20f > maxFovChange)?maxFovChange:3*(rb.velocity.magnitude - 20f)));
         }
         else if (isFovChanged)
         {

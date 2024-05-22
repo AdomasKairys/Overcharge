@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -15,6 +16,8 @@ public class PauseMenu : NetworkBehaviour
 
     private void Start()
     {
+        player = player.Where(x => x.enabled).ToArray();
+        NotPauseMenuUI = NotPauseMenuUI.Where(x => x.activeSelf).ToArray();
         pauseMenu.SetActive(false);
     }
     void Update()

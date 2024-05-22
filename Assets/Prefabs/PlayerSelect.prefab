@@ -669,8 +669,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerVisual
       objectReference: {fileID: 0}
+    - target: {fileID: 2840551034045740854, guid: f8496c3eb894f93489e92a93ea389a94, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1118513168
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5751953309038627281, guid: f8496c3eb894f93489e92a93ea389a94, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8496c3eb894f93489e92a93ea389a94, type: 3}

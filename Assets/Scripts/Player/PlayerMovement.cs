@@ -180,6 +180,8 @@ public class PlayerMovement : NetworkBehaviour
         {
             moveSpeed = desiredMoveSpeed;
         }
+        
+
         lastDesiredMoveSpeed = desiredMoveSpeed;
         lastState = state;
     }

@@ -7,6 +7,8 @@ public class PredictionPointUI : MonoBehaviour
 {
     [SerializeField] private Camera cam;
     [SerializeField] private Transform predictionPoint;
+    [SerializeField] private Swinging swinging;
+
     private Image img;
 
     private void Start()
@@ -16,7 +18,7 @@ public class PredictionPointUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!predictionPoint.gameObject.activeSelf)
+        if (!predictionPoint.gameObject.activeSelf || !swinging.enabled)
         {
             img.enabled = false;
         }

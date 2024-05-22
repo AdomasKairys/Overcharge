@@ -21,6 +21,8 @@ public class GameManager : NetworkBehaviour
 
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private NetworkVariable<float> countDownToStartTimer = new NetworkVariable<float>(3f);
+
+
     private void Awake()
     {
         Instance = this;
@@ -31,7 +33,7 @@ public class GameManager : NetworkBehaviour
         if (IsServer)
             SetRandomPlayerChaser();
     }
-    private void Update()
+    private void LateUpdate()
     {
         if (!IsServer)
             return;

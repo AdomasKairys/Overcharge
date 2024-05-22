@@ -6,7 +6,10 @@ using UnityEngine;
 
 public class PlayerController : NetworkBehaviour
 {
+    //could be change to a list of monobehaviours/networkbehaviours
     public PlayerMovement pm;
+    public PlayerSphereEffect psf;
+    public DashTrail dt;
     public ProjectileController prjc;
     public Climbing cl;
     public Swinging sw;
@@ -19,18 +22,17 @@ public class PlayerController : NetworkBehaviour
     public TagController tc;
     public InventoryController inventoryController;
 
-    // Start is called before the first frame update
     void Start()
     {
         // Initially disable all equipment
         sw.enabled = false;
         prjc.enabled = false;
-        
+
         PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
 
         // Enable equipment based on selection
-        switch(playerData.primaryEquipment)
+        switch (playerData.primaryEquipment)
         {
             case EquipmentType.None:
                 break;
@@ -68,7 +70,9 @@ public class PlayerController : NetworkBehaviour
             ds.enabled = false;
             psc.enabled = false;
             tc.enabled = false;
+            dt.enabled = false;
             prjc.enabled = false;
+            psf.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
         }
@@ -76,13 +80,7 @@ public class PlayerController : NetworkBehaviour
         {
             fl.Priority = 10;
         }
-    }
-    private void Update()
-    {
-        if (GameManager.Instance.IsGamePlaying())
-        {
-
-        }
+        
     }
 
 }
