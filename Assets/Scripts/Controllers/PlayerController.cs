@@ -21,6 +21,11 @@ public class PlayerController : NetworkBehaviour
     public InventoryController inventoryController;
     public PlayerInput pi;
 
+    private PlayerInputActions _playerInputActions;
+
+    private InputAction _usePrimaryAction;
+    private InputAction _useSecondaryAction;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -46,6 +51,11 @@ public class PlayerController : NetworkBehaviour
             // Initially disable all equipment
             sw.enabled = false;
             prjc.enabled = false;
+
+            _playerInputActions = new PlayerInputActions();
+
+            _usePrimaryAction = _playerInputActions.Player.UsePrimary;
+            _useSecondaryAction = _playerInputActions.Player.UseSecondary;
         }
         PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
@@ -57,11 +67,11 @@ public class PlayerController : NetworkBehaviour
                 break;
             case EquipmentType.GrapplingHook:
                 sw.enabled = true;
-                sw.UseKey = KeyCode.Mouse0;
+                sw.Initialize(_usePrimaryAction);
                 break;
             case EquipmentType.RocketLauncher:
                 prjc.enabled = true;
-                prjc.UseKey = KeyCode.Mouse0;
+                prjc.Initialize(_usePrimaryAction);
                 break;
         }
         switch (playerData.secondaryEquipment)
@@ -70,11 +80,11 @@ public class PlayerController : NetworkBehaviour
                 break;
             case EquipmentType.GrapplingHook:
                 sw.enabled = true;
-                sw.UseKey = KeyCode.Mouse1;
+                sw.Initialize(_useSecondaryAction);
                 break;
             case EquipmentType.RocketLauncher:
                 prjc.enabled = true;
-                prjc.UseKey = KeyCode.Mouse1;
+                prjc.Initialize(_useSecondaryAction);
                 break;
         }
         ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);

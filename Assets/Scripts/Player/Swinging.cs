@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Swinging : EquipmentController
 {
@@ -36,18 +38,27 @@ public class Swinging : EquipmentController
     //[Header("Input")]
     //public KeyCode swingKey = KeyCode.Mouse0;
 
-    private void Start()
+    public override void Initialize(InputAction useAction)
     {
         swingTimer = swingDuration;
         gun.enabled = false;
+
+        base.Initialize(useAction);
     }
+
     private void Update()
     {
-        if (Input.GetKeyDown(UseKey) && !IsSwingOver()) StartSwing();
-        if (Input.GetKeyUp(UseKey) || IsSwingOver()) StopSwing();
+        if( !_initialized ) { return; }
+
+        // TODO: figure this out
+        if (Input.GetKeyDown(KeyCode.Mouse1) && !IsSwingOver()) StartSwing();
+        if (Input.GetKeyUp(KeyCode.Mouse1) || IsSwingOver()) StopSwing();
+        //if (_useAction.triggered && !IsSwingOver()) StartSwing();
+        //if (_useAction.phase == InputActionPhase.Canceled || IsSwingOver()) StopSwing();
 
         CheckForSwingPoints();
     }
+
     private void FixedUpdate()
     {
         if (joint != null) SwingMovement();

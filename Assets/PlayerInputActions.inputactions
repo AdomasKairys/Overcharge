@@ -24,9 +24,18 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Fire",
+                    "name": "UsePrimary",
                     "type": "Button",
                     "id": "b5d22b24-35e7-45a9-bc14-e2431bd1e0c8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "UseSecondary",
+                    "type": "Button",
+                    "id": "8dde2140-2985-4b4f-8947-df9952ad566e",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -45,6 +54,15 @@
                     "name": "Dash",
                     "type": "Button",
                     "id": "0dba3ce0-af00-4b66-84b2-a45811da9968",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "UsePickup",
+                    "type": "Button",
+                    "id": "1d1b13b0-6df0-4300-8964-b58a412dbdba",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -224,7 +242,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Fire",
+                    "action": "UsePrimary",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -235,7 +253,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Fire",
+                    "action": "UsePrimary",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -246,7 +264,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Touch",
-                    "action": "Fire",
+                    "action": "UsePrimary",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -257,7 +275,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Joystick",
-                    "action": "Fire",
+                    "action": "UsePrimary",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -268,7 +286,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Fire",
+                    "action": "UsePrimary",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -302,6 +320,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5c5fe532-9f11-4706-b92a-3092cd86cefa",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "UseSecondary",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "708d5513-963e-4031-ae2b-ced1d1acdb20",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "UsePickup",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

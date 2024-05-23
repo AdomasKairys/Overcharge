@@ -1,11 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InventoryController : NetworkBehaviour
 {
+    private PlayerInputActions _playerInputActions;
+
+    private InputAction _usePickupAction;
+
     [SerializeField]
     private PlayerMovement _playerMovement;
 
@@ -24,17 +30,36 @@ public class InventoryController : NetworkBehaviour
 
     private float pickingUpDelay = 3f;
 
- 
-    void Update()
+    public override void OnNetworkSpawn()
     {
-        if(!IsOwner) return;
-
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (IsOwner)
         {
-            if(currentPickup != PickupType.None && canUseCurrentPickup)
-            {
-                UseCurrentPickUp();
-            }
+            _playerInputActions = new PlayerInputActions();
+
+            _usePickupAction = _playerInputActions.Player.UsePickup;
+            _usePickupAction.performed += OnUsePickup;
+            _usePickupAction.Enable();
+        }
+
+        base.OnNetworkSpawn();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsOwner)
+        {
+            _usePickupAction.performed -= OnUsePickup;
+            _usePickupAction.Disable();
+        }
+
+        base.OnNetworkDespawn();
+    }
+
+    private void OnUsePickup(InputAction.CallbackContext context)
+    {
+        if (currentPickup != PickupType.None && canUseCurrentPickup)
+        {
+            UseCurrentPickUp();
         }
     }
 

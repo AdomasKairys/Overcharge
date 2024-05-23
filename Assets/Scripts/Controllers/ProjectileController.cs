@@ -3,28 +3,33 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ProjectileController : EquipmentController
 {
     [SerializeField] private Camera cam;
     [SerializeField] private Transform pfRocket;
 
-    private float cooldownTimer;
+    private float cooldownTimer = 0f;
     public event EventHandler<OnShootEventArgs> OnShoot;
     public class OnShootEventArgs : EventArgs
     {
         public Vector3 spawnPos;
         public Vector3 shootDir;
     }
-    private void Awake()
+
+    public override void Initialize(InputAction useAction)
     {
         OnShoot += ProjectileController_OnShoot;
+
+        base.Initialize(useAction);
     }
 
     private void ProjectileController_OnShoot(object sender, OnShootEventArgs e)
     {
         OnShootServerRPC(e.spawnPos, e.shootDir);
     }
+
     [ServerRpc]
     public void OnShootServerRPC(Vector3 spawnPos, Vector3 shootDir)
     {
@@ -35,7 +40,9 @@ public class ProjectileController : EquipmentController
 
     private void Update()
     {
-        if(Input.GetKeyDown(UseKey) && cooldownTimer <= 0f)
+        if( !_initialized ) { return; }
+
+        if(_useAction.ReadValue<float>() > 0 && cooldownTimer <= 0f)
         {
             float maxCooldownTimer = 0.5f;
             cooldownTimer = maxCooldownTimer;
