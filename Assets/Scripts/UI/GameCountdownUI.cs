@@ -9,11 +9,14 @@ public class GameCountdownUI : MonoBehaviour
     [SerializeField] private MonoBehaviour[] player;
     [SerializeField] private GameObject[] UI;
     [SerializeField] private NetworkObject networkObject;
+    private void Awake()
+    {
+        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+    }
     void Start()
     {
         player = player.Where(x => x.enabled).ToArray();
         UI = UI.Where(x => x.activeSelf).ToArray();
-        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
         Hide();
     }
 
@@ -56,5 +59,9 @@ public class GameCountdownUI : MonoBehaviour
         {
             mb.enabled = to;
         }
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
     }
 }

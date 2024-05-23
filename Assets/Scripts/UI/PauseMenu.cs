@@ -16,8 +16,6 @@ public class PauseMenu : NetworkBehaviour
 
     private void Start()
     {
-        player = player.Where(x => x.enabled).ToArray();
-        NotPauseMenuUI = NotPauseMenuUI.Where(x => x.activeSelf).ToArray();
         pauseMenu.SetActive(false);
     }
     void Update()
@@ -45,6 +43,11 @@ public class PauseMenu : NetworkBehaviour
     }
     void Pause()
 	{
+        //remove already disabled elements so that they dont reenable
+        //if elements are disable before calling false that means they have to stay that way
+        player = player.Where(x => x.enabled).ToArray();
+        NotPauseMenuUI = NotPauseMenuUI.Where(x => x.activeSelf).ToArray();
+
         thirdPersonCam.FreezeCamera();
         pauseMenu.SetActive(true);
         isPaused = true;

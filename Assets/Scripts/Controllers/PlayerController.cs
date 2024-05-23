@@ -24,7 +24,10 @@ public class PlayerController : NetworkBehaviour
 
     void Start()
     {
-        // Initially disable all equipment
+        
+    }
+    public override void OnNetworkSpawn()
+    {
         sw.enabled = false;
         prjc.enabled = false;
 
@@ -69,18 +72,17 @@ public class PlayerController : NetworkBehaviour
             wr.enabled = false;
             ds.enabled = false;
             psc.enabled = false;
-            tc.enabled = false;
             dt.enabled = false;
             prjc.enabled = false;
             psf.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
+            Destroy(ui); //throws an error but if removed everything brakes
         }
         else
         {
             fl.Priority = 10;
         }
-        
     }
 
 }

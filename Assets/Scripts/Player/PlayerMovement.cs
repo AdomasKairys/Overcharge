@@ -197,7 +197,7 @@ public class PlayerMovement : NetworkBehaviour
             Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
             //bug here fixed (?)
-            if (flatVel.magnitude < walkSpeed && desiredMoveSpeed <= startValue)
+            if (flatVel.magnitude < walkSpeed && desiredMoveSpeed <= startValue || flatVel.magnitude < walkSpeed && desiredMoveSpeed == walkSpeed)
             {
                 break;
             }
@@ -299,12 +299,12 @@ public class PlayerMovement : NetworkBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
-    public void UniversalKnockback(Vector3 otherPosition, float strength, ulong targetId)
+    public void UniversalKnockback(Vector3 otherPosition, float strength, ulong targetId, bool resetVel = false)
     {
-        UniversalKnockbackServerRPC(otherPosition, strength, targetId);
+        UniversalKnockbackServerRPC(otherPosition, strength, targetId, resetVel);
     }
     [ServerRpc(RequireOwnership=false)]
-    private void UniversalKnockbackServerRPC(Vector3 otherPosition, float strength, ulong targetId)
+    private void UniversalKnockbackServerRPC(Vector3 otherPosition, float strength, ulong targetId, bool resetVel)
     {
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -313,14 +313,18 @@ public class PlayerMovement : NetworkBehaviour
                 TargetClientIds = new ulong[] { targetId }
             }
         };
-        UniversalKnockbackClientRPC(otherPosition, strength, clientRpcParams);
+        UniversalKnockbackClientRPC(otherPosition, strength, resetVel, clientRpcParams);
     }
     [ClientRpc]
-    private void UniversalKnockbackClientRPC(Vector3 otherPosition, float strength, ClientRpcParams clientRpcParams = default)
+    private void UniversalKnockbackClientRPC(Vector3 otherPosition, float strength, bool resetVel, ClientRpcParams clientRpcParams = default)
     {
         Debug.Log("hello");
         isKnockedBack = true;
         var thisRb = GetComponent<Rigidbody>();
+        if (resetVel)
+        {
+            thisRb.velocity = Vector3.zero;
+        }
         Vector3 pushDirection = (thisRb.transform.position - otherPosition).normalized;
         thisRb.AddForce(pushDirection * strength, ForceMode.Impulse);
         Invoke(nameof(stopKnockback), 0.25f);

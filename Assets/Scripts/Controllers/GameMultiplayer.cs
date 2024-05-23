@@ -151,7 +151,7 @@ public class GameMultiplayer : NetworkBehaviour
         {
             playerDataNetworkList.Clear();
         }
-        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() , isDead=false});
+        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() });
         SetPlayerNameServerRPC(GetPlayerName());
     }
 
@@ -181,6 +181,16 @@ public class GameMultiplayer : NetworkBehaviour
         }
         return -1;
     }
+    public List<PlayerData> GetAlivePlayers()
+    {
+        List<PlayerData> playerDatas = new List<PlayerData>();
+        foreach (PlayerData playerData in playerDataNetworkList)
+        {
+            if (playerData.playerState != PlayerState.Dead)
+                playerDatas.Add(playerData);
+        }
+        return playerDatas;
+    }
     public PlayerData GetPlayerDataFromClientId(ulong clientId)
     {
         foreach (PlayerData playerData in playerDataNetworkList)
@@ -190,16 +200,7 @@ public class GameMultiplayer : NetworkBehaviour
         }
         return default;
     }
-    public bool IsGameOver()
-    {
-        int aliveCout = 0;
-        foreach(PlayerData playerData in playerDataNetworkList)
-        {
-            if(!playerData.isDead)
-                aliveCout++;
-        }
-        return aliveCout <= 1;
-    }
+    public bool IsGameOver() => GetAlivePlayers().Count <= 1;
     public PlayerData GetPlayerData() => GetPlayerDataFromClientId(NetworkManager.Singleton.LocalClientId);
     public PlayerData GetPlayerDataFrompLayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];
     public Color GetPlayerColor(int colorId) => playerColors[colorId];

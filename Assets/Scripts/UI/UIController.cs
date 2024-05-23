@@ -22,9 +22,6 @@ public class UIController : MonoBehaviour
     [Header("Velocity Text Box")]
     public GameObject velocityText;
 
-    [Header("Player Death Menu")]
-    public GameObject deathMenu;
-
     [Header("Crosshair image")]
     [SerializeField] private Image crosshair;
 
@@ -47,7 +44,7 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        deathMenu.gameObject.SetActive(false);
+
         textMesh_velocity = velocityText.GetComponent<TextMeshProUGUI>();
         textMesh_playerState = playerStateText.GetComponent<TextMeshProUGUI>();
         if (player != null)
@@ -55,7 +52,7 @@ public class UIController : MonoBehaviour
             // Retrieve the player state information
             playerStateController = player.GetComponent<PlayerStateController>();
             // Subscribe to the player death event
-            playerStateController.onPlayerDeath.AddListener(ShowDeathMenu);
+            playerStateController.OnPlayerDeath += PlayerStateController_OnPlayerDeath; ;
         }
 
         // Setup the charge bar
@@ -63,6 +60,13 @@ public class UIController : MonoBehaviour
         playerChargeBarSlider.minValue = 0;
         playerChargeBarSlider.maxValue = playerStateController.overcharge;
         playerChargeBarSlider.value = playerStateController.currCharge.Value;
+    }
+
+    private void PlayerStateController_OnPlayerDeath(object sender, EventArgs e)
+    {
+        playerStateText.SetActive(false);
+        playerChargeBar.SetActive(false);
+        velocityText.SetActive(false);
     }
 
     // Update is called once per frame
@@ -104,21 +108,10 @@ public class UIController : MonoBehaviour
         }
     }
 
-    private void ShowDeathMenu()
-    {
-        playerStateText.SetActive(false);
-        playerChargeBar.SetActive(false);
-        velocityText.SetActive(false);
-        deathMenu.gameObject.SetActive(true);
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = true;
-    }
-
     public void OnRespawnButtonClicked()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        deathMenu.SetActive(false);
         playerStateText.SetActive(true);
         playerChargeBarSlider.value = 0;
         playerChargeBar.SetActive(true);

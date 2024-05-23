@@ -13,6 +13,8 @@ public class Swinging : EquipmentController
     public LayerMask playerLayer;
     public PlayerMovement pm;
 
+    public PlayerStateController ps;
+
     [Header("Swinging")]
     public float swingDuration;
     private float swingTimer;
@@ -138,6 +140,7 @@ public class Swinging : EquipmentController
     }
 
     private ulong hitPlayerClientId;
+    private Collider hitPlayerCollider;
     private void CheckForSwingPoints()
     {
         if (joint != null) return;
@@ -162,9 +165,10 @@ public class Swinging : EquipmentController
             isPlayerGrappled = false;
 
         // Option 0 - Hit player
-        if (raycastHitPlayer.point != Vector3.zero)
+        if (raycastHitPlayer.point != Vector3.zero && ps.GetState()==PlayerState.Chaser)
         {
             hitPlayerClientId = raycastHitPlayer.collider.GetComponentInParent<NetworkObject>().OwnerClientId;
+            hitPlayerCollider = raycastHitPlayer.collider;
             if (hitPlayerClientId != OwnerClientId)
             {
                 Debug.Log("Player hit");
@@ -205,7 +209,7 @@ public class Swinging : EquipmentController
         if (isPlayerGrappled)
         {
             Debug.Log("Player hit1");
-            pm.UniversalKnockback(player.position, 50f, hitPlayerClientId);
+            hitPlayerCollider.GetComponent<PlayerMovement>().UniversalKnockback(player.position, -50f, hitPlayerClientId);
             swingTimer = 0.5f;
         }
 

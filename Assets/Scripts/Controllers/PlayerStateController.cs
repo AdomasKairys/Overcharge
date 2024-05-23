@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Cinemachine;
 using System.Linq;
+using System;
 
 
 // Define the possible player states
@@ -18,7 +19,7 @@ public class PlayerStateController : NetworkBehaviour
     public float chargeRate = 1.0f; // The rate in which the palyer's charge increases
     public float overcharge = 100.0f; // The maximum value of charge at which the player dies
 
-    public UnityEvent onPlayerDeath;
+    public event EventHandler OnPlayerDeath;
 
     public NetworkObject netObj;
     //[Header("Tagging")]
@@ -101,7 +102,7 @@ public class PlayerStateController : NetworkBehaviour
     {
         if (!netObjRef.TryGet(out NetworkObject networkObject))
             return;
-        onPlayerDeath.Invoke();
+        OnPlayerDeath?.Invoke(this, EventArgs.Empty);
         var player = networkObject.transform.Find("Player");
         player.gameObject.SetActive(false);
     }

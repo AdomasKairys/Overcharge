@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameOverUI : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI text;   
     private void Awake()
     {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
@@ -14,6 +16,7 @@ public class GameOverUI : MonoBehaviour
     {
         if (GameManager.Instance.IsGameOver())
         {
+            text.text = GameManager.Instance.GetWinner().Value.playerName.ToString();
             Show();
         }
         else

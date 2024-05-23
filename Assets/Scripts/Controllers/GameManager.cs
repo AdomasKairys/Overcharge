@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
@@ -22,7 +23,6 @@ public class GameManager : NetworkBehaviour
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private NetworkVariable<float> countDownToStartTimer = new NetworkVariable<float>(3f);
 
-
     private void Awake()
     {
         Instance = this;
@@ -37,11 +37,13 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsServer)
             return;
-
         switch (state.Value)
         {
             case State.WaitingToStart:
-                state.Value = State.CountdownToStart;
+                if (NetworkManager.SpawnManager.SpawnedObjectsList.Where(no=>no.IsPlayerObject).Count() > 1)
+                {
+                    state.Value = State.CountdownToStart;
+                }
                 break;
             case State.CountdownToStart:
                 countDownToStartTimer.Value -= Time.deltaTime;
@@ -86,6 +88,14 @@ public class GameManager : NetworkBehaviour
             playerTransform.position = new Vector3(UnityEngine.Random.value*10, playerTransform.position.y, UnityEngine.Random.value * 10);
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
+    }
+    public PlayerData? GetWinner()
+    {
+        if(GameMultiplayer.Instance.IsGameOver())
+        {
+            return GameMultiplayer.Instance.GetAlivePlayers().First();
+        }
+        return null;
     }
     public bool IsGamePlaying() => state.Value == State.GamePlaying;
     public bool IsCountdownToStartActive() => state.Value == State.CountdownToStart;

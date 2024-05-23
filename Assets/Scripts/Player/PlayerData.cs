@@ -11,7 +11,6 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
     public ulong clientId;
     public int colorId;
     public PlayerState playerState;
-    public bool isDead;
     public FixedString64Bytes playerName;
     public FixedString64Bytes playerId;
 
@@ -36,7 +35,6 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
         serializer.SerializeValue(ref primaryEquipment);
         serializer.SerializeValue(ref secondaryEquipment);
         serializer.SerializeValue(ref playerState);
-        serializer.SerializeValue(ref isDead);
     }
 }
 
