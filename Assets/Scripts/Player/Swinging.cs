@@ -17,6 +17,8 @@ public class Swinging : EquipmentController
 
     [Header("Swinging")]
     public float swingDuration;
+    public float swingCooldown = 5f;
+    private float cooldownTimer;
     private float swingTimer;
     private float maxSwingDistance = 50f;
     private Vector3 swingPoint;
@@ -41,13 +43,20 @@ public class Swinging : EquipmentController
 
     private void Start()
     {
+        cooldownTimer = 0;
         swingTimer = swingDuration;
         gun.enabled = false;
     }
     private void Update()
     {
-        if (Input.GetKeyDown(UseKey) && !IsSwingOver()) StartSwing();
-        if (Input.GetKeyUp(UseKey) || IsSwingOver()) StopSwing();
+        Debug.Log(cooldownTimer);
+        if (Input.GetKeyDown(UseKey) && !IsSwingOver() && cooldownTimer<=0.1f) StartSwing();
+        if ((Input.GetKeyUp(UseKey) || IsSwingOver()) && cooldownTimer <= 0.1f) StopSwing();
+
+        if(cooldownTimer > 0.1f)
+        {
+            cooldownTimer -= Time.deltaTime;
+        }
 
         CheckForSwingPoints();
     }
@@ -242,8 +251,8 @@ public class Swinging : EquipmentController
     }
     public void StopSwing()
     {
+        cooldownTimer = swingTimer >= swingDuration/2 ? swingCooldown/2 : swingCooldown;
         swingTimer = swingDuration;
-
         pm.isSwinging = false;
         SetLineRenderer(pc, 0, false);
 
@@ -278,4 +287,6 @@ public class Swinging : EquipmentController
         lineRenderer.SetPosition(0, gunTipPos);
         lineRenderer.SetPosition(1, currentGrapplePosition);
     }
+    public float GetCooldownTimer() => cooldownTimer;
+
 }
