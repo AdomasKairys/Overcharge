@@ -1,11 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    // TODO: look, equipment and pickup actions
+    private PlayerInputActions _playerInputActions;
+
+    private InputAction _moveAction;
+    private InputAction _jumpAction;
+
     [Header("Movement")]
     private float moveSpeed;
     private float moveSpeedMultiplier;
@@ -34,8 +42,8 @@ public class PlayerMovement : NetworkBehaviour
     bool isReadyToJump;
 
     [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode crouchKey = KeyCode.LeftControl;
+    //public KeyCode jumpKey = KeyCode.Space;
+    //public KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -88,21 +96,73 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Magnet wall speed")]
     public float VerticalMagnetRunSpeed;
     public float VerticalMagnetClimbSpeed;
-    private void Start()
-    {
-        moveSpeed = walkSpeed;
-        moveSpeedMultiplier = 1f;
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
 
-        isReadyToJump = true;
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            _playerInputActions = new PlayerInputActions();
+
+            _moveAction = _playerInputActions.Player.Move;
+            _moveAction.Enable();
+
+            _jumpAction = _playerInputActions.Player.Jump;
+            _jumpAction.performed += OnJump;
+            _jumpAction.Enable();
+
+            moveSpeed = walkSpeed;
+            moveSpeedMultiplier = 1f;
+            rb = GetComponent<Rigidbody>();
+            rb.freezeRotation = true;
+
+            isReadyToJump = true;
+        }
+
+        base.OnNetworkSpawn();
     }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsOwner)
+        {
+            _moveAction.Disable();
+
+            _jumpAction.performed -= OnJump;
+            _jumpAction.Disable();
+        }
+
+        base.OnNetworkDespawn();
+    }
+
+    //private void Start()
+    //{
+    //    moveSpeed = walkSpeed;
+    //    moveSpeedMultiplier = 1f;
+    //    rb = GetComponent<Rigidbody>();
+    //    rb.freezeRotation = true;
+
+    //    isReadyToJump = true;
+    //}
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        if (isReadyToJump && isGrounded)
+        {
+
+            isReadyToJump = false;
+
+            Jump();
+
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
+    }
+
     private void Update()
     {
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
         MyInput();
         StateHandler();
-        Debug.Log(isKnockedBack);
+        //Debug.Log(isKnockedBack);
         rb.drag = isGrounded && state != MovementState.dashing && state != MovementState.knockback && !isSwinging ? groundDrag : 0;
         
     }
@@ -118,19 +178,19 @@ public class PlayerMovement : NetworkBehaviour
 
     private void MyInput()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
-        Debug.Log("waht");
+        horizontalInput = _moveAction.ReadValue<Vector2>().x; //Input.GetAxisRaw("Horizontal");
+        verticalInput = _moveAction.ReadValue<Vector2>().y; //Input.GetAxisRaw("Vertical");
+        //Debug.Log("waht");
 
-        if (Input.GetKey(jumpKey) && isReadyToJump && isGrounded)
-        {
+        //if (Input.GetKey(jumpKey) && isReadyToJump && isGrounded)
+        //{
 
-            isReadyToJump = false;
+        //    isReadyToJump = false;
 
-            Jump();
+        //    Jump();
 
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
+        //    Invoke(nameof(ResetJump), jumpCooldown);
+        //}
 
     }
     private MovementState lastState;
@@ -240,7 +300,7 @@ public class PlayerMovement : NetworkBehaviour
 
         if (IsOnSlope() && !isExitingSlope)
         {
-            Debug.Log("waht2");
+            //Debug.Log("waht2");
 
             if (rb.velocity.y > -0.1f)
                 rb.AddForce(20f * moveSpeed * GetSlopeMoveDirection(moveDir), ForceMode.Force);
@@ -253,13 +313,13 @@ public class PlayerMovement : NetworkBehaviour
         }
         else if (isGrounded)
         {
-            Debug.Log("waht3");
+            //Debug.Log("waht3");
 
             rb.AddForce(10f * moveSpeed * moveDir.normalized, ForceMode.Force);
         }
         else if (!isGrounded)
         {
-            Debug.Log("waht4");
+            //Debug.Log("waht4");
 
             rb.AddForce(10f * airMultiplier * moveSpeed * moveDir.normalized, ForceMode.Force);
         }

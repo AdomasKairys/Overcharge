@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -18,6 +19,7 @@ public class PlayerController : NetworkBehaviour
     public PlayerStateController psc;
     public TagController tc;
     public InventoryController inventoryController;
+    public PlayerInput pi;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +35,7 @@ public class PlayerController : NetworkBehaviour
             psc.enabled = false;
             tc.enabled = false;
             prjc.enabled = false;
+            pi.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
         }

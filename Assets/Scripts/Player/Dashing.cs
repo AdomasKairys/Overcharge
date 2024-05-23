@@ -1,9 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Dashing : MonoBehaviour
 {
+    private PlayerInputActions _playerInputActions;
+
+    private InputAction _moveAction;
+    private InputAction _dashAction;
+
     [Header("References")]
     public Transform orientation;
     public Transform playerCam;
@@ -37,11 +43,33 @@ public class Dashing : MonoBehaviour
         pm = GetComponent<PlayerMovement>();
     }
 
+    private void OnEnable()
+    {
+        _playerInputActions = new PlayerInputActions();
+
+        _moveAction = _playerInputActions.Player.Move;
+        _moveAction.Enable();
+
+        _dashAction = _playerInputActions.Player.Dash;
+        _dashAction.performed += OnDash;
+        _dashAction.Enable();
+    }
+
+    private void OnDash(InputAction.CallbackContext context)
+    {
+        Dash();
+    }
+
+    private void OnDisable()
+    {
+        _moveAction.Disable();
+
+        _dashAction.performed -= OnDash;
+        _dashAction.Disable();
+    }
+
     private void Update()
     {
-        if (Input.GetKeyDown(dashKey))
-            Dash();
-
         if (dashCdTimer > 0)
             dashCdTimer -= Time.deltaTime;
     }
@@ -96,8 +124,8 @@ public class Dashing : MonoBehaviour
 
     private Vector3 GetDirection(Transform forwardT)
     {
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
+        float horizontalInput = _moveAction.ReadValue<Vector2>().x; //Input.GetAxisRaw("Horizontal");
+        float verticalInput = _moveAction.ReadValue<Vector2>().y; //Input.GetAxisRaw("Vertical");
 
         Vector3 direction;
 
