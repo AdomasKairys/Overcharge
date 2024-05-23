@@ -76,7 +76,7 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_YAxis:
-    Value: 0.06190272
+    Value: 0.6316856
     m_SpeedMode: 0
     m_MaxSpeed: 4
     m_AccelTime: 0
@@ -100,7 +100,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 79.257614
+    Value: 78.65078
     m_SpeedMode: 0
     m_MaxSpeed: 600
     m_AccelTime: 0
@@ -403,7 +403,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 1.0695317, z: -2.8096766}
+  m_FollowOffset: {x: 0, y: 3.2585385, z: -5.4782925}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -423,7 +423,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 79.257614
+    Value: 78.65078
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -793,8 +793,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101542914612667811}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.2091413, y: 0.6138462, z: 0.17319392, w: 0.74125344}
-  m_LocalPosition: {x: -2.6652014, y: -0.05512309, z: 15.723235}
+  m_LocalRotation: {x: 0.15258287, y: 0.62127334, z: -0.1250006, w: 0.7583619}
+  m_LocalPosition: {x: -5.275934, y: 2.1338837, z: 15.168876}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -837,7 +837,7 @@ Camera:
   field of view: 50
   orthographic: 0
   orthographic size: 10
-  m_Depth: -1
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -1209,7 +1209,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1153568536243439725}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.18076998, y: 0.62163216, z: -0.46801624, w: 0.60154516}
+  m_LocalRotation: {x: -0.05969906, y: 0.75231683, z: -0.19870886, w: 0.62527615}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3381,7 +3381,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4742919576680228534}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06216649, y: 0.6997861, z: -0.34024256, w: 0.6250357}
+  m_LocalRotation: {x: -0.11940524, y: 0.7679091, z: -0.12562416, w: 0.6166658}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4464,7 +4464,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6981099671181752950}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.12069056, y: 0.7681692, z: -0.1240231, w: 0.6164156}
+  m_LocalRotation: {x: -0.2104923, y: 0.7780636, z: -0.009097852, w: 0.5918}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5105,7 +5105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 1.0695317, z: -2.8096766}
+  m_FollowOffset: {x: 0, y: 3.2585385, z: -5.4782925}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -5125,7 +5125,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 79.257614
+    Value: 78.65078
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -5538,7 +5538,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 1.0695317, z: -2.8096766}
+  m_FollowOffset: {x: 0, y: 3.2585385, z: -5.4782925}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -5558,7 +5558,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 79.257614
+    Value: 78.65078
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -5976,10 +5976,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerVisual
       objectReference: {fileID: 0}
+    - target: {fileID: 2569175222814397585, guid: f8496c3eb894f93489e92a93ea389a94, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3574823054609257199, guid: f8496c3eb894f93489e92a93ea389a94, type: 3}
       propertyPath: rb
       value: 
       objectReference: {fileID: 501004073326517727}
+    - target: {fileID: 5751953309038627281, guid: f8496c3eb894f93489e92a93ea389a94, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
