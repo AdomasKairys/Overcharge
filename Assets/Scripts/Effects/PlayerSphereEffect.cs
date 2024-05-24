@@ -7,15 +7,21 @@ public class PlayerSphereEffect : NetworkBehaviour
 {
     [SerializeField] private PlayerStateController playerStateController;
     [SerializeField] private GameObject playerSphere;
+    [SerializeField] private ParticleSystem chaserEffect;
     [SerializeField] private NetworkObject networkObject;
 
     public Material material;
 
-    // Start is called before the first frame update
-    private void Start()
+    private void Awake()
     {
         material = new Material(playerSphere.GetComponent<MeshRenderer>().material);
         playerSphere.GetComponent<MeshRenderer>().material = material;
+        chaserEffect.Stop();
+        chaserEffect.Clear();
+    }
+    // Start is called before the first frame update
+    private void Start()
+    {
         SetColor();
         GameMultiplayer.Instance.OnPlayerDataNetworkListChanged += GameMultiplayer_OnPlayerDataNetworkListChanged;
     }
@@ -28,11 +34,14 @@ public class PlayerSphereEffect : NetworkBehaviour
     {
         if (playerStateController.GetState() == PlayerState.Chaser)
         {
+            chaserEffect.Play();
             SetColorServerRPC(networkObject, Color.red, new Color(0.529f, 0.153f, 0.267f));
 
         }
         else if (playerStateController.GetState() == PlayerState.Runner)
         {
+            chaserEffect.Stop();
+            chaserEffect.Clear();
             SetColorServerRPC(networkObject, Color.blue, new Color(0.54f, 0.41f, 0.69f));
 
         }

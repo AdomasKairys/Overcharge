@@ -16,7 +16,7 @@ public class PlayerStateController : NetworkBehaviour
 {
     [Header("Player State")]
     public NetworkVariable<float> currCharge = new NetworkVariable<float>(0.0f); // Current value of charge the player has
-    public float chargeRate = 0.5f; // The rate in which the palyer's charge increases
+    public float chargeRate = 0.25f; // The rate in which the palyer's charge increases
     public float overcharge = 100.0f; // The maximum value of charge at which the player dies
 
     public event EventHandler OnPlayerDeath;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
 
 public class GameManager : NetworkBehaviour
 {
@@ -23,6 +22,7 @@ public class GameManager : NetworkBehaviour
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private NetworkVariable<float> countDownToStartTimer = new NetworkVariable<float>(3f);
 
+    private List<Vector3> spawnPositions = new List<Vector3>();
     private void Awake()
     {
         Instance = this;
@@ -82,10 +82,20 @@ public class GameManager : NetworkBehaviour
 
     private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
+        //handle spawning better this is just so that player dont clip through the map
+        float sign = 1f;
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
+            sign *= ((clientId + 1) % 3) == 0 ? -1f : sign; 
+            var positionX = sign * ((clientId + 1) % 2);
+            var positionZ = sign * ((clientId + 2) % 2);
+
             Transform playerTransform = Instantiate(playerPrefab);
-            playerTransform.position = new Vector3(UnityEngine.Random.value*10, playerTransform.position.y, UnityEngine.Random.value * 10);
+            playerTransform.position = new Vector3(
+                20 * positionX,
+                playerTransform.position.y,
+                20 * positionZ
+                );
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }

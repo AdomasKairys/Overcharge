@@ -12,7 +12,6 @@ public class ThirdPersonCam : NetworkBehaviour
     [Header("References")]
     public Transform orientation;
     public Transform player;
-    public Transform playerObj;
     public Rigidbody rb;
     public WallRunning wr;
     public PlayerMovement pr;
@@ -57,16 +56,6 @@ public class ThirdPersonCam : NetworkBehaviour
         }
         Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
         orientation.forward = viewDir;
-
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticallInput = Input.GetAxis("Vertical");
-
-        Vector3 inputDir = orientation.forward * verticallInput + orientation.right * horizontalInput;
-        
-        //if (inputDir != Vector3.zero)
-        //    playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
-         
-
     }
     public void FreezeCamera()
     {
