@@ -8,7 +8,6 @@ public class PlayerController : NetworkBehaviour
 {
     //could be change to a list of monobehaviours/networkbehaviours
     public PlayerMovement pm;
-    public PlayerSphereEffect psf;
     public DashTrail dt;
     public ProjectileController prjc;
     public Climbing cl;
@@ -74,7 +73,6 @@ public class PlayerController : NetworkBehaviour
             psc.enabled = false;
             dt.enabled = false;
             prjc.enabled = false;
-            psf.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
             Destroy(ui); //throws an error but if removed everything brakes

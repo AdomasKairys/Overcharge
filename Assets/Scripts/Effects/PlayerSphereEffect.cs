@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerSphereEffect : NetworkBehaviour
+public class PlayerSphereEffect : MonoBehaviour
 {
     [SerializeField] private PlayerStateController playerStateController;
     [SerializeField] private GameObject playerSphere;
     [SerializeField] private ParticleSystem chaserEffect;
-    [SerializeField] private NetworkObject networkObject;
 
     public Material material;
 
@@ -22,47 +21,36 @@ public class PlayerSphereEffect : NetworkBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        SetColor();
+        UpdateColor();
         GameMultiplayer.Instance.OnPlayerDataNetworkListChanged += GameMultiplayer_OnPlayerDataNetworkListChanged;
     }
 
     private void GameMultiplayer_OnPlayerDataNetworkListChanged(object sender, System.EventArgs e)
     {
-        SetColor();
+        UpdateColor();
     }
-    void SetColor()
+    void UpdateColor()
     {
         if (playerStateController.GetState() == PlayerState.Chaser)
         {
             chaserEffect.Play();
-            SetColorServerRPC(networkObject, Color.red, new Color(0.529f, 0.153f, 0.267f));
+            SetMaterialColor(Color.red, new Color(0.529f, 0.153f, 0.267f));
 
         }
         else if (playerStateController.GetState() == PlayerState.Runner)
         {
             chaserEffect.Stop();
             chaserEffect.Clear();
-            SetColorServerRPC(networkObject, Color.blue, new Color(0.54f, 0.41f, 0.69f));
+            SetMaterialColor(Color.blue, new Color(0.54f, 0.41f, 0.69f));
 
         }
     }
-    [ServerRpc]
-    void SetColorServerRPC(NetworkObjectReference target, Color rimColor, Color color)
+    void SetMaterialColor(Color rimColor, Color color)
     {
-        SetColorClientRPC(target, rimColor, color);
+        material.SetColor("_RimColor", rimColor);
+        material.SetColor("_Color", color);
     }
-    [ClientRpc]
-    void SetColorClientRPC(NetworkObjectReference target, Color rimColor, Color color)
-    {
-        if (!target.TryGet(out NetworkObject networkObject))
-            return;
-
-        var player = networkObject.transform.Find("Player");
-        player.GetComponent<PlayerSphereEffect>().material.SetColor("_RimColor", rimColor);
-        player.GetComponent<PlayerSphereEffect>().material.SetColor("_Color", color);
-
-    }
-    private new void OnDestroy()
+    private void OnDestroy()
     {
         GameMultiplayer.Instance.OnPlayerDataNetworkListChanged -= GameMultiplayer_OnPlayerDataNetworkListChanged;
     }
