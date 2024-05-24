@@ -44,15 +44,38 @@ public class Swinging : EquipmentController
         gun.enabled = false;
 
         base.Initialize(useAction);
+
+        _useAction.performed += OnPress;
+        _useAction.canceled += OnRelease;
     }
+
+    private void OnPress(InputAction.CallbackContext context)
+    {
+        if (!IsSwingOver())
+        {
+            StartSwing();
+        }
+    }
+
+    private void OnRelease(InputAction.CallbackContext context)
+    {
+        if (!IsSwingOver())
+        {
+            StopSwing();
+        }        
+    }
+
+
 
     private void Update()
     {
         if( !_initialized ) { return; }
 
+        if (IsSwingOver()) StopSwing();
+
         // TODO: figure this out
-        if (Input.GetKeyDown(KeyCode.Mouse1) && !IsSwingOver()) StartSwing();
-        if (Input.GetKeyUp(KeyCode.Mouse1) || IsSwingOver()) StopSwing();
+        //if (Input.GetKeyDown(KeyCode.Mouse1) && !IsSwingOver()) StartSwing();
+        //if (Input.GetKeyUp(KeyCode.Mouse1) || IsSwingOver()) StopSwing();
         //if (_useAction.triggered && !IsSwingOver()) StartSwing();
         //if (_useAction.phase == InputActionPhase.Canceled || IsSwingOver()) StopSwing();
 
@@ -203,6 +226,7 @@ public class Swinging : EquipmentController
     {
         swingTimer -= Time.deltaTime;
         Vector3 forceHorizontal = orientation.forward * Mathf.Pow(swingTimer/swingDuration, 2) + (swingPoint - player.position).normalized;
+        // TODO: replace this when I add the PlayerInput singleton for connecting to all input actions
         // right
         if (Input.GetKey(KeyCode.D)) forceHorizontal += orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
         // left
@@ -227,5 +251,12 @@ public class Swinging : EquipmentController
         lineRenderer.SetPosition(0, gunTipPos);
         Debug.Log(gunTipPos);
         lineRenderer.SetPosition(1, currentGrapplePosition);
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        _useAction.performed -= OnPress;
+        _useAction.canceled -= OnRelease;
+        base.OnNetworkDespawn();
     }
 }
