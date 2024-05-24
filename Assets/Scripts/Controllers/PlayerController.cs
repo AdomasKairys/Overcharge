@@ -6,7 +6,9 @@ using UnityEngine;
 
 public class PlayerController : NetworkBehaviour
 {
+    //could be change to a list of monobehaviours/networkbehaviours
     public PlayerMovement pm;
+    public DashTrail dt;
     public ProjectileController prjc;
     public Climbing cl;
     public Swinging sw;
@@ -19,36 +21,20 @@ public class PlayerController : NetworkBehaviour
     public TagController tc;
     public InventoryController inventoryController;
 
-    // Start is called before the first frame update
     void Start()
     {
-        if (!IsOwner)
-        {
-            fl.Priority = 0;
-            pm.enabled = false;
-            cl.enabled = false;
-            sw.enabled = false;
-            wr.enabled = false;
-            ds.enabled = false;
-            psc.enabled = false;
-            tc.enabled = false;
-            prjc.enabled = false;
-            inventoryController.enabled = false;
-            ui.SetActive(false);
-        }
-        else
-        {
-            fl.Priority = 10;
+        
+    }
+    public override void OnNetworkSpawn()
+    {
+        sw.enabled = false;
+        prjc.enabled = false;
 
-            // Initially disable all equipment
-            sw.enabled = false;
-            prjc.enabled = false;
-        }
         PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
 
         // Enable equipment based on selection
-        switch(playerData.primaryEquipment)
+        switch (playerData.primaryEquipment)
         {
             case EquipmentType.None:
                 break;
@@ -75,12 +61,25 @@ public class PlayerController : NetworkBehaviour
                 break;
         }
         ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
-    }
-    private void Update()
-    {
-        if (GameManager.Instance.IsGamePlaying())
+        if (!IsOwner)
         {
-
+            pm.gameObject.layer = LayerMask.NameToLayer("otherPlayer");
+            fl.Priority = 0;
+            pm.enabled = false;
+            cl.enabled = false;
+            sw.enabled = false;
+            wr.enabled = false;
+            ds.enabled = false;
+            psc.enabled = false;
+            dt.enabled = false;
+            prjc.enabled = false;
+            inventoryController.enabled = false;
+            ui.SetActive(false);
+            Destroy(ui); //throws an error but if removed everything brakes
+        }
+        else
+        {
+            fl.Priority = 10;
         }
     }
 

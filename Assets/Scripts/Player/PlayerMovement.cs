@@ -102,7 +102,6 @@ public class PlayerMovement : NetworkBehaviour
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
         MyInput();
         StateHandler();
-        Debug.Log(isKnockedBack);
         rb.drag = isGrounded && state != MovementState.dashing && state != MovementState.knockback && !isSwinging ? groundDrag : 0;
         
     }
@@ -120,7 +119,6 @@ public class PlayerMovement : NetworkBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
-        Debug.Log("waht");
 
         if (Input.GetKey(jumpKey) && isReadyToJump && isGrounded)
         {
@@ -182,6 +180,8 @@ public class PlayerMovement : NetworkBehaviour
         {
             moveSpeed = desiredMoveSpeed;
         }
+        
+
         lastDesiredMoveSpeed = desiredMoveSpeed;
         lastState = state;
     }
@@ -197,7 +197,7 @@ public class PlayerMovement : NetworkBehaviour
             Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
             //bug here fixed (?)
-            if (flatVel.magnitude < walkSpeed && desiredMoveSpeed <= startValue)
+            if (flatVel.magnitude < walkSpeed && desiredMoveSpeed <= startValue || flatVel.magnitude < walkSpeed && desiredMoveSpeed == walkSpeed)
             {
                 break;
             }
@@ -230,8 +230,6 @@ public class PlayerMovement : NetworkBehaviour
         {
 
             float wallLookAngle = Vector3.Angle(moveDir, -wallFrontHit.normal);
-            Debug.Log(wallLookAngle);
-
             if(wallLookAngle < 90f)
             {
                 moveDir = wallLookAngle > 15f ? Vector3.ProjectOnPlane(moveDir, wallFrontHit.normal).normalized : Vector3.zero;
@@ -240,8 +238,6 @@ public class PlayerMovement : NetworkBehaviour
 
         if (IsOnSlope() && !isExitingSlope)
         {
-            Debug.Log("waht2");
-
             if (rb.velocity.y > -0.1f)
                 rb.AddForce(20f * moveSpeed * GetSlopeMoveDirection(moveDir), ForceMode.Force);
 
@@ -253,14 +249,10 @@ public class PlayerMovement : NetworkBehaviour
         }
         else if (isGrounded)
         {
-            Debug.Log("waht3");
-
             rb.AddForce(10f * moveSpeed * moveDir.normalized, ForceMode.Force);
         }
         else if (!isGrounded)
         {
-            Debug.Log("waht4");
-
             rb.AddForce(10f * airMultiplier * moveSpeed * moveDir.normalized, ForceMode.Force);
         }
 
@@ -307,24 +299,34 @@ public class PlayerMovement : NetworkBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
-    public void RocketKnockback(Vector3 otherPosition, ulong targetId)
+    public void UniversalKnockback(Vector3 otherPosition, float strength, ulong targetId, bool resetVel = false)
     {
-        RocketKnockbackServerRPC(otherPosition, targetId);
+        UniversalKnockbackServerRPC(otherPosition, strength, targetId, resetVel);
     }
     [ServerRpc(RequireOwnership=false)]
-    private void RocketKnockbackServerRPC(Vector3 otherPosition, ulong targetId)
+    private void UniversalKnockbackServerRPC(Vector3 otherPosition, float strength, ulong targetId, bool resetVel)
     {
-        RocketKnockbackClientRPC(otherPosition, targetId);
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { targetId }
+            }
+        };
+        UniversalKnockbackClientRPC(otherPosition, strength, resetVel, clientRpcParams);
     }
     [ClientRpc]
-    private void RocketKnockbackClientRPC(Vector3 otherPosition, ulong targetId)
+    private void UniversalKnockbackClientRPC(Vector3 otherPosition, float strength, bool resetVel, ClientRpcParams clientRpcParams = default)
     {
-        if (OwnerClientId != targetId)
-            return;
+        Debug.Log("hello");
         isKnockedBack = true;
         var thisRb = GetComponent<Rigidbody>();
+        if (resetVel)
+        {
+            thisRb.velocity = Vector3.zero;
+        }
         Vector3 pushDirection = (thisRb.transform.position - otherPosition).normalized;
-        thisRb.AddForce(pushDirection * 75, ForceMode.Impulse);
+        thisRb.AddForce(pushDirection * strength, ForceMode.Impulse);
         Invoke(nameof(stopKnockback), 0.25f);
     }
     private void stopKnockback()

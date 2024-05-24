@@ -28,10 +28,10 @@ public class Rocket : NetworkBehaviour
         else 
             rocket.gameObject.GetComponent<MeshRenderer>().enabled = false;
     }
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
         if (!IsOwner) return;
-        if (collisionLayerMask == (collisionLayerMask | (1 << other.gameObject.layer)))
+        if (collisionLayerMask == (collisionLayerMask | (1 << collision.gameObject.layer)))
         {
             KnockBackPlayer();
             particleController.PlayParticles();
@@ -49,7 +49,7 @@ public class Rocket : NetworkBehaviour
         foreach(Collider player in players) 
         {
             PlayerMovement pm = player.gameObject.GetComponentInParent<PlayerMovement>();
-            pm.RocketKnockback(transform.position, player.transform.parent.parent.GetComponent<NetworkObject>().OwnerClientId);
+            pm.UniversalKnockback(transform.position, 50f, player.transform.parent.parent.GetComponent<NetworkObject>().OwnerClientId);
         }
     }
 

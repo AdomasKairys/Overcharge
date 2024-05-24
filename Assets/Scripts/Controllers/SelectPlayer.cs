@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -16,7 +17,7 @@ public class SelectPlayer : MonoBehaviour
     private void Awake()
     {
         kickButton.onClick.AddListener(() => {
-            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFrompLayerIndex(playerIndex);
+            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(playerIndex);
             GameLobby.Instance.KickPlayer(playerData.playerId.ToString());
             GameMultiplayer.Instance.KickPlayer(playerData.clientId);
         });
@@ -25,7 +26,19 @@ public class SelectPlayer : MonoBehaviour
     {
         GameMultiplayer.Instance.OnPlayerDataNetworkListChanged += GameMultiplayer_OnPlayerDataNetworkListChanged;
         PlayerReady.Instance.OnReadyChanged += PlayerReady_OnReadyChanged;
-        kickButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
+
+        ulong clientId = 0;
+
+        //this is to remove the kick buttom on the host, so that you cant kick the host. Try catch because if the player isn't connected you get index out of bounds error
+        try
+        {
+            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(playerIndex);
+            clientId = playerData.clientId;
+        }
+        catch (Exception)
+        {}
+
+        kickButton.gameObject.SetActive(NetworkManager.Singleton.IsServer && clientId != 0);
         UpdatePlayer();
     }
 
@@ -43,11 +56,13 @@ public class SelectPlayer : MonoBehaviour
         if (GameMultiplayer.Instance.IsPlayerIndexConnected(playerIndex))
         { 
             Show();
-            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFrompLayerIndex(playerIndex);
+            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(playerIndex);
             readyGameObject.SetActive(PlayerReady.Instance.IsPlayerReady(playerData.clientId));
 
+            Color playerColor = GameMultiplayer.Instance.GetPlayerColor(playerData.colorId);
+            playerNameText.color = playerColor;
             playerNameText.text = playerData.playerName.ToString();
-            playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
+            playerVisual.SetPlayerColor(playerColor);
         }
         else
             Hide();
