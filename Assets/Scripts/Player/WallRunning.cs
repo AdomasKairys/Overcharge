@@ -82,6 +82,25 @@ public class WallRunning : MonoBehaviour
         if (pm.isWallrunning && !isExitingWall)
             WallRunningMovement();
     }
+
+    public void updateKeybinds()
+    {
+        if (PlayerPrefs.HasKey("jumpKey"))
+        {
+            string keyString = PlayerPrefs.GetString("jumpKey");
+            jumpKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+        if (PlayerPrefs.HasKey("upwardsRunKey"))
+        {
+            string keyString = PlayerPrefs.GetString("upwardsRunKey");
+            upwardsRunKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+        if (PlayerPrefs.HasKey("downwardsRunKey"))
+        {
+            string keyString = PlayerPrefs.GetString("downwardsRunKey");
+            downwardsRunKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+    }
     private void CheckForWall()
     {
         isWallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallCheckDistance, whatIsWall);

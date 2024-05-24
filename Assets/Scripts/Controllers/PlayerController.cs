@@ -7,20 +7,22 @@ using UnityEngine;
 public class PlayerController : NetworkBehaviour
 {
     //could be change to a list of monobehaviours/networkbehaviours
-    public PlayerMovement pm;
+    public PlayerMovement pm;//keybinds update
     public DashTrail dt;
-    public ProjectileController prjc;
-    public Climbing cl;
-    public Swinging sw;
-    public WallRunning wr;
+    public ProjectileController prjc;//keybinds update
+    public Climbing cl;//keybinds update
+    public Swinging sw;//keybinds update
+    public WallRunning wr;//keybinds update
     public CinemachineFreeLook fl;
-    public Dashing ds;
+    public Dashing ds;//keybinds update
     public GameObject ui;
     public PlayerVisual playerVisual;
     public PlayerStateController psc;
     public TagController tc;
     public InventoryController inventoryController;
 
+    private KeyCode primEquipKey = KeyCode.Mouse0;
+    private KeyCode secEquipKey = KeyCode.Mouse1;
     void Start()
     {
         
@@ -33,6 +35,7 @@ public class PlayerController : NetworkBehaviour
         PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
 
+        updateAllKeybinds();
         // Enable equipment based on selection
         switch (playerData.primaryEquipment)
         {
@@ -40,11 +43,11 @@ public class PlayerController : NetworkBehaviour
                 break;
             case EquipmentType.GrapplingHook:
                 sw.enabled = true;
-                sw.UseKey = KeyCode.Mouse0;
+                sw.UseKey = primEquipKey;
                 break;
             case EquipmentType.RocketLauncher:
                 prjc.enabled = true;
-                prjc.UseKey = KeyCode.Mouse0;
+                prjc.UseKey = primEquipKey;
                 break;
         }
         switch (playerData.secondaryEquipment)
@@ -53,11 +56,11 @@ public class PlayerController : NetworkBehaviour
                 break;
             case EquipmentType.GrapplingHook:
                 sw.enabled = true;
-                sw.UseKey = KeyCode.Mouse1;
+                sw.UseKey = secEquipKey;
                 break;
             case EquipmentType.RocketLauncher:
                 prjc.enabled = true;
-                prjc.UseKey = KeyCode.Mouse1;
+                prjc.UseKey = secEquipKey;
                 break;
         }
         ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
@@ -82,5 +85,25 @@ public class PlayerController : NetworkBehaviour
             fl.Priority = 10;
         }
     }
-
+    public void updateAllKeybinds()
+	{
+        updateKeybinds();
+        pm.updateKeybinds();
+        wr.updateKeybinds();
+        cl.updateKeybinds();
+        ds.updateKeybinds();
+    }
+    public void updateKeybinds()
+    {
+        if (PlayerPrefs.HasKey("primEquipKey"))
+        {
+            string keyString = PlayerPrefs.GetString("primEquipKey");
+            primEquipKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+        if (PlayerPrefs.HasKey("secEquipKey"))
+        {
+            string keyString = PlayerPrefs.GetString("secEquipKey");
+            secEquipKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+    }
 }

@@ -114,7 +114,19 @@ public class PlayerMovement : NetworkBehaviour
     {
         MovePlayer(); 
     }
-
+    public void updateKeybinds()
+	{
+		if (PlayerPrefs.HasKey("jumpKey"))
+		{
+            string keyString = PlayerPrefs.GetString("jumpKey");
+            jumpKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+        if (PlayerPrefs.HasKey("crouchKey"))
+        {
+            string keyString = PlayerPrefs.GetString("crouchKey");
+            crouchKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+    }
     private void MyInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");

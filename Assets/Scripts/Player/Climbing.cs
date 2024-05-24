@@ -55,7 +55,14 @@ public class Climbing : MonoBehaviour
     {
         if (isClimbing && !isExitingWall) ClimbingMovement();
     }
-
+    public void updateKeybinds()
+    {
+        if (PlayerPrefs.HasKey("jumpKey"))
+        {
+            string keyString = PlayerPrefs.GetString("jumpKey");
+            jumpKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+    }
     private void StateMachine()
     {
         

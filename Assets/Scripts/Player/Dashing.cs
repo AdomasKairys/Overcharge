@@ -45,6 +45,14 @@ public class Dashing : MonoBehaviour
         if (dashCdTimer > 0)
             dashCdTimer -= Time.deltaTime;
     }
+    public void updateKeybinds()
+    {
+        if (PlayerPrefs.HasKey("dashKey"))
+        {
+            string keyString = PlayerPrefs.GetString("dashKey");
+            dashKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyString);
+        }
+    }
 
     private void Dash()
     {
