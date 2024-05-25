@@ -9,8 +9,6 @@ using static PlayerController;
 
 public class PlayerController : NetworkBehaviour
 {
-    private PlayerInputs _playerInputs;
-
     //could be change to a list of monobehaviours/networkbehaviours
     public PlayerMovement pm;
     public DashTrail dt;
@@ -54,11 +52,8 @@ public class PlayerController : NetworkBehaviour
         }
         else
         {
-            // The owner initializes their player inputs
-            _playerInputs = new PlayerInputs();
-
             // The owner enables their inputs NOTE: this could be changed to happen only when countdown ends
-            _playerInputs.Enable();
+            GameSettings.Instance.playerInputs.Enable();
 
             fl.Priority = 10;
 
@@ -69,11 +64,11 @@ public class PlayerController : NetworkBehaviour
                     break;
                 case EquipmentType.GrapplingHook:
                     sw.enabled = true;
-                    sw.Initialize(EquipmentSlot.Primary, _playerInputs);
+                    sw.Initialize(EquipmentSlot.Primary, GameSettings.Instance.playerInputs);
                     break;
                 case EquipmentType.RocketLauncher:
                     prjc.enabled = true;
-                    prjc.Initialize(EquipmentSlot.Primary, _playerInputs);
+                    prjc.Initialize(EquipmentSlot.Primary, GameSettings.Instance.playerInputs);
                     break;
             }
             switch (playerData.secondaryEquipment)
@@ -82,11 +77,11 @@ public class PlayerController : NetworkBehaviour
                     break;
                 case EquipmentType.GrapplingHook:
                     sw.enabled = true;
-                    sw.Initialize(EquipmentSlot.Secondary, _playerInputs);
+                    sw.Initialize(EquipmentSlot.Secondary, GameSettings.Instance.playerInputs);
                     break;
                 case EquipmentType.RocketLauncher:
                     prjc.enabled = true;
-                    prjc.Initialize(EquipmentSlot.Secondary, _playerInputs);
+                    prjc.Initialize(EquipmentSlot.Secondary, GameSettings.Instance.playerInputs);
                     break;
             }
         }
@@ -98,7 +93,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsOwner)
         {
-            _playerInputs.Disable();
+            GameSettings.Instance.playerInputs.Disable();
         }
 
         base.OnNetworkDespawn();

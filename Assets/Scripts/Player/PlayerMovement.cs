@@ -8,11 +8,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    private PlayerInputActions _playerInputActions;
-
-    private InputAction _moveAction;
-    private InputAction _jumpAction;
-
     [Header("Movement")]
     private float moveSpeed;
     private float moveSpeedMultiplier;
@@ -100,14 +95,10 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (IsOwner)
         {
-            _playerInputActions = new PlayerInputActions();
+            GameSettings.Instance.playerInputs.MoveAction.Enable();
 
-            _moveAction = _playerInputActions.Player.Move;
-            _moveAction.Enable();
-
-            _jumpAction = _playerInputActions.Player.Jump;
-            _jumpAction.performed += OnJump;
-            _jumpAction.Enable();
+            GameSettings.Instance.playerInputs.JumpAction.performed += OnJump;
+            GameSettings.Instance.playerInputs.JumpAction.Enable();
 
             moveSpeed = walkSpeed;
             moveSpeedMultiplier = 1f;
@@ -124,10 +115,10 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (IsOwner)
         {
-            _moveAction.Disable();
+            GameSettings.Instance.playerInputs.MoveAction.Disable();
 
-            _jumpAction.performed -= OnJump;
-            _jumpAction.Disable();
+            GameSettings.Instance.playerInputs.JumpAction.performed -= OnJump;
+            GameSettings.Instance.playerInputs.JumpAction.Disable();
         }
 
         base.OnNetworkDespawn();
@@ -177,8 +168,8 @@ public class PlayerMovement : NetworkBehaviour
 
     private void MyInput()
     {
-        horizontalInput = _moveAction.ReadValue<Vector2>().x;
-        verticalInput = _moveAction.ReadValue<Vector2>().y;
+        horizontalInput = GameSettings.Instance.playerInputs.MoveAction.ReadValue<Vector2>().x;
+        verticalInput = GameSettings.Instance.playerInputs.MoveAction.ReadValue<Vector2>().y;
 
     }
     private MovementState lastState;

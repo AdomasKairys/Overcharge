@@ -7,13 +7,6 @@ using UnityEngine.InputSystem;
 
 public class WallRunning : MonoBehaviour
 {
-    private PlayerInputActions _playerInputActions;
-
-    private InputAction _upwardsWallRunAction;
-    private InputAction _downwardsWallRunAction;
-    private InputAction _moveAction;
-    private InputAction _jumpAction;
-
     [Header("Wallrunning")]
     public LayerMask whatIsWall;
     public LayerMask whatIsGround;
@@ -73,20 +66,14 @@ public class WallRunning : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         pm = GetComponent<PlayerMovement>();
 
-        _playerInputActions = new PlayerInputActions();
+        GameSettings.Instance.playerInputs.MoveAction.Enable();
 
-        _moveAction = _playerInputActions.Player.Move;
-        _moveAction.Enable();
+        GameSettings.Instance.playerInputs.JumpAction.performed += OnJump;
+        GameSettings.Instance.playerInputs.JumpAction.Enable();
 
-        _jumpAction = _playerInputActions.Player.Jump;
-        _jumpAction.performed += OnJump;
-        _jumpAction.Enable();
+        GameSettings.Instance.playerInputs.UpwardsWallRun.Enable();
 
-        _upwardsWallRunAction = _playerInputActions.Player.UpwardsWallRun;
-        _upwardsWallRunAction.Enable();
-
-        _downwardsWallRunAction = _playerInputActions.Player.DownwardsWallRun;
-        _downwardsWallRunAction.Enable();
+        GameSettings.Instance.playerInputs.DownwardWallRun.Enable();
     }
 
     private void OnJump(InputAction.CallbackContext context)
@@ -127,11 +114,11 @@ public class WallRunning : MonoBehaviour
     }
     private void StateMachine()
     {
-        horizontalInput = _moveAction.ReadValue<Vector2>().x;
-        verticalInput = _moveAction.ReadValue<Vector2>().y;
+        horizontalInput = GameSettings.Instance.playerInputs.MoveAction.ReadValue<Vector2>().x;
+        verticalInput = GameSettings.Instance.playerInputs.MoveAction.ReadValue<Vector2>().y;
 
-        upwardsRunning = _upwardsWallRunAction.inProgress;
-        downwardsRunning = _upwardsWallRunAction.inProgress;
+        upwardsRunning = GameSettings.Instance.playerInputs.UpwardsWallRun.inProgress;
+        downwardsRunning = GameSettings.Instance.playerInputs.UpwardsWallRun.inProgress;
 
         if ((isWallLeft || isWallRight) && verticalInput > 0 && IsAboveGround() && !isExitingWall)
         {

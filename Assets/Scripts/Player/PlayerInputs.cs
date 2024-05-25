@@ -19,16 +19,22 @@ public class PlayerInputs
 
     public InputAction UseSecondaryEquipment { get; private set; }
 
+    public InputAction UpwardsWallRun { get; private set; }
+
+    public InputAction DownwardWallRun { get; private set; }
+
     public PlayerInputs()
     {
         // Retrieve and setup the actions
         PlayerInputActions playerInputActions = new PlayerInputActions();
-        MoveAction = playerInputActions.Player.Jump;
+        MoveAction = playerInputActions.Player.Move;
         JumpAction = playerInputActions.Player.Jump;
         DashAction = playerInputActions.Player.Dash;
         UsePickup = playerInputActions.Player.UsePickup;
         UsePrimaryEquipment = playerInputActions.Player.UsePrimary;
         UseSecondaryEquipment = playerInputActions.Player.UseSecondary;
+        UpwardsWallRun = playerInputActions.Player.UpwardsWallRun;
+        DownwardWallRun = playerInputActions.Player.DownwardsWallRun;
     }
 
     public void Enable()
@@ -39,6 +45,8 @@ public class PlayerInputs
         UsePickup.Enable();
         UsePrimaryEquipment.Enable();
         UseSecondaryEquipment.Enable();
+        UpwardsWallRun.Enable();
+        DownwardWallRun.Enable();
     }
 
     public void Disable()
@@ -49,5 +57,7 @@ public class PlayerInputs
         UsePickup.Disable();
         UsePrimaryEquipment.Disable();
         UseSecondaryEquipment.Disable();
+        UpwardsWallRun.Disable();
+        DownwardWallRun.Disable();
     }
 }

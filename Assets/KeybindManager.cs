@@ -8,7 +8,6 @@ using TMPro;
 
 public class KeybindManager : MonoBehaviour
 {
-    public PlayerInputActions playerInputActions;
     public Button rebindUpButton;
     public Button rebindDownButton;
     public Button rebindLeftButton;
@@ -22,13 +21,11 @@ public class KeybindManager : MonoBehaviour
 
     private void Start()
     {
-        playerInputActions = new PlayerInputActions();
-        playerInputActions.Enable();
         UpdateBindingDisplay();
-        rebindUpButton.onClick.AddListener(() => StartRebinding(playerInputActions.Player.Move, "up"));
-        rebindDownButton.onClick.AddListener(() => StartRebinding(playerInputActions.Player.Move, "down"));
-        rebindLeftButton.onClick.AddListener(() => StartRebinding(playerInputActions.Player.Move, "left"));
-        rebindRightButton.onClick.AddListener(() => StartRebinding(playerInputActions.Player.Move, "right"));
+        rebindUpButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "up"));
+        rebindDownButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "down"));
+        rebindLeftButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "left"));
+        rebindRightButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "right"));
     }
 
     private void OnDisable()
@@ -38,14 +35,14 @@ public class KeybindManager : MonoBehaviour
 
     private void UpdateBindingDisplay()
     {
-        int upBindingIndex = FindBindingIndex(playerInputActions.Player.Move, "up");
-        int downBindingIndex = FindBindingIndex(playerInputActions.Player.Move, "down");
-        int leftBindingIndex = FindBindingIndex(playerInputActions.Player.Move, "left");
-        int rightBindingIndex = FindBindingIndex(playerInputActions.Player.Move, "right");
-        upBindingText.text = InputControlPath.ToHumanReadableString(playerInputActions.Player.Move.bindings[upBindingIndex].effectivePath);
-        downBindingText.text = InputControlPath.ToHumanReadableString(playerInputActions.Player.Move.bindings[downBindingIndex].effectivePath);
-        leftBindingText.text = InputControlPath.ToHumanReadableString(playerInputActions.Player.Move.bindings[leftBindingIndex].effectivePath);
-        rightBindingText.text = InputControlPath.ToHumanReadableString(playerInputActions.Player.Move.bindings[rightBindingIndex].effectivePath);
+        int upBindingIndex = FindBindingIndex(GameSettings.Instance.playerInputs.MoveAction, "up");
+        int downBindingIndex = FindBindingIndex(GameSettings.Instance.playerInputs.MoveAction, "down");
+        int leftBindingIndex = FindBindingIndex(GameSettings.Instance.playerInputs.MoveAction, "left");
+        int rightBindingIndex = FindBindingIndex(GameSettings.Instance.playerInputs.MoveAction, "right");
+        upBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[upBindingIndex].effectivePath);
+        downBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[downBindingIndex].effectivePath);
+        leftBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[leftBindingIndex].effectivePath);
+        rightBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[rightBindingIndex].effectivePath);
     }
 
     private int FindBindingIndex(InputAction action, string compositePart)
@@ -87,7 +84,7 @@ public class KeybindManager : MonoBehaviour
 
     public void SaveBindings()
     {
-        var rebinds = playerInputActions.SaveBindingOverridesAsJson();
+        var rebinds = GameSettings.Instance.playerInputs.MoveAction.SaveBindingOverridesAsJson();
         PlayerPrefs.SetString("rebinds", rebinds);
         PlayerPrefs.Save();
     }
@@ -97,7 +94,7 @@ public class KeybindManager : MonoBehaviour
         var rebinds = PlayerPrefs.GetString("rebinds", string.Empty);
         if (!string.IsNullOrEmpty(rebinds))
         {
-            playerInputActions.LoadBindingOverridesFromJson(rebinds);
+            GameSettings.Instance.playerInputs.MoveAction.LoadBindingOverridesFromJson(rebinds);
             UpdateBindingDisplay();
         }
     }

@@ -7,11 +7,6 @@ using UnityEngine.InputSystem;
 
 public class Climbing : MonoBehaviour
 {
-    private PlayerInputActions _playerInputActions;
-
-    private InputAction _moveAction;
-    private InputAction _jumpAction;
-
     [Header("References")]
     public Transform orientation;
     public Rigidbody rb;
@@ -53,14 +48,9 @@ public class Climbing : MonoBehaviour
 
     private void OnEnable()
     {
-        _playerInputActions = new PlayerInputActions();
-
-        _moveAction = _playerInputActions.Player.Move;
-        _moveAction.Enable();
-
-        _jumpAction = _playerInputActions.Player.Jump;
-        _jumpAction.performed += OnJump;
-        _jumpAction.Enable();
+        GameSettings.Instance.playerInputs.MoveAction.Enable();
+        GameSettings.Instance.playerInputs.JumpAction.performed += OnJump;
+        GameSettings.Instance.playerInputs.JumpAction.Enable();
     }
 
     private void OnJump(InputAction.CallbackContext context)
@@ -74,10 +64,10 @@ public class Climbing : MonoBehaviour
 
     private void OnDisable()
     {
-        _moveAction.Disable();
+        GameSettings.Instance.playerInputs.MoveAction.Disable();
 
-        _jumpAction.performed -= OnJump;
-        _jumpAction.Disable();
+        GameSettings.Instance.playerInputs.JumpAction.performed -= OnJump;
+        GameSettings.Instance.playerInputs.JumpAction.Disable();
     }
 
     // Update is called once per frame
@@ -97,7 +87,7 @@ public class Climbing : MonoBehaviour
     {
         
         // State 1 - Climbing
-        if (wallFront && _moveAction.ReadValue<Vector2>().y > 0 && wallLookAngle < maxWallLookAngle && !isExitingWall)
+        if (wallFront && GameSettings.Instance.playerInputs.MoveAction.ReadValue<Vector2>().y > 0 && wallLookAngle < maxWallLookAngle && !isExitingWall)
         {
             if (!isClimbing && climbTimer > 0) StartClimbing();
 
