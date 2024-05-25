@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,14 +12,20 @@ public class HostDisconnectUI : MonoBehaviour
 
     private void Start()
     {
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
-        playAgainButton.onClick.AddListener(() => { SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString()); });
+        Debug.Log(NetworkManager.ServerClientId + " " + NetworkManager.Singleton.LocalClientId);
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback; 
+        playAgainButton.onClick.AddListener(() => {
+            GameLobby.Instance.LeaveLobby();
+            SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString()); 
+        });
         Hide();
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
-        if(clientId == NetworkManager.ServerClientId)
+        Debug.Log(NetworkManager.ServerClientId + " " + clientId);
+        if (clientId == NetworkManager.ServerClientId)
         {
             Show();
         }
@@ -43,7 +47,9 @@ public class HostDisconnectUI : MonoBehaviour
     }
     private void OnDestroy()
     {
-         if( NetworkManager.Singleton != null)
+        if (NetworkManager.Singleton != null)
+        {
             NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
+        }
     }
 }

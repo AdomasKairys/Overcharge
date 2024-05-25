@@ -10,13 +10,15 @@ public class LobbyCreateUI : MonoBehaviour
     [SerializeField] private Button createPublicButton;
     [SerializeField] private Button createPrivateButton;
     [SerializeField] private TMP_InputField lobbyNameInputField;
+    [SerializeField] private TMP_InputField playerName;
+
 
 
     private void Awake()
     {
         createPublicButton.onClick.AddListener(() =>
         {
-            GameLobby.Instance.CreateLobby(lobbyNameInputField.text, false);
+            GameLobby.Instance.CreateLobby(playerName.text + ":" + lobbyNameInputField.text, false);
         });
         createPrivateButton.onClick.AddListener(() =>
         {

@@ -1,4 +1,6 @@
+using System.Linq;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public class GameCountdownUI : MonoBehaviour
@@ -6,16 +8,22 @@ public class GameCountdownUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private MonoBehaviour[] player;
     [SerializeField] private GameObject[] UI;
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private NetworkObject networkObject;
+    private void Awake()
     {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
-
+    }
+    void Start()
+    {
+        player = player.Where(x => x.enabled).ToArray();
+        UI = UI.Where(x => x.activeSelf).ToArray();
         Hide();
     }
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
     {
+        Debug.Log("State Changed" + GameManager.Instance.IsCountdownToStartActive());
+
         if (GameManager.Instance.IsCountdownToStartActive())
         {
             Show();
@@ -51,5 +59,9 @@ public class GameCountdownUI : MonoBehaviour
         {
             mb.enabled = to;
         }
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
     }
 }

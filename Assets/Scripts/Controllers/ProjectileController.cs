@@ -11,6 +11,7 @@ public class ProjectileController : EquipmentController
 
     private float cooldownTimer;
     public event EventHandler<OnShootEventArgs> OnShoot;
+    public float maxCooldown = 4f;
     public class OnShootEventArgs : EventArgs
     {
         public Vector3 spawnPos;
@@ -37,8 +38,8 @@ public class ProjectileController : EquipmentController
     {
         if(Input.GetKeyDown(UseKey) && cooldownTimer <= 0f)
         {
-            float maxCooldownTimer = 0.5f;
-            cooldownTimer = maxCooldownTimer;
+            
+            cooldownTimer = maxCooldown;
             Vector3 mousePosWorld = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 50f));
             Vector3 shootDir = (mousePosWorld - transform.position).normalized;
             OnShoot?.Invoke(this, new OnShootEventArgs { 
@@ -49,4 +50,5 @@ public class ProjectileController : EquipmentController
         else if (cooldownTimer > 0f)
             cooldownTimer -= Time.deltaTime;
     }
+    public float GetCooldownTimer() => cooldownTimer;
 }

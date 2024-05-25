@@ -37,7 +37,8 @@ public class GameLobby : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        callbacks.PlayerLeft += Callbacks_PlayerLeft;
+        if(IsLobbyHost())
+            callbacks.PlayerLeft += Callbacks_PlayerLeft;
         callbacks.KickedFromLobby += Callbacks_KickedFromLobby;
         DontDestroyOnLoad(gameObject);
         InitializeUnityAuthentication();
