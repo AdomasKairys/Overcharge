@@ -18,7 +18,7 @@ public class UIController : MonoBehaviour
     [Header("Player Charge Bar")]
     public GameObject playerChargeBar;
     private Slider playerChargeBarSlider;
-
+    public GameObject sliderColor;
     [Header("Velocity Text Box")]
     public GameObject velocityText;
 
@@ -60,6 +60,8 @@ public class UIController : MonoBehaviour
         playerChargeBarSlider.minValue = 0;
         playerChargeBarSlider.maxValue = playerStateController.overcharge;
         playerChargeBarSlider.value = playerStateController.currCharge.Value;
+
+        sliderColor.GetComponent<Image>().color = Color.blue;
     }
 
     private void PlayerStateController_OnPlayerDeath(object sender, EventArgs e)
@@ -73,11 +75,15 @@ public class UIController : MonoBehaviour
     void Update()
     {
         // Update the player state information
-        if(playerStateController.GetState() == PlayerState.Chaser)
+        if (playerStateController.GetState() == PlayerState.Chaser)
         {
             playerChargeBarSlider.value = playerStateController.currCharge.Value;
-        }        
-
+            sliderColor.GetComponent<Image>().color = Color.red;
+        }
+		else
+		{
+            sliderColor.GetComponent<Image>().color = Color.blue;
+        }
         // Update the text boxes
         textMesh_velocity.text = player.GetComponent<Rigidbody>().velocity.magnitude.ToString();
         textMesh_playerState.text = playerStateController.GetState().ToString();
