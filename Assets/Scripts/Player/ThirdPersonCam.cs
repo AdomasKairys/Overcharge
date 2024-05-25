@@ -25,7 +25,7 @@ public class ThirdPersonCam : NetworkBehaviour
     private bool isTiltChanged;
 
     public float defaultFov = 50f;
-    public float maxFovChange = 20f;
+    private float maxFovChange = 50f;
 
     // Start is called before the first frame update
     void Start()
@@ -68,10 +68,10 @@ public class ThirdPersonCam : NetworkBehaviour
     }
     private void CameraEffects()
     {
-        if (rb.velocity.magnitude > 15 && !isFovChanged)
+        if (rb.velocity.magnitude > 20f && !isFovChanged)
         {
             isFovChanged = true;
-            DoFov(defaultFov+3*((rb.velocity.magnitude - 20f > maxFovChange)?maxFovChange:3*(rb.velocity.magnitude - 20f)));
+            DoFov(defaultFov+3*((rb.velocity.magnitude - 15f > maxFovChange)?maxFovChange:rb.velocity.magnitude - 15f));
         }
         else if (isFovChanged)
         {

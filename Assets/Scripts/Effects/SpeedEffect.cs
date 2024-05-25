@@ -16,7 +16,7 @@ public class SpeedEffect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (rb.velocity.magnitude >= 24)
+        if (rb.velocity.magnitude > 30)
         {
             transform.parent.forward = rb.velocity.normalized;
             ps.Play();

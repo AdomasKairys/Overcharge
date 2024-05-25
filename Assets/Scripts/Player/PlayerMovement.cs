@@ -305,7 +305,7 @@ public class PlayerMovement : NetworkBehaviour
 
         if (flatVel.magnitude > moveSpeed * moveSpeedMultiplier)
         {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            Vector3 limitedVel = flatVel.normalized * moveSpeed * moveSpeedMultiplier;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
         //if (maxYSpeed != 0 && rb.velocity.y > maxYSpeed)
