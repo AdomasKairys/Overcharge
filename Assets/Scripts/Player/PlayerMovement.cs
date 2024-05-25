@@ -1,11 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    private PlayerInputActions _playerInputActions;
+
+    private InputAction _moveAction;
+    private InputAction _jumpAction;
+
     [Header("Movement")]
     private float moveSpeed;
     private float moveSpeedMultiplier;
@@ -34,8 +41,8 @@ public class PlayerMovement : NetworkBehaviour
     bool isReadyToJump;
 
     [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode crouchKey = KeyCode.LeftControl;
+    //public KeyCode jumpKey = KeyCode.Space;
+    //public KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -88,20 +95,73 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Magnet wall speed")]
     public float VerticalMagnetRunSpeed;
     public float VerticalMagnetClimbSpeed;
-    private void Start()
-    {
-        moveSpeed = walkSpeed;
-        moveSpeedMultiplier = 1f;
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
 
-        isReadyToJump = true;
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            _playerInputActions = new PlayerInputActions();
+
+            _moveAction = _playerInputActions.Player.Move;
+            _moveAction.Enable();
+
+            _jumpAction = _playerInputActions.Player.Jump;
+            _jumpAction.performed += OnJump;
+            _jumpAction.Enable();
+
+            moveSpeed = walkSpeed;
+            moveSpeedMultiplier = 1f;
+            rb = GetComponent<Rigidbody>();
+            rb.freezeRotation = true;
+
+            isReadyToJump = true;
+        }
+
+        base.OnNetworkSpawn();
     }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsOwner)
+        {
+            _moveAction.Disable();
+
+            _jumpAction.performed -= OnJump;
+            _jumpAction.Disable();
+        }
+
+        base.OnNetworkDespawn();
+    }
+
+    //private void Start()
+    //{
+    //    moveSpeed = walkSpeed;
+    //    moveSpeedMultiplier = 1f;
+    //    rb = GetComponent<Rigidbody>();
+    //    rb.freezeRotation = true;
+
+    //    isReadyToJump = true;
+    //}
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        if (isReadyToJump && isGrounded)
+        {
+
+            isReadyToJump = false;
+
+            Jump();
+
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
+    }
+
     private void Update()
     {
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
         MyInput();
         StateHandler();
+        //Debug.Log(isKnockedBack);
         rb.drag = isGrounded && state != MovementState.dashing && state != MovementState.knockback && !isSwinging ? groundDrag : 0;
         
     }
@@ -117,18 +177,8 @@ public class PlayerMovement : NetworkBehaviour
 
     private void MyInput()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
-
-        if (Input.GetKey(jumpKey) && isReadyToJump && isGrounded)
-        {
-
-            isReadyToJump = false;
-
-            Jump();
-
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
+        horizontalInput = _moveAction.ReadValue<Vector2>().x;
+        verticalInput = _moveAction.ReadValue<Vector2>().y;
 
     }
     private MovementState lastState;

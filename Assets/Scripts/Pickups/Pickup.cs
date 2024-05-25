@@ -46,7 +46,7 @@ public class Pickup : NetworkBehaviour
         Disable();
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void RequestDisableServerRpc()
     {
         if (!IsServer) return;
