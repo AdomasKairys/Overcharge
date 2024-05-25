@@ -1,11 +1,16 @@
 using Cinemachine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static PlayerController;
 
 public class PlayerController : NetworkBehaviour
 {
+    private PlayerInputs _playerInputs;
+
     //could be change to a list of monobehaviours/networkbehaviours
     public PlayerMovement pm;
     public DashTrail dt;
@@ -20,11 +25,8 @@ public class PlayerController : NetworkBehaviour
     public PlayerStateController psc;
     public TagController tc;
     public InventoryController inventoryController;
+    public PlayerInput pi;
 
-    void Start()
-    {
-        
-    }
     public override void OnNetworkSpawn()
     {
         sw.enabled = false;
@@ -33,33 +35,6 @@ public class PlayerController : NetworkBehaviour
         PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
 
-        // Enable equipment based on selection
-        switch (playerData.primaryEquipment)
-        {
-            case EquipmentType.None:
-                break;
-            case EquipmentType.GrapplingHook:
-                sw.enabled = true;
-                sw.UseKey = KeyCode.Mouse0;
-                break;
-            case EquipmentType.RocketLauncher:
-                prjc.enabled = true;
-                prjc.UseKey = KeyCode.Mouse0;
-                break;
-        }
-        switch (playerData.secondaryEquipment)
-        {
-            case EquipmentType.None:
-                break;
-            case EquipmentType.GrapplingHook:
-                sw.enabled = true;
-                sw.UseKey = KeyCode.Mouse1;
-                break;
-            case EquipmentType.RocketLauncher:
-                prjc.enabled = true;
-                prjc.UseKey = KeyCode.Mouse1;
-                break;
-        }
         ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
         if (!IsOwner)
         {
@@ -79,8 +54,53 @@ public class PlayerController : NetworkBehaviour
         }
         else
         {
+            // The owner initializes their player inputs
+            _playerInputs = new PlayerInputs();
+
+            // The owner enables their inputs NOTE: this could be changed to happen only when countdown ends
+            _playerInputs.Enable();
+
             fl.Priority = 10;
+
+            //Enable equipment based on selection
+            switch (playerData.primaryEquipment)
+            {
+                case EquipmentType.None:
+                    break;
+                case EquipmentType.GrapplingHook:
+                    sw.enabled = true;
+                    sw.Initialize(EquipmentSlot.Primary, _playerInputs);
+                    break;
+                case EquipmentType.RocketLauncher:
+                    prjc.enabled = true;
+                    prjc.Initialize(EquipmentSlot.Primary, _playerInputs);
+                    break;
+            }
+            switch (playerData.secondaryEquipment)
+            {
+                case EquipmentType.None:
+                    break;
+                case EquipmentType.GrapplingHook:
+                    sw.enabled = true;
+                    sw.Initialize(EquipmentSlot.Secondary, _playerInputs);
+                    break;
+                case EquipmentType.RocketLauncher:
+                    prjc.enabled = true;
+                    prjc.Initialize(EquipmentSlot.Secondary, _playerInputs);
+                    break;
+            }
         }
+
+        base.OnNetworkSpawn();
     }
 
+    public override void OnNetworkDespawn()
+    {
+        if (IsOwner)
+        {
+            _playerInputs.Disable();
+        }
+
+        base.OnNetworkDespawn();
+    }
 }

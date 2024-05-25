@@ -1,6 +1,7 @@
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Swinging : EquipmentController
 {
@@ -18,7 +19,7 @@ public class Swinging : EquipmentController
     [Header("Swinging")]
     public float swingDuration;
     public float swingCooldown = 5f;
-    private float cooldownTimer;
+    
     private float swingTimer;
     private float maxSwingDistance = 50f;
     private Vector3 swingPoint;
@@ -41,25 +42,58 @@ public class Swinging : EquipmentController
 
     private bool isPlayerGrappled = false;
 
-    private void Start()
+    private InputAction _moveAction;
+
+    public override void Initialize(EquipmentSlot slot, PlayerInputs playerInput)
     {
-        cooldownTimer = 0;
+        base.Initialize(slot, playerInput);
+        _moveAction = _playerInputs.MoveAction;
+
+        _useCooldown = 0;
         swingTimer = swingDuration;
         gun.enabled = false;
+
+        _useAction.performed += OnPress;
+        _useAction.canceled += OnRelease;
+
+        _initialized = true;
     }
+
+    private void OnPress(InputAction.CallbackContext context)
+    {
+        if (!IsSwingOver() && _useCooldown <= 0.1f)
+        {
+            StartSwing();
+        }
+    }
+
+    private void OnRelease(InputAction.CallbackContext context)
+    {
+        if (!IsSwingOver() && _useCooldown <= 0.1f)
+        {
+            StopSwing();
+        }        
+    }
+
     private void Update()
     {
-        Debug.Log(cooldownTimer);
-        if (Input.GetKeyDown(UseKey) && !IsSwingOver() && cooldownTimer<=0.1f) StartSwing();
-        if ((Input.GetKeyUp(UseKey) || IsSwingOver()) && cooldownTimer <= 0.1f) StopSwing();
+        if( !_initialized ) { return; }
 
-        if(cooldownTimer > 0.1f)
+        if (IsSwingOver() && _useCooldown <= 0.1f) StopSwing();
+
+        // TODO: fix
+        Debug.Log(_useCooldown);
+        //if (Input.GetKeyDown(UseKey) && !IsSwingOver() && cooldownTimer <= 0.1f) StartSwing();
+        //if ((Input.GetKeyUp(UseKey) || IsSwingOver()) && cooldownTimer <= 0.1f) StopSwing();
+
+        if (_useCooldown > 0.1f)
         {
-            cooldownTimer -= Time.deltaTime;
+            _useCooldown -= Time.deltaTime;
         }
 
         CheckForSwingPoints();
     }
+
     private void FixedUpdate()
     {
         if (joint != null) SwingMovement();
@@ -251,7 +285,7 @@ public class Swinging : EquipmentController
     }
     public void StopSwing()
     {
-        cooldownTimer = swingTimer >= swingDuration/2 ? swingCooldown/2 : swingCooldown;
+        _useCooldown = swingTimer >= swingDuration/2 ? swingCooldown/2 : swingCooldown;
         swingTimer = swingDuration;
         pm.isSwinging = false;
         SetLineRenderer(pc, 0, false);
@@ -263,10 +297,11 @@ public class Swinging : EquipmentController
     {
         swingTimer -= Time.deltaTime;
         Vector3 forceHorizontal = orientation.forward * Mathf.Pow(swingTimer/swingDuration, 2) + (swingPoint - player.position).normalized;
+        // TODO: replace this when I add the PlayerInput singleton for connecting to all input actions
         // right
-        if (Input.GetKey(KeyCode.D)) forceHorizontal += orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
+        if (_moveAction.ReadValue<Vector2>().x > 0) forceHorizontal += orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
         // left
-        if (Input.GetKey(KeyCode.A)) forceHorizontal -= orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
+        if (_moveAction.ReadValue<Vector2>().x < 0) forceHorizontal -= orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
 
         rb.AddForce(forceHorizontal.normalized * horizontalThrustForce, ForceMode.Force);
 
@@ -287,6 +322,11 @@ public class Swinging : EquipmentController
         lineRenderer.SetPosition(0, gunTipPos);
         lineRenderer.SetPosition(1, currentGrapplePosition);
     }
-    public float GetCooldownTimer() => cooldownTimer;
 
+    public override void OnNetworkDespawn()
+    {
+        _useAction.performed -= OnPress;
+        _useAction.canceled -= OnRelease;
+        base.OnNetworkDespawn();
+    }
 }

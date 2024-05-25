@@ -750,7 +750,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pm: {fileID: 4375474895832565972}
-  psf: {fileID: 2802015242824511605}
   dt: {fileID: 3117305367558806154}
   prjc: {fileID: 8805743022013943199}
   cl: {fileID: 3233911490611355447}
@@ -763,6 +762,7 @@ MonoBehaviour:
   psc: {fileID: 268782608315915819}
   tc: {fileID: 6767623379712817156}
   inventoryController: {fileID: 2515348113318348897}
+  pi: {fileID: 0}
 --- !u!114 &4450052275269707250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3018,10 +3018,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4396995675694076079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11304348cebb33846b6cba935d37be3b, type: 3}
+  m_Script: {fileID: 11500000, guid: 25f83f3380312244dbb5da5f16e1f6c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _useKey: 0
   cam: {fileID: 9134585161714008559}
   pfRocket: {fileID: 297782522620805522, guid: 765230f229ae90b489a048ea0994e651, type: 3}
   maxCooldown: 4
@@ -3037,7 +3036,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fedba4eff95d9b4cacd406f36a149c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _useKey: 0
   pc: {fileID: 3725760152432914651}
   lr: {fileID: 664434284539484444}
   gun: {fileID: 4893966730672807441}
@@ -3089,8 +3087,6 @@ MonoBehaviour:
   jumpForce: 12
   jumpCooldown: 0.25
   airMultiplier: 0.4
-  jumpKey: 32
-  crouchKey: 306
   playerHeight: 2
   whatIsGround:
     serializedVersion: 2
@@ -3216,7 +3212,6 @@ MonoBehaviour:
   playerStateController: {fileID: 268782608315915819}
   playerSphere: {fileID: 2318058592887856979}
   chaserEffect: {fileID: 5819651808437412344}
-  networkObject: {fileID: 3725760152432914651}
   material: {fileID: 2100000, guid: 1879d016620a61f47b93b7953a5c1818, type: 2}
 --- !u!114 &3117305367558806154
 MonoBehaviour:

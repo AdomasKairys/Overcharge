@@ -1,10 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Climbing : MonoBehaviour
 {
+    private PlayerInputActions _playerInputActions;
+
+    private InputAction _moveAction;
+    private InputAction _jumpAction;
+
     [Header("References")]
     public Transform orientation;
     public Rigidbody rb;
@@ -44,6 +51,35 @@ public class Climbing : MonoBehaviour
     public float exitWallTime;
     private float exitWallTimer;
 
+    private void OnEnable()
+    {
+        _playerInputActions = new PlayerInputActions();
+
+        _moveAction = _playerInputActions.Player.Move;
+        _moveAction.Enable();
+
+        _jumpAction = _playerInputActions.Player.Jump;
+        _jumpAction.performed += OnJump;
+        _jumpAction.Enable();
+    }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        if (wallFront && climbJumpsLeft > 0)
+        {
+            Debug.Log("Climb jumping");
+            ClimbJump();
+        }
+    }
+
+    private void OnDisable()
+    {
+        _moveAction.Disable();
+
+        _jumpAction.performed -= OnJump;
+        _jumpAction.Disable();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -51,6 +87,7 @@ public class Climbing : MonoBehaviour
         StateMachine();
 
     }
+
     private void FixedUpdate()
     {
         if (isClimbing && !isExitingWall) ClimbingMovement();
@@ -60,7 +97,7 @@ public class Climbing : MonoBehaviour
     {
         
         // State 1 - Climbing
-        if (wallFront && Input.GetKey(KeyCode.W) && wallLookAngle < maxWallLookAngle && !isExitingWall)
+        if (wallFront && _moveAction.ReadValue<Vector2>().y > 0 && wallLookAngle < maxWallLookAngle && !isExitingWall)
         {
             if (!isClimbing && climbTimer > 0) StartClimbing();
 
@@ -82,8 +119,6 @@ public class Climbing : MonoBehaviour
         {
             if (isClimbing) StopClimbing();
         }
-
-        if (wallFront && Input.GetKeyDown(jumpKey) && climbJumpsLeft > 0) ClimbJump();
     }
     private void WallCheck()
     {

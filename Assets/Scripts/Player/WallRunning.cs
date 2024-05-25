@@ -1,10 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class WallRunning : MonoBehaviour
 {
+    private PlayerInputActions _playerInputActions;
+
+    private InputAction _upwardsWallRunAction;
+    private InputAction _downwardsWallRunAction;
+    private InputAction _moveAction;
+    private InputAction _jumpAction;
+
     [Header("Wallrunning")]
     public LayerMask whatIsWall;
     public LayerMask whatIsGround;
@@ -16,9 +25,6 @@ public class WallRunning : MonoBehaviour
     private float wallRunTimer;
 
     [Header("Input")]
-    public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode upwardsRunKey = KeyCode.LeftShift;
-    public KeyCode downwardsRunKey = KeyCode.LeftControl;
     private bool upwardsRunning;
     private bool downwardsRunning;
     private float horizontalInput;
@@ -66,6 +72,27 @@ public class WallRunning : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         pm = GetComponent<PlayerMovement>();
+
+        _playerInputActions = new PlayerInputActions();
+
+        _moveAction = _playerInputActions.Player.Move;
+        _moveAction.Enable();
+
+        _jumpAction = _playerInputActions.Player.Jump;
+        _jumpAction.performed += OnJump;
+        _jumpAction.Enable();
+
+        _upwardsWallRunAction = _playerInputActions.Player.UpwardsWallRun;
+        _upwardsWallRunAction.Enable();
+
+        _downwardsWallRunAction = _playerInputActions.Player.DownwardsWallRun;
+        _downwardsWallRunAction.Enable();
+    }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        if ((isWallLeft || isWallRight) && verticalInput > 0 && IsAboveGround() && !isExitingWall)
+            WallJump();
     }
 
     // Update is called once per frame
@@ -100,11 +127,11 @@ public class WallRunning : MonoBehaviour
     }
     private void StateMachine()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
+        horizontalInput = _moveAction.ReadValue<Vector2>().x;
+        verticalInput = _moveAction.ReadValue<Vector2>().y;
 
-        upwardsRunning = Input.GetKey(upwardsRunKey);
-        downwardsRunning = Input.GetKey(downwardsRunKey);
+        upwardsRunning = _upwardsWallRunAction.inProgress;
+        downwardsRunning = _upwardsWallRunAction.inProgress;
 
         if ((isWallLeft || isWallRight) && verticalInput > 0 && IsAboveGround() && !isExitingWall)
         {
@@ -120,10 +147,7 @@ public class WallRunning : MonoBehaviour
                     WallJump();
 
                 isExitingWall = true;
-            }
-
-            if (Input.GetKeyDown(jumpKey))
-                WallJump();
+            } 
         }
         else if (isExitingWall)
         {
