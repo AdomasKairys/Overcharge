@@ -7,7 +7,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : NetworkBehaviour
 {
+    //could be change to a list of monobehaviours/networkbehaviours
     public PlayerMovement pm;
+    public DashTrail dt;
     public ProjectileController prjc;
     public Climbing cl;
     public Swinging sw;
@@ -22,15 +24,47 @@ public class PlayerController : NetworkBehaviour
     public PlayerInput pi;
 
     private PlayerInputActions _playerInputActions;
+    private InputAction _usePrimaryAction, _useSecondaryAction;
 
-    private InputAction _usePrimaryAction;
-    private InputAction _useSecondaryAction;
-
-    // Start is called before the first frame update
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        sw.enabled = false;
+        prjc.enabled = false;
+
+        PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
+
+        //// Enable equipment based on selection
+        //switch (playerData.primaryEquipment)
+        //{
+        //    case EquipmentType.None:
+        //        break;
+        //    case EquipmentType.GrapplingHook:
+        //        sw.enabled = true;
+        //        sw.Initialize(_usePrimaryAction);
+        //        break;
+        //    case EquipmentType.RocketLauncher:
+        //        prjc.enabled = true;
+        //        prjc.Initialize(_usePrimaryAction);
+        //        break;
+        //}
+        //switch (playerData.secondaryEquipment)
+        //{
+        //    case EquipmentType.None:
+        //        break;
+        //    case EquipmentType.GrapplingHook:
+        //        sw.enabled = true;
+        //        sw.Initialize(_useSecondaryAction);
+        //        break;
+        //    case EquipmentType.RocketLauncher:
+        //        prjc.enabled = true;
+        //        prjc.Initialize(_useSecondaryAction);
+        //        break;
+        //}
+        ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
         if (!IsOwner)
         {
+            pm.gameObject.layer = LayerMask.NameToLayer("otherPlayer");
             fl.Priority = 0;
             pm.enabled = false;
             cl.enabled = false;
@@ -38,63 +72,46 @@ public class PlayerController : NetworkBehaviour
             wr.enabled = false;
             ds.enabled = false;
             psc.enabled = false;
-            tc.enabled = false;
+            dt.enabled = false;
             prjc.enabled = false;
-            pi.enabled = false;
             inventoryController.enabled = false;
             ui.SetActive(false);
+            Destroy(ui); //throws an error but if removed everything brakes
         }
         else
         {
             fl.Priority = 10;
-
-            // Initially disable all equipment
-            sw.enabled = false;
-            prjc.enabled = false;
-
             _playerInputActions = new PlayerInputActions();
-
+            // TODO: test
             _usePrimaryAction = _playerInputActions.Player.UsePrimary;
             _useSecondaryAction = _playerInputActions.Player.UseSecondary;
-        }
-        PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
-        playerVisual.SetPlayerColor(GameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
-
-        // Enable equipment based on selection
-        switch(playerData.primaryEquipment)
-        {
-            case EquipmentType.None:
-                break;
-            case EquipmentType.GrapplingHook:
-                sw.enabled = true;
-                sw.Initialize(_usePrimaryAction);
-                break;
-            case EquipmentType.RocketLauncher:
-                prjc.enabled = true;
-                prjc.Initialize(_usePrimaryAction);
-                break;
-        }
-        switch (playerData.secondaryEquipment)
-        {
-            case EquipmentType.None:
-                break;
-            case EquipmentType.GrapplingHook:
-                sw.enabled = true;
-                sw.Initialize(_useSecondaryAction);
-                break;
-            case EquipmentType.RocketLauncher:
-                prjc.enabled = true;
-                prjc.Initialize(_useSecondaryAction);
-                break;
-        }
-        ui.GetComponent<UIController>().SetEquipment(playerData.primaryEquipment, playerData.secondaryEquipment);
-    }
-    private void Update()
-    {
-        if (GameManager.Instance.IsGamePlaying())
-        {
-
+            //Enable equipment based on selection
+            switch (playerData.primaryEquipment)
+            {
+                case EquipmentType.None:
+                    break;
+                case EquipmentType.GrapplingHook:
+                    sw.enabled = true;
+                    sw.Initialize(_usePrimaryAction);
+                    break;
+                case EquipmentType.RocketLauncher:
+                    prjc.enabled = true;
+                    prjc.Initialize(_usePrimaryAction);
+                    break;
+            }
+            switch (playerData.secondaryEquipment)
+            {
+                case EquipmentType.None:
+                    break;
+                case EquipmentType.GrapplingHook:
+                    sw.enabled = true;
+                    sw.Initialize(_useSecondaryAction);
+                    break;
+                case EquipmentType.RocketLauncher:
+                    prjc.enabled = true;
+                    prjc.Initialize(_useSecondaryAction);
+                    break;
+            }
         }
     }
-
 }

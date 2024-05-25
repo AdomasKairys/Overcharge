@@ -1,7 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,10 +11,15 @@ public class Swinging : EquipmentController
     public MeshRenderer gun;
     public Transform gunHolder, gunTip, cam, player;
     public LayerMask whatIsGrappleable;
+    public LayerMask playerLayer;
     public PlayerMovement pm;
+
+    public PlayerStateController ps;
 
     [Header("Swinging")]
     public float swingDuration;
+    public float swingCooldown = 5f;
+    private float cooldownTimer;
     private float swingTimer;
     private float maxSwingDistance = 50f;
     private Vector3 swingPoint;
@@ -38,8 +40,11 @@ public class Swinging : EquipmentController
     //[Header("Input")]
     //public KeyCode swingKey = KeyCode.Mouse0;
 
+    private bool isPlayerGrappled = false;
+
     public override void Initialize(InputAction useAction)
     {
+        cooldownTimer = 0;
         swingTimer = swingDuration;
         gun.enabled = false;
 
@@ -79,6 +84,16 @@ public class Swinging : EquipmentController
         //if (_useAction.triggered && !IsSwingOver()) StartSwing();
         //if (_useAction.phase == InputActionPhase.Canceled || IsSwingOver()) StopSwing();
 
+        // TODO: fix
+        Debug.Log(cooldownTimer);
+        //if (Input.GetKeyDown(UseKey) && !IsSwingOver() && cooldownTimer <= 0.1f) StartSwing();
+        //if ((Input.GetKeyUp(UseKey) || IsSwingOver()) && cooldownTimer <= 0.1f) StopSwing();
+
+        if (cooldownTimer > 0.1f)
+        {
+            cooldownTimer -= Time.deltaTime;
+        }
+
         CheckForSwingPoints();
     }
 
@@ -93,21 +108,30 @@ public class Swinging : EquipmentController
 
     private void LateUpdate()
     {
-        if (joint) DrawRopeServerRPC(pc);
+        if (joint) DrawRope(pc);
     }
-
-    [ServerRpc]
-    private void DrawRopeServerRPC(NetworkObjectReference pc)
+    
+    private void SetLineRenderer(NetworkObjectReference pc, int count, bool enabled)
     {
-        DrawRopeClientRPC(pc);
+        lr.positionCount = count;
+        currentGrapplePosition = gunTip.position;
+        gun.enabled = enabled;
+        SetLineRendererServerRPC(pc, count, enabled);
     }
-    [ServerRpc]
-    private void SetLineRendererServerRPC(NetworkObjectReference pc, int count, bool enabled)
+   [ServerRpc]
+    private void SetLineRendererServerRPC(NetworkObjectReference pc, int count, bool enabled, ServerRpcParams serverRpcParams = default)
     {
-        SetLineRendererClientRPC(pc, count ,enabled);
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds.Where(id => id != serverRpcParams.Receive.SenderClientId).ToList()
+            }
+        };
+        SetLineRendererClientRPC(pc, count, enabled, clientRpcParams);
     }
     [ClientRpc]
-    private void SetLineRendererClientRPC(NetworkObjectReference pc, int count, bool enabled)
+    private void SetLineRendererClientRPC(NetworkObjectReference pc, int count, bool enabled, ClientRpcParams clientRpcParams = default)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
@@ -120,8 +144,32 @@ public class Swinging : EquipmentController
         gun.GetComponent<MeshRenderer>().enabled = enabled;
 
     }
+    private void DrawRope(NetworkObjectReference pc)
+    {
+        DrawRope(
+            player,
+            lr,
+            gunHolder,
+            ref currentGrapplePosition,
+            predictionPoint.position,
+            gunTip.position
+        );
+        DrawRopeServerRPC(pc);
+    }
+    [ServerRpc]
+    private void DrawRopeServerRPC(NetworkObjectReference pc, ServerRpcParams serverRpcParams = default)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds.Where(id => id != serverRpcParams.Receive.SenderClientId).ToList()
+            }
+        };
+        DrawRopeClientRPC(pc, clientRpcParams);
+    }
     [ClientRpc]
-    private void DrawRopeClientRPC(NetworkObjectReference pc)
+    private void DrawRopeClientRPC(NetworkObjectReference pc, ClientRpcParams clientRpcParams = default)
     {
         if (!pc.TryGet(out NetworkObject networkObject))
             return;
@@ -137,7 +185,8 @@ public class Swinging : EquipmentController
             );
     }
 
-
+    private ulong hitPlayerClientId;
+    private Collider hitPlayerCollider;
     private void CheckForSwingPoints()
     {
         if (joint != null) return;
@@ -150,19 +199,38 @@ public class Swinging : EquipmentController
         Physics.Raycast(cam.position, cam.forward,
                             out raycastHit, maxSwingDistance, whatIsGrappleable);
 
-        Vector3 realHitPoint;
+        RaycastHit raycastHitPlayer;
+        Physics.Raycast(cam.position, cam.forward,
+                            out raycastHitPlayer, maxSwingDistance, playerLayer);
 
+        // Option 3 - Miss
+
+        Vector3 realHitPoint = Vector3.zero;
+
+        if (raycastHitPlayer.point == Vector3.zero)
+            isPlayerGrappled = false;
+
+        // Option 0 - Hit player
+        if (raycastHitPlayer.point != Vector3.zero && ps.GetState()==PlayerState.Chaser)
+        {
+            hitPlayerClientId = raycastHitPlayer.collider.GetComponentInParent<NetworkObject>().OwnerClientId;
+            hitPlayerCollider = raycastHitPlayer.collider;
+            if (hitPlayerClientId != OwnerClientId)
+            {
+                Debug.Log("Player hit");
+                isPlayerGrappled = true;
+                realHitPoint = raycastHitPlayer.point;
+                Debug.Log(hitPlayerClientId + " " + OwnerClientId);
+            }
+        }
         // Option 1 - Direct Hit
-        if (raycastHit.point != Vector3.zero)
+        else if (raycastHit.point != Vector3.zero)
             realHitPoint = raycastHit.point;
 
         // Option 2 - Indirect (predicted) Hit
         else if (sphereCastHit.point != Vector3.zero)
             realHitPoint = sphereCastHit.point;
 
-        // Option 3 - Miss
-        else
-            realHitPoint = Vector3.zero;
 
         // realHitPoint found
         if (realHitPoint != Vector3.zero)
@@ -183,6 +251,13 @@ public class Swinging : EquipmentController
     {
         // return if predictionHit not found
         if (predictionHit.point == Vector3.zero) return;
+
+        if (isPlayerGrappled)
+        {
+            Debug.Log("Player hit1");
+            hitPlayerCollider.GetComponent<PlayerMovement>().UniversalKnockback(player.position, -50f, hitPlayerClientId);
+            swingTimer = 0.5f;
+        }
 
         // deactivate active grapple
         //if (GetComponent<Grappling>() != null)
@@ -208,16 +283,15 @@ public class Swinging : EquipmentController
         joint.damper = 7f;
         joint.massScale = 4.5f;
 
-        SetLineRendererServerRPC(pc, 2, true);
+        SetLineRenderer(pc, 2, true);
         currentGrapplePosition = gunTip.position;
     }
-
     public void StopSwing()
     {
+        cooldownTimer = swingTimer >= swingDuration/2 ? swingCooldown/2 : swingCooldown;
         swingTimer = swingDuration;
-
         pm.isSwinging = false;
-        SetLineRendererServerRPC(pc, 0, false);
+        SetLineRenderer(pc, 0, false);
 
         Destroy(joint);
     }
@@ -249,7 +323,6 @@ public class Swinging : EquipmentController
         currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
 
         lineRenderer.SetPosition(0, gunTipPos);
-        Debug.Log(gunTipPos);
         lineRenderer.SetPosition(1, currentGrapplePosition);
     }
 
@@ -259,4 +332,6 @@ public class Swinging : EquipmentController
         _useAction.canceled -= OnRelease;
         base.OnNetworkDespawn();
     }
+
+    public float GetCooldownTimer() => cooldownTimer;
 }

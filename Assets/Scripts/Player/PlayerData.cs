@@ -10,6 +10,7 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
     // General player information
     public ulong clientId;
     public int colorId;
+    public PlayerState playerState;
     public FixedString64Bytes playerName;
     public FixedString64Bytes playerId;
 
@@ -17,7 +18,8 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
     public EquipmentType primaryEquipment;
     public EquipmentType secondaryEquipment;
 
-    public bool Equals(PlayerData other) => clientId == other.clientId && 
+    public bool Equals(PlayerData other) => clientId == other.clientId &&
+        playerState == other.playerState &&
         colorId==other.colorId && 
         playerName == other.playerName &&
         playerId == other.playerId &&
@@ -32,6 +34,7 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
         serializer.SerializeValue(ref playerId);
         serializer.SerializeValue(ref primaryEquipment);
         serializer.SerializeValue(ref secondaryEquipment);
+        serializer.SerializeValue(ref playerState);
     }
 }
 
@@ -40,4 +43,10 @@ public enum EquipmentType
     None = 0,
     GrapplingHook = 1,
     RocketLauncher = 2
+}
+public enum PlayerState
+{
+    Runner = 0,
+    Chaser = 1,
+    Dead = 2
 }

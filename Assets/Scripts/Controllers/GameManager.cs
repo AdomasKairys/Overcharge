@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
 
 public class GameManager : NetworkBehaviour
 {
@@ -11,7 +11,6 @@ public class GameManager : NetworkBehaviour
     public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
-
     private enum State
     {
         WaitingToStart,
@@ -22,19 +21,29 @@ public class GameManager : NetworkBehaviour
 
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private NetworkVariable<float> countDownToStartTimer = new NetworkVariable<float>(3f);
+
+    private List<Vector3> spawnPositions = new List<Vector3>();
     private void Awake()
     {
         Instance = this;
     }
-    private void Update()
+    private void Start()
+    {
+        Debug.Log(IsServer);
+        if (IsServer)
+            SetRandomPlayerChaser();
+    }
+    private void LateUpdate()
     {
         if (!IsServer)
             return;
-
         switch (state.Value)
         {
             case State.WaitingToStart:
-                state.Value = State.CountdownToStart;
+                if (NetworkManager.SpawnManager.SpawnedObjectsList.Where(no=>no.IsPlayerObject).Count() > 1)
+                {
+                    state.Value = State.CountdownToStart;
+                }
                 break;
             case State.CountdownToStart:
                 countDownToStartTimer.Value -= Time.deltaTime;
@@ -43,6 +52,8 @@ public class GameManager : NetworkBehaviour
                 }
                 break;
             case State.GamePlaying:
+                if(GameMultiplayer.Instance.IsGameOver())
+                    state.Value = State.GameOver;
                 break;
             case State.GameOver:
                 break;
@@ -57,7 +68,13 @@ public class GameManager : NetworkBehaviour
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
         }
     }
-
+    public void SetRandomPlayerChaser()
+    {
+        var rand = new System.Random();
+        var clientIds = NetworkManager.Singleton.ConnectedClientsIds;
+        if(!GameMultiplayer.Instance.IsGameOver())
+            GameMultiplayer.Instance.ChangePlayerState(clientIds[rand.Next(0, clientIds.Count)], PlayerState.Chaser);
+    }
     private void State_OnValueChanged(State previousValue, State newValue)
     {
         OnStateChanged?.Invoke(this, EventArgs.Empty);
@@ -65,14 +82,35 @@ public class GameManager : NetworkBehaviour
 
     private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
+        //handle spawning better this is just so that player dont clip through the map
+        float sign = 1f;
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
+            sign *= ((clientId + 1) % 3) == 0 ? -1f : sign; 
+            var positionX = sign * ((clientId + 1) % 2);
+            var positionZ = sign * ((clientId + 2) % 2);
+
             Transform playerTransform = Instantiate(playerPrefab);
+            playerTransform.position = new Vector3(
+                20 * positionX,
+                playerTransform.position.y,
+                20 * positionZ
+                );
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }
+    public PlayerData? GetWinner()
+    {
+        if(GameMultiplayer.Instance.IsGameOver())
+        {
+            return GameMultiplayer.Instance.GetAlivePlayers().First();
+        }
+        return null;
+    }
     public bool IsGamePlaying() => state.Value == State.GamePlaying;
     public bool IsCountdownToStartActive() => state.Value == State.CountdownToStart;
+    public bool IsGameOver() => state.Value == State.GameOver;
+
     public float GetCountdownToStartTimer() => countDownToStartTimer.Value;
 
 }

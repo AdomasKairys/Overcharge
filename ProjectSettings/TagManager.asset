@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Pickup
   - Magnet
+  - ThirdPersonCam
   layers:
   - Default
   - TransparentFX
@@ -20,8 +21,8 @@ TagManager:
   - whatIsWall
   - tagTrigger
   - particles
-  - 
-  - 
+  - otherPlayer
+  - playerOutline
   - 
   - 
   - 

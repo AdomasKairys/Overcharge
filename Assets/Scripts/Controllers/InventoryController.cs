@@ -158,7 +158,7 @@ public class InventoryController : NetworkBehaviour
                 break;
             case PickupType.GravityBomb:
                 //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
-                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.currState.Value == PlayerState.Chaser, (int)OwnerClientId); 
+                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser, (int)OwnerClientId); 
                 break;
         }
 

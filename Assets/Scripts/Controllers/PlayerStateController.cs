@@ -4,42 +4,40 @@ using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.Events;
+using Cinemachine;
+using System.Linq;
+using System;
+
 
 // Define the possible player states
-public enum PlayerState
-{
-    Chaser,
-    Runner,
-    Dead
-}
+
 
 public class PlayerStateController : NetworkBehaviour
 {
     [Header("Player State")]
-    public NetworkVariable<PlayerState> currState = new NetworkVariable<PlayerState>(PlayerState.Runner); // Current state of the player, default is Runner TODO: later make private
     public NetworkVariable<float> currCharge = new NetworkVariable<float>(0.0f); // Current value of charge the player has
-    public float chargeRate = 1.0f; // The rate in which the palyer's charge increases
+    public float chargeRate = 0.25f; // The rate in which the palyer's charge increases
     public float overcharge = 100.0f; // The maximum value of charge at which the player dies
 
-    public UnityEvent onPlayerDeath;
+    public event EventHandler OnPlayerDeath;
 
-    public NetworkObject pc;
+    public NetworkObject netObj;
     //[Header("Tagging")]
     //public GameObject tagTrigger;
-
 
     // Update is called once per frame
     void Update()
     {
+        
         // Change the player state if Enter is presed (for debugging)
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            SetStateServerRPC(gameObject.GetComponentInParent<NetworkObject>());
+            SetStateServerRPC(netObj);
         }
 
-        if (currState.Value == PlayerState.Chaser)
+        if (GetState() == PlayerState.Chaser)
         {
-            ChangeChargeValueServerRPC(gameObject.GetComponentInParent<NetworkObject>());
+            ChangeChargeValueServerRPC(netObj);
 
             if(currCharge.Value >= overcharge)
             {
@@ -58,48 +56,53 @@ public class PlayerStateController : NetworkBehaviour
     }
     // Method for setting the state of the player
     [ServerRpc]
-    private void SetStateServerRPC(NetworkObjectReference target)
+    private void SetStateServerRPC(NetworkObjectReference netObjRef)
     {
-        if (!target.TryGet(out NetworkObject targetObject))
+        if (!netObjRef.TryGet(out NetworkObject networkObject))
             return;
 
-        var currState = targetObject.GetComponentInChildren<PlayerStateController>().currState.Value;
+        var currState = GameMultiplayer.Instance.GetPlayerDataFromClientId(networkObject.OwnerClientId);
 
-        if (currState == PlayerState.Runner)
+        if (currState.playerState == PlayerState.Runner)
         {
-            targetObject.GetComponentInChildren<PlayerStateController>().currState.Value = PlayerState.Chaser;
+            GameMultiplayer.Instance.ChangePlayerState(networkObject.OwnerClientId, PlayerState.Chaser);
         }
         else
         {
-            targetObject.GetComponentInChildren<PlayerStateController>().currState.Value = PlayerState.Runner;
+            GameMultiplayer.Instance.ChangePlayerState(networkObject.OwnerClientId, PlayerState.Runner);
         }
     }
     public void SetState(PlayerState newState)
     {
-        currState.Value = newState;
+        GameMultiplayer.Instance.ChangePlayerState(netObj.OwnerClientId, newState);
     }
 
     // Method for getting the state of the player
     public PlayerState GetState()
     {
-        return currState.Value;
+        return GameMultiplayer.Instance.GetPlayerDataFromClientId(netObj.OwnerClientId).playerState;
     }
 
     private void Die()
     {
-        DieServerRPC(pc); // deactivate the player object
+        DieServerRPC(netObj); // deactivate the player object
     }
     [ServerRpc]
-    private void DieServerRPC(NetworkObjectReference pc)
+    private void DieServerRPC(NetworkObjectReference netObjRef)
     {
-        DieClientRPC(pc);
+        if (!netObjRef.TryGet(out NetworkObject networkObject))
+            return;
+        DieClientRPC(netObjRef);
+        GameMultiplayer.Instance.ChangePlayerState(networkObject.OwnerClientId, PlayerState.Dead);
+        GameManager.Instance.SetRandomPlayerChaser();
+
     }
     [ClientRpc]
-    private void DieClientRPC(NetworkObjectReference pc)
+    private void DieClientRPC(NetworkObjectReference netObjRef)
     {
-        if (!pc.TryGet(out NetworkObject networkObject))
+        if (!netObjRef.TryGet(out NetworkObject networkObject))
             return;
-        onPlayerDeath.Invoke();
+        OnPlayerDeath?.Invoke(this, EventArgs.Empty);
         var player = networkObject.transform.Find("Player");
         player.gameObject.SetActive(false);
     }
@@ -107,25 +110,5 @@ public class PlayerStateController : NetworkBehaviour
     public void Respawn()
     {
         // Reset player's health or other states as necessary
-        RespawnServerRPC(pc);
-    }
-    [ServerRpc]
-    private void RespawnServerRPC(NetworkObjectReference pc)
-    {
-        if (!pc.TryGet(out NetworkObject networkObject))
-            return;
-        var player = networkObject.transform.Find("Player");
-        player.GetComponent<PlayerStateController>().currState.Value = PlayerState.Runner;
-        player.GetComponent<PlayerStateController>().currCharge.Value = 0.0f;
-        RespawnClientRPC(pc);
-    }
-    [ClientRpc]
-    private void RespawnClientRPC(NetworkObjectReference pc)
-    {
-        if (!pc.TryGet(out NetworkObject networkObject))
-            return;
-        var player = networkObject.transform.Find("Player");
-        player.position = new Vector3(0, 0, 0);
-        player.gameObject.SetActive(true);
     }
 }

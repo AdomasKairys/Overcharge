@@ -12,6 +12,6 @@ public class PlayerVisual : MonoBehaviour
     }
     public void SetPlayerColor(Color color)
     {
-        material.color = color;
+        material.SetColor("_BaseColor", color);
     }
 }
