@@ -67,6 +67,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "UpwardsWallRun",
+                    "type": "Button",
+                    "id": "d3d76c03-7413-48a4-8ba9-d1f32498b470",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DownwardsWallRun",
+                    "type": "Button",
+                    "id": "456117a6-df5e-4742-b77a-71ea40e56097",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -342,6 +360,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "UsePickup",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "36413ab6-fc29-4a90-9840-0f27da9182b2",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "UpwardsWallRun",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cc88e962-c1e5-4e9d-b7a0-0a73b39ab105",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "DownwardsWallRun",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -34,9 +34,6 @@ public class Dashing : MonoBehaviour
     public float dashCd;
     private float dashCdTimer;
 
-    [Header("Input")]
-    public KeyCode dashKey = KeyCode.LeftShift;
-
     private void Start()
     {
         rb = GetComponent<Rigidbody>();

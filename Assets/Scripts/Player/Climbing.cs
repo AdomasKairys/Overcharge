@@ -97,7 +97,7 @@ public class Climbing : MonoBehaviour
     {
         
         // State 1 - Climbing
-        if (wallFront && Input.GetKey(KeyCode.W) && wallLookAngle < maxWallLookAngle && !isExitingWall)
+        if (wallFront && _moveAction.ReadValue<Vector2>().y > 0 && wallLookAngle < maxWallLookAngle && !isExitingWall)
         {
             if (!isClimbing && climbTimer > 0) StartClimbing();
 
@@ -119,8 +119,6 @@ public class Climbing : MonoBehaviour
         {
             if (isClimbing) StopClimbing();
         }
-
-        //if (wallFront && Input.GetKeyDown(jumpKey) && climbJumpsLeft > 0) ClimbJump();
     }
     private void WallCheck()
     {

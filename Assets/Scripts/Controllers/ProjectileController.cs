@@ -10,7 +10,6 @@ public class ProjectileController : EquipmentController
     [SerializeField] private Camera cam;
     [SerializeField] private Transform pfRocket;
 
-    private float cooldownTimer = 0f;
     public event EventHandler<OnShootEventArgs> OnShoot;
     public float maxCooldown = 4f;
     public class OnShootEventArgs : EventArgs
@@ -19,11 +18,30 @@ public class ProjectileController : EquipmentController
         public Vector3 shootDir;
     }
 
-    public override void Initialize(InputAction useAction)
+    public override void Initialize(EquipmentSlot slot, PlayerInputs playerInputs)
     {
         OnShoot += ProjectileController_OnShoot;
 
-        base.Initialize(useAction);
+        base.Initialize(slot, playerInputs);
+
+        _useAction.performed += OnPress;
+
+        _initialized = true;
+    }
+
+    private void OnPress(InputAction.CallbackContext context)
+    {
+        if (_useCooldown <= 0f)
+        {
+            _useCooldown = maxCooldown;
+            Vector3 mousePosWorld = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 50f));
+            Vector3 shootDir = (mousePosWorld - transform.position).normalized;
+            OnShoot?.Invoke(this, new OnShootEventArgs
+            {
+                spawnPos = transform.position,
+                shootDir = shootDir
+            });
+        }
     }
 
     private void ProjectileController_OnShoot(object sender, OnShootEventArgs e)
@@ -41,21 +59,7 @@ public class ProjectileController : EquipmentController
 
     private void Update()
     {
-        if( !_initialized ) { return; }
-
-        if(_useAction.ReadValue<float>() > 0 && cooldownTimer <= 0f)
-        {
-            
-            cooldownTimer = maxCooldown;
-            Vector3 mousePosWorld = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 50f));
-            Vector3 shootDir = (mousePosWorld - transform.position).normalized;
-            OnShoot?.Invoke(this, new OnShootEventArgs { 
-                spawnPos = transform.position,
-                shootDir = shootDir
-            });
-        }
-        else if (cooldownTimer > 0f)
-            cooldownTimer -= Time.deltaTime;
+        if( _initialized && _useCooldown > 0f)
+            _useCooldown -= Time.deltaTime;
     }
-    public float GetCooldownTimer() => cooldownTimer;
 }

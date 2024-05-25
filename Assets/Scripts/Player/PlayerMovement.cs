@@ -177,22 +177,8 @@ public class PlayerMovement : NetworkBehaviour
 
     private void MyInput()
     {
-        horizontalInput = _moveAction.ReadValue<Vector2>().x; //Input.GetAxisRaw("Horizontal");
-        verticalInput = _moveAction.ReadValue<Vector2>().y; //Input.GetAxisRaw("Vertical");
-        //Debug.Log("waht");
-
-        //horizontalInput = Input.GetAxisRaw("Horizontal");
-        //verticalInput = Input.GetAxisRaw("Vertical");
-
-        //if (Input.GetKey(jumpKey) && isReadyToJump && isGrounded)
-        //{
-
-        //    isReadyToJump = false;
-
-        //    Jump();
-
-        //    Invoke(nameof(ResetJump), jumpCooldown);
-        //}
+        horizontalInput = _moveAction.ReadValue<Vector2>().x;
+        verticalInput = _moveAction.ReadValue<Vector2>().y;
 
     }
     private MovementState lastState;

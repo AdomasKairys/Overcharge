@@ -89,6 +89,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""UpwardsWallRun"",
+                    ""type"": ""Button"",
+                    ""id"": ""d3d76c03-7413-48a4-8ba9-d1f32498b470"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DownwardsWallRun"",
+                    ""type"": ""Button"",
+                    ""id"": ""456117a6-df5e-4742-b77a-71ea40e56097"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -364,6 +382,28 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""UsePickup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""36413ab6-fc29-4a90-9840-0f27da9182b2"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""UpwardsWallRun"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cc88e962-c1e5-4e9d-b7a0-0a73b39ab105"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""DownwardsWallRun"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -958,6 +998,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_UsePickup = m_Player.FindAction("UsePickup", throwIfNotFound: true);
+        m_Player_UpwardsWallRun = m_Player.FindAction("UpwardsWallRun", throwIfNotFound: true);
+        m_Player_DownwardsWallRun = m_Player.FindAction("DownwardsWallRun", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1038,6 +1080,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_UsePickup;
+    private readonly InputAction m_Player_UpwardsWallRun;
+    private readonly InputAction m_Player_DownwardsWallRun;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -1049,6 +1093,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputAction @UsePickup => m_Wrapper.m_Player_UsePickup;
+        public InputAction @UpwardsWallRun => m_Wrapper.m_Player_UpwardsWallRun;
+        public InputAction @DownwardsWallRun => m_Wrapper.m_Player_DownwardsWallRun;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1079,6 +1125,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @UsePickup.started += instance.OnUsePickup;
             @UsePickup.performed += instance.OnUsePickup;
             @UsePickup.canceled += instance.OnUsePickup;
+            @UpwardsWallRun.started += instance.OnUpwardsWallRun;
+            @UpwardsWallRun.performed += instance.OnUpwardsWallRun;
+            @UpwardsWallRun.canceled += instance.OnUpwardsWallRun;
+            @DownwardsWallRun.started += instance.OnDownwardsWallRun;
+            @DownwardsWallRun.performed += instance.OnDownwardsWallRun;
+            @DownwardsWallRun.canceled += instance.OnDownwardsWallRun;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1104,6 +1156,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @UsePickup.started -= instance.OnUsePickup;
             @UsePickup.performed -= instance.OnUsePickup;
             @UsePickup.canceled -= instance.OnUsePickup;
+            @UpwardsWallRun.started -= instance.OnUpwardsWallRun;
+            @UpwardsWallRun.performed -= instance.OnUpwardsWallRun;
+            @UpwardsWallRun.canceled -= instance.OnUpwardsWallRun;
+            @DownwardsWallRun.started -= instance.OnDownwardsWallRun;
+            @DownwardsWallRun.performed -= instance.OnDownwardsWallRun;
+            @DownwardsWallRun.canceled -= instance.OnDownwardsWallRun;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1293,6 +1351,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnUsePickup(InputAction.CallbackContext context);
+        void OnUpwardsWallRun(InputAction.CallbackContext context);
+        void OnDownwardsWallRun(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

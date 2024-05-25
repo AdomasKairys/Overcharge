@@ -19,7 +19,7 @@ public class Swinging : EquipmentController
     [Header("Swinging")]
     public float swingDuration;
     public float swingCooldown = 5f;
-    private float cooldownTimer;
+    
     private float swingTimer;
     private float maxSwingDistance = 50f;
     private Vector3 swingPoint;
@@ -42,21 +42,26 @@ public class Swinging : EquipmentController
 
     private bool isPlayerGrappled = false;
 
-    public override void Initialize(InputAction useAction)
+    private InputAction _moveAction;
+
+    public override void Initialize(EquipmentSlot slot, PlayerInputs playerInput)
     {
-        cooldownTimer = 0;
+        base.Initialize(slot, playerInput);
+        _moveAction = _playerInputs.MoveAction;
+
+        _useCooldown = 0;
         swingTimer = swingDuration;
         gun.enabled = false;
 
-        base.Initialize(useAction);
-
         _useAction.performed += OnPress;
         _useAction.canceled += OnRelease;
+
+        _initialized = true;
     }
 
     private void OnPress(InputAction.CallbackContext context)
     {
-        if (!IsSwingOver())
+        if (!IsSwingOver() && _useCooldown <= 0.1f)
         {
             StartSwing();
         }
@@ -64,34 +69,26 @@ public class Swinging : EquipmentController
 
     private void OnRelease(InputAction.CallbackContext context)
     {
-        if (!IsSwingOver())
+        if (!IsSwingOver() && _useCooldown <= 0.1f)
         {
             StopSwing();
         }        
     }
 
-
-
     private void Update()
     {
         if( !_initialized ) { return; }
 
-        if (IsSwingOver()) StopSwing();
-
-        // TODO: figure this out
-        //if (Input.GetKeyDown(KeyCode.Mouse1) && !IsSwingOver()) StartSwing();
-        //if (Input.GetKeyUp(KeyCode.Mouse1) || IsSwingOver()) StopSwing();
-        //if (_useAction.triggered && !IsSwingOver()) StartSwing();
-        //if (_useAction.phase == InputActionPhase.Canceled || IsSwingOver()) StopSwing();
+        if (IsSwingOver() && _useCooldown <= 0.1f) StopSwing();
 
         // TODO: fix
-        Debug.Log(cooldownTimer);
+        Debug.Log(_useCooldown);
         //if (Input.GetKeyDown(UseKey) && !IsSwingOver() && cooldownTimer <= 0.1f) StartSwing();
         //if ((Input.GetKeyUp(UseKey) || IsSwingOver()) && cooldownTimer <= 0.1f) StopSwing();
 
-        if (cooldownTimer > 0.1f)
+        if (_useCooldown > 0.1f)
         {
-            cooldownTimer -= Time.deltaTime;
+            _useCooldown -= Time.deltaTime;
         }
 
         CheckForSwingPoints();
@@ -288,7 +285,7 @@ public class Swinging : EquipmentController
     }
     public void StopSwing()
     {
-        cooldownTimer = swingTimer >= swingDuration/2 ? swingCooldown/2 : swingCooldown;
+        _useCooldown = swingTimer >= swingDuration/2 ? swingCooldown/2 : swingCooldown;
         swingTimer = swingDuration;
         pm.isSwinging = false;
         SetLineRenderer(pc, 0, false);
@@ -302,9 +299,9 @@ public class Swinging : EquipmentController
         Vector3 forceHorizontal = orientation.forward * Mathf.Pow(swingTimer/swingDuration, 2) + (swingPoint - player.position).normalized;
         // TODO: replace this when I add the PlayerInput singleton for connecting to all input actions
         // right
-        if (Input.GetKey(KeyCode.D)) forceHorizontal += orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
+        if (_moveAction.ReadValue<Vector2>().x > 0) forceHorizontal += orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
         // left
-        if (Input.GetKey(KeyCode.A)) forceHorizontal -= orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
+        if (_moveAction.ReadValue<Vector2>().x < 0) forceHorizontal -= orientation.right * Mathf.Pow(swingTimer / swingDuration, 2);
 
         rb.AddForce(forceHorizontal.normalized * horizontalThrustForce, ForceMode.Force);
 
@@ -332,6 +329,4 @@ public class Swinging : EquipmentController
         _useAction.canceled -= OnRelease;
         base.OnNetworkDespawn();
     }
-
-    public float GetCooldownTimer() => cooldownTimer;
 }

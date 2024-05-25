@@ -38,12 +38,6 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
     }
 }
 
-public enum EquipmentType
-{
-    None = 0,
-    GrapplingHook = 1,
-    RocketLauncher = 2
-}
 public enum PlayerState
 {
     Runner = 0,
