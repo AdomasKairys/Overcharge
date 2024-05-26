@@ -38,8 +38,9 @@ public class GameMultiplayer : NetworkBehaviour
     public void SetPlayerName(string playerName)
     {
         this.playerName = playerName;
+		//PlayerCard.SetName(playerName);
 
-        PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
+		PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
     }
     private void PlayerDataNetworkList_OnListChanged(NetworkListEvent<PlayerData> changeEvent)
     {
@@ -68,7 +69,10 @@ public class GameMultiplayer : NetworkBehaviour
 
         playerData.playerName = playerName;
 
-        playerDataNetworkList[playerDataIndex] = playerData;
+		//PlayerCard playerCard = new PlayerCard();
+		//PlayerCard.SetName(playerName);
+
+		playerDataNetworkList[playerDataIndex] = playerData;
     }
     [ServerRpc(RequireOwnership = false)]
     private void SetPlayerIdServerRPC(string playerId, ServerRpcParams serverRpcParams = default)
@@ -143,9 +147,10 @@ public class GameMultiplayer : NetworkBehaviour
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
         NetworkManager_Host_OnClientDisconnectCallback(clientId);
-    }
+		//GameManager.PlayerLeft(clientId);
+	}
 
-    private void NetworkManager_OnClientConnectedCallback(ulong clientId)
+	private void NetworkManager_OnClientConnectedCallback(ulong clientId)
     {
         if (NetworkManager.Singleton.ConnectedClientsList.Count < playerDataNetworkList.Count && NetworkManager.Singleton.IsServer)
         {
@@ -195,7 +200,8 @@ public class GameMultiplayer : NetworkBehaviour
     {
         foreach (PlayerData playerData in playerDataNetworkList)
         {
-            if (playerData.clientId == clientId)
+			//PlayerCard.SetClient(clientId);
+			if (playerData.clientId == clientId)
                 return playerData;
         }
         return default;
@@ -268,5 +274,24 @@ public class GameMultiplayer : NetworkBehaviour
         playerDataNetworkList[playerDataIndex] = playerData;
     }
 
-    #endregion
+	#endregion
+
+	//#region Scoreboard
+	//public static void ScoreboardAdd(ulong clientId)
+	//{
+	//	Debug.Log($"Client ID: {clientId}");
+	//	GameMultiplayer gameMultiplayerInstance = new GameMultiplayer();
+	//	if (GameManager.Instance != null)
+	//	{
+	//		foreach (PlayerData playerData in gameMultiplayerInstance.playerDataNetworkList)
+	//		{
+	//			GameManager.PlayerJoined(ulong.Parse(playerData.playerId.ToString().Trim()), playerData.playerName.ToString(), "Runner");
+	//		}
+	//	}
+	//	else
+	//	{
+	//		Debug.LogError("GameManager instance is null!");
+	//	}
+	//}
+	//#endregion
 }
