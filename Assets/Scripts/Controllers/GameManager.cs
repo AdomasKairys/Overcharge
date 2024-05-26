@@ -83,9 +83,12 @@ public class GameManager : NetworkBehaviour
     private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
         //handle spawning better this is just so that player dont clip through the map
-        float sign = 1f;
+        //float sign = 1f;
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+        bool[] occupied = new bool[spawnPoints.Length];
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
+            /*
             sign *= ((clientId + 1) % 3) == 0 ? -1f : sign; 
             var positionX = sign * ((clientId + 1) % 2);
             var positionZ = sign * ((clientId + 2) % 2);
@@ -96,6 +99,32 @@ public class GameManager : NetworkBehaviour
                 playerTransform.position.y,
                 20 * positionZ
                 );
+            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            */
+            bool searching = true;
+            int index = UnityEngine.Random.Range(0, spawnPoints.Length - 1);
+
+            while (searching){
+				if (index >= spawnPoints.Length)
+				{
+                    index = 0;
+				}
+				if (occupied[index])
+				{
+                    index += 1;
+                    if (index >= spawnPoints.Length)
+                    {
+                        index = 0;
+                    }
+                }
+				else
+				{
+                    occupied[index] = true;
+                    searching = false;
+				}
+			}
+            Transform playerTransform = Instantiate(playerPrefab);
+            playerTransform.position = spawnPoints[index].transform.position;
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }

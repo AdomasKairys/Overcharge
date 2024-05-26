@@ -9,6 +9,7 @@ TagManager:
   - Pickup
   - Magnet
   - ThirdPersonCam
+  - SpawnPoint
   layers:
   - Default
   - TransparentFX
