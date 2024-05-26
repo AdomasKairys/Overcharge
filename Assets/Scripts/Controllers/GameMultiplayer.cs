@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
@@ -38,8 +39,9 @@ public class GameMultiplayer : NetworkBehaviour
     public void SetPlayerName(string playerName)
     {
         this.playerName = playerName;
+		PlayerCard.SetName(playerName);
 
-        PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
+		PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
     }
     private void PlayerDataNetworkList_OnListChanged(NetworkListEvent<PlayerData> changeEvent)
     {
@@ -68,7 +70,10 @@ public class GameMultiplayer : NetworkBehaviour
 
         playerData.playerName = playerName;
 
-        playerDataNetworkList[playerDataIndex] = playerData;
+        //PlayerCard playerCard = new PlayerCard();
+		//PlayerCard.SetName(playerName);
+
+		playerDataNetworkList[playerDataIndex] = playerData;
     }
     [ServerRpc(RequireOwnership = false)]
     private void SetPlayerIdServerRPC(string playerId, ServerRpcParams serverRpcParams = default)
@@ -78,7 +83,7 @@ public class GameMultiplayer : NetworkBehaviour
 
         playerData.playerId = playerId;
 
-        playerDataNetworkList[playerDataIndex] = playerData;
+		playerDataNetworkList[playerDataIndex] = playerData;
     }
     private void NetworkManager_Client_OnClientDisconnectCallback(ulong clientId)
     {
@@ -127,14 +132,14 @@ public class GameMultiplayer : NetworkBehaviour
             Debug.Log(playerDataNetworkList.Count);
         }
         NetworkManager.Singleton.Shutdown();
-        GameManager.PlayerLeft(clientId);
+        //UIController.PlayerLeft(clientId);
 
     }
     public void KickPlayer(ulong clientId)
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
         NetworkManager_Host_OnClientDisconnectCallback(clientId);
-        GameManager.PlayerLeft(clientId);
+		//UIController.PlayerLeft(clientId);
     }
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)
@@ -173,9 +178,9 @@ public class GameMultiplayer : NetworkBehaviour
     {
         foreach (PlayerData playerData in playerDataNetworkList)
         {
-            if (playerData.clientId == clientId)
+			PlayerCard.SetClient(clientId);
+			if (playerData.clientId == clientId)
                 return playerData;
-                GameManager.PlayerJoined(clientId, playerName);
         }
         return default;
     }
@@ -183,12 +188,32 @@ public class GameMultiplayer : NetworkBehaviour
     public PlayerData GetPlayerDataFrompLayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];
     public Color GetPlayerColor(int colorId) => playerColors[colorId];
 
-    #region Color management
+	#region Scoreboard
+	public static void ScoreboardAdd(ulong clientId)
+    {
+		Debug.Log($"Client ID: {clientId}");
+		GameMultiplayer gameMultiplayerInstance = new GameMultiplayer();
+		if (GameManager.Instance != null)
+		{
+			foreach (PlayerData playerData in gameMultiplayerInstance.playerDataNetworkList)
+			{
+				GameManager.PlayerJoined(ulong.Parse(playerData.playerId.ToString().Trim()), playerData.playerName.ToString(), "Runner");
+			}
+		}
+		else
+        {
+            Debug.LogError("GameManager instance is null!");
+        }
+	}
+	#endregion
 
-    public void ChangePlayerColor(int colorId)
+
+	#region Color management
+
+	public void ChangePlayerColor(int colorId)
     {
         ChangePlayerColorServerRPC(colorId);
-    }
+	}
     [ServerRpc(RequireOwnership = false)]
     private void ChangePlayerColorServerRPC(int colorId, ServerRpcParams serverRpcParams = default)
     {

@@ -5,12 +5,15 @@ using UnityEngine;
 
 public class PlayerCard : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI rankText, nameText, scoreText;
+    [SerializeField] private TextMeshProUGUI statusText, nameText, scoreText;
+	private static ulong playerClient;
+	private static string playerName;
 
-    public void Initialize(string name)
+
+	public void Initialize(string name, string status)
     {
         nameText.text = name;
-        rankText.text = "1";
+		statusText.text = status;
         scoreText.text = "0";
     }
 
@@ -19,8 +22,30 @@ public class PlayerCard : MonoBehaviour
         scoreText.text = score.ToString();
     }
 
-    public void SetRank(int rank)
+    public void SetStatus(string status)
     {
-        rankText.text = rank.ToString();
+        statusText.text = status;
     }
+
+	// Get information for the Scoreboard
+	public static void SetClient(ulong client)
+	{
+		playerClient = client;
+	}
+
+	public static ulong GetClient()
+	{
+		return playerClient;
+	}
+
+	public static void SetName(string name)
+	{
+		playerName = name;
+	}
+
+	public static string GetName()
+	{
+		return playerName;
+	}
+
 }

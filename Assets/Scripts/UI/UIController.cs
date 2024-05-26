@@ -41,7 +41,15 @@ public class UIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _primaryText;
     [SerializeField] private TextMeshProUGUI _secondaryText;
 
-    TextMeshProUGUI textMesh_playerState;
+	//[Header("Scoreboard")]
+	//[SerializeField] private GameObject scoreboard;
+	//[SerializeField] private PlayerCard playCardPrefab;
+	//[SerializeField] private Transform playerCardParent;
+
+	//private Dictionary<ulong, PlayerCard> _playerCards = new Dictionary<ulong, PlayerCard>();
+	[SerializeField] private Transform playerPrefab;
+
+	TextMeshProUGUI textMesh_playerState;
     TextMeshProUGUI textMesh_velocity;
 
     // Start is called before the first frame update
@@ -181,4 +189,20 @@ public class UIController : MonoBehaviour
         pickupImage.sprite = pickupSprites[UnityEngine.Random.Range(0, pickupSprites.Length)];
         shufflePickups = true;
     }
+
+    //public static void PlayerJoined(ulong clientID, string name, string status)
+    //{
+    //    PlayerCard newCard = Instantiate(GameManager.Instance.playCardPrefab, Instance.playerCardParent);
+    //    Instance._playerCards.Add(clientID, newCard);
+    //    newCard.Initialize(name.ToString(), status.ToString());
+    //}
+
+    //public static void PlayerLeft(ulong clientID)
+    //{
+    //	if (Instance._playerCards.TryGetValue(clientID, out PlayerCard playerCard))
+    //	{
+    //		Destroy(playerCard.gameObject);
+    //		Instance._playerCards.Remove(clientID);
+    //	}
+    //}
 }

@@ -27,7 +27,7 @@ public class Grappling : MonoBehaviour
 
     private bool isGrappling;
 
-    private void Start()
+	private void Start()
     {
         pm = GetComponent<PlayerMovement>();
     }
@@ -52,7 +52,7 @@ public class Grappling : MonoBehaviour
         if (GetComponent<Swinging>() != null)
             GetComponent<Swinging>().StopSwing();
 
-        isGrappling = true;
+		isGrappling = true;
 
 
         RaycastHit hit;
@@ -61,7 +61,8 @@ public class Grappling : MonoBehaviour
             grapplePoint = hit.point;
 
             Invoke(nameof(ExecuteGrapple), grappleDelayTime);
-        }
+
+		}
         else
         {
             grapplePoint = cam.position + cam.forward * maxGrappleDistance;
@@ -78,7 +79,7 @@ public class Grappling : MonoBehaviour
 
         Vector3 lowestPoint = new Vector3(transform.position.x, transform.position.y - 1f, transform.position.z);
 
-        float grapplePointRelativeYPos = grapplePoint.y - lowestPoint.y;
+		float grapplePointRelativeYPos = grapplePoint.y - lowestPoint.y;
         float highestPointOnArc = grapplePointRelativeYPos + overshootYAxis;
 
         if (grapplePointRelativeYPos < 0) highestPointOnArc = overshootYAxis;

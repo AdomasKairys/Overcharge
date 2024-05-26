@@ -22,10 +22,16 @@ public class InventoryController : NetworkBehaviour
 
     public bool pickingUp = false;
 
-    private float pickingUpDelay = 3f;
+    private float pickingUpDelay = 3.6f;
 
- 
-    void Update()
+	EffectsManager effectsManager;
+
+	private void Awake()
+	{
+		effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	}
+
+	void Update()
     {
         if(!IsOwner) return;
 
@@ -86,9 +92,10 @@ public class InventoryController : NetworkBehaviour
     private IEnumerator Pickup(int pickupIndex)
     {
         // Waits the delay
+        effectsManager.PlaySFX(effectsManager.itemPickUp);
         yield return new WaitForSeconds(pickingUpDelay);
-
-        switch (pickupIndex)
+		
+		switch (pickupIndex)
         {
             case 1:
                 currentPickup = PickupType.SpeedBoost; 
@@ -129,12 +136,14 @@ public class InventoryController : NetworkBehaviour
         switch (currentPickup)
         {
             case PickupType.SpeedBoost:
-                RequestUseSpeedBoostServerRpc((int)OwnerClientId); 
-                break;
+                RequestUseSpeedBoostServerRpc((int)OwnerClientId);
+				effectsManager.PlaySFX(effectsManager.itemSpeedBoost);
+				break;
             case PickupType.GravityBomb:
                 //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
-                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.currState.Value == PlayerState.Chaser, (int)OwnerClientId); 
-                break;
+                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.currState.Value == PlayerState.Chaser, (int)OwnerClientId);
+				effectsManager.PlaySFX(effectsManager.itemGravityBomb);
+				break;
         }
 
         if(currentPickupUses <= 0)

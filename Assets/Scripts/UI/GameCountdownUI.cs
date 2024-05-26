@@ -6,8 +6,16 @@ public class GameCountdownUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private MonoBehaviour[] player;
     [SerializeField] private GameObject[] UI;
+	
+	EffectsManager effectsManager;
+
+	private void Awake()
+	{
+		effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	}
+
     // Start is called before the first frame update
-    void Start()
+	void Start()
     {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
 
@@ -19,7 +27,8 @@ public class GameCountdownUI : MonoBehaviour
         if (GameManager.Instance.IsCountdownToStartActive())
         {
             Show();
-        }
+			effectsManager.PlaySFX(effectsManager.countDown);
+		}
         else
         {
             Hide();

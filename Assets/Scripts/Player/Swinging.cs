@@ -33,17 +33,27 @@ public class Swinging : EquipmentController
     public float predictionSphereCastRadius;
     public Transform predictionPoint;
 
-    //[Header("Input")]
-    //public KeyCode swingKey = KeyCode.Mouse0;
+	EffectsManager effectsManager;
+	//[Header("Input")]
+	//public KeyCode swingKey = KeyCode.Mouse0;
 
-    private void Start()
+	private void Awake()
+	{
+		effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	}
+
+	private void Start()
     {
         swingTimer = swingDuration;
         gun.enabled = false;
     }
     private void Update()
     {
-        if (Input.GetKeyDown(UseKey) && !IsSwingOver()) StartSwing();
+        if (Input.GetKeyDown(UseKey) && !IsSwingOver())
+        { 
+            StartSwing();
+			//effectsManager.PlaySFX(effectsManager.hookLaunch);
+		}
         if (Input.GetKeyUp(UseKey) || IsSwingOver()) StopSwing();
 
         CheckForSwingPoints();
@@ -122,8 +132,8 @@ public class Swinging : EquipmentController
         if (raycastHit.point != Vector3.zero)
             realHitPoint = raycastHit.point;
 
-        // Option 2 - Indirect (predicted) Hit
-        else if (sphereCastHit.point != Vector3.zero)
+		// Option 2 - Indirect (predicted) Hit
+		else if (sphereCastHit.point != Vector3.zero)
             realHitPoint = sphereCastHit.point;
 
         // Option 3 - Miss
@@ -156,22 +166,24 @@ public class Swinging : EquipmentController
         //pm.ResetRestrictions();
 
         pm.isSwinging = true;
+		effectsManager.PlaySFX(effectsManager.hookLaunch);
 
-        swingPoint = predictionHit.point;
+		swingPoint = predictionHit.point;
+		effectsManager.PlaySFX(effectsManager.hookHit);
 
-        joint = player.gameObject.AddComponent<SpringJoint>();
+		joint = player.gameObject.AddComponent<SpringJoint>();
         joint.autoConfigureConnectedAnchor = false;
         joint.connectedAnchor = swingPoint;
 
         float distanceFromPoint = Vector3.Distance(player.position, swingPoint);
 
-        // the distance grapple will try to keep from grapple point. 
-        //joint.maxDistance = distanceFromPoint * 0.8f;
-        //joint.minDistance = distanceFromPoint * 0.25f;
+		// the distance grapple will try to keep from grapple point. 
+		//joint.maxDistance = distanceFromPoint * 0.8f;
+		//joint.minDistance = distanceFromPoint * 0.25f;
 
-        // customize values as you like
-        //joint.spring = 4.5f;
-        joint.damper = 7f;
+		// customize values as you like
+		//joint.spring = 4.5f;
+		joint.damper = 7f;
         joint.massScale = 4.5f;
 
         SetLineRendererServerRPC(pc, 2, true);
@@ -211,7 +223,7 @@ public class Swinging : EquipmentController
         // if not grappling, don't draw rope
         gunHolder.forward = (swingPoint - player.position).normalized;
 
-        currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
+		currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
 
         lineRenderer.SetPosition(0, gunTipPos);
         Debug.Log(gunTipPos);

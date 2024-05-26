@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Pickup
   - Magnet
+  - Audio
   layers:
   - Default
   - TransparentFX
