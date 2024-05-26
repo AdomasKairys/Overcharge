@@ -81,11 +81,6 @@ public class Swinging : EquipmentController
 
         if (IsSwingOver() && _useCooldown <= 0.1f) StopSwing();
 
-        // TODO: fix
-        Debug.Log(_useCooldown);
-        //if (Input.GetKeyDown(UseKey) && !IsSwingOver() && cooldownTimer <= 0.1f) StartSwing();
-        //if ((Input.GetKeyUp(UseKey) || IsSwingOver()) && cooldownTimer <= 0.1f) StopSwing();
-
         if (_useCooldown > 0.1f)
         {
             _useCooldown -= Time.deltaTime;
@@ -325,8 +320,11 @@ public class Swinging : EquipmentController
 
     public override void OnNetworkDespawn()
     {
-        _useAction.performed -= OnPress;
-        _useAction.canceled -= OnRelease;
+        if (_initialized)
+        {
+            _useAction.performed -= OnPress;
+            _useAction.canceled -= OnRelease;
+        }        
         base.OnNetworkDespawn();
     }
 }

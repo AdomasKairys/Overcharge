@@ -12,7 +12,7 @@ public class HostDisconnectUI : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log(NetworkManager.ServerClientId + " " + NetworkManager.Singleton.LocalClientId);
+        //Debug.Log(NetworkManager.ServerClientId + " " + NetworkManager.Singleton.LocalClientId);
 
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback; 
         playAgainButton.onClick.AddListener(() => {

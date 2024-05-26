@@ -103,7 +103,7 @@ public class GameMultiplayer : NetworkBehaviour
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Host_OnClientDisconnectCallback;
         Debug.Log(playerDataNetworkList.Count);
         NetworkManager.Singleton.StartHost();
-        Debug.Log(playerDataNetworkList.Count);
+        //Debug.Log(playerDataNetworkList.Count);
 
 
     }
@@ -151,7 +151,7 @@ public class GameMultiplayer : NetworkBehaviour
         {
             playerDataNetworkList.Clear();
         }
-        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() });
+        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId(), playerState = PlayerState.Runner });
         SetPlayerNameServerRPC(GetPlayerName());
     }
 
@@ -189,6 +189,7 @@ public class GameMultiplayer : NetworkBehaviour
             if (playerData.playerState != PlayerState.Dead)
                 playerDatas.Add(playerData);
         }
+        Debug.Log("GameMultiplayer: alive player count is  " + playerDatas.Count);
         return playerDatas;
     }
     public PlayerData GetPlayerDataFromClientId(ulong clientId)
@@ -205,6 +206,8 @@ public class GameMultiplayer : NetworkBehaviour
     public PlayerData GetPlayerDataFromPlayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];
     public Color GetPlayerColor(int colorId) => playerColors[colorId];
     public void ChangePlayerState(ulong playerId, PlayerState newState) => ChangePlayerStateServerRPC(playerId, newState);
+
+    public int GetPlayerCount() => playerDataNetworkList.Count;
 
     #region Color management
 

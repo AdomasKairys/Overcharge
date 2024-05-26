@@ -22,7 +22,7 @@ public class GameCountdownUI : MonoBehaviour
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
     {
-        Debug.Log("State Changed" + GameManager.Instance.IsCountdownToStartActive());
+        //Debug.Log("State Changed " + GameManager.Instance.IsCountdownToStartActive());
 
         if (GameManager.Instance.IsCountdownToStartActive())
         {
@@ -53,7 +53,12 @@ public class GameCountdownUI : MonoBehaviour
     {
         foreach (GameObject o in UI)
         {
-            o.SetActive(to);
+            // An error is encountered as if a game object has been destroyed
+            // this could also be causing the network object index out of bounds error
+            if (o != null)
+            {
+                o.SetActive(to);
+            }
         }
         foreach (MonoBehaviour mb in player)
         {
@@ -62,6 +67,7 @@ public class GameCountdownUI : MonoBehaviour
     }
     private void OnDestroy()
     {
-        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
+        // TODO: this throws an error because it gets destroyed after game manager (temp for when plaeyrs aren't explicitly despawned)
+        //GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
     }
 }

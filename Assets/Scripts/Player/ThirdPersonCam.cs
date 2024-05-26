@@ -116,4 +116,12 @@ public class ThirdPersonCam : NetworkBehaviour
         StopCoroutine(tiltCoroutine);
         StartCoroutine(tiltCoroutine);
     }
+
+    public override void OnNetworkDespawn()
+    {
+        // Unlock and unhide mouse
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
+        base.OnNetworkDespawn();
+    }
 }

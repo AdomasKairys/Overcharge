@@ -42,7 +42,7 @@ public class PlayerReady : NetworkBehaviour
 
         if (AllPlayersReady)
         {
-            GameLobby.Instance.DeleteLobby();
+            //GameLobby.Instance.DeleteLobby();
             SceneLoader.LoadScene(SceneLoader.Scene.map1);
         }
     }

@@ -14,15 +14,23 @@ public class GameOverUI : MonoBehaviour
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
     {
+        // TODO: remove the logs
+        Debug.Log("State change was called in game over UI");
         if (GameManager.Instance.IsGameOver())
         {
+            Debug.Log("State is game over");
             text.text = GameManager.Instance.GetWinner().Value.playerName.ToString();
             Show();
         }
         else
         {
-            Hide();
+            Debug.Log("State is not game over");
         }
+        // I'm pretty sure this isn't necessary as there won't be a scenario where the game becomes no longer over
+        //else
+        //{
+        //    Hide();
+        //}
     }
     private void Show()
     {
