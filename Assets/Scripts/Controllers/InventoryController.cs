@@ -8,7 +8,8 @@ using UnityEngine.InputSystem;
 
 public class InventoryController : NetworkBehaviour
 {
-    private PlayerInputActions _playerInputActions;
+    //private PlayerInputActions _playerInputActions;
+    private PlayerInputs _playerInputActionsPlayer;
 
     private InputAction _usePickupAction;
 
@@ -34,11 +35,13 @@ public class InventoryController : NetworkBehaviour
     {
         if (IsOwner)
         {
-            _playerInputActions = new PlayerInputActions();
+            //_playerInputActions = new PlayerInputActions();
+            _playerInputActionsPlayer = GameSettings.Instance.playerInputs;
 
-            _usePickupAction = _playerInputActions.Player.UsePickup;
+            _usePickupAction = _playerInputActionsPlayer.UsePickup;
             _usePickupAction.performed += OnUsePickup;
             _usePickupAction.Enable();
+
         }
 
         base.OnNetworkSpawn();
