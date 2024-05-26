@@ -8,6 +8,8 @@ using TMPro;
 
 public class KeybindManager : MonoBehaviour
 {
+    //move (wasd)
+    [Header("Move")]
     public Button rebindUpButton;
     public Button rebindDownButton;
     public Button rebindLeftButton;
@@ -16,16 +18,53 @@ public class KeybindManager : MonoBehaviour
     public TMP_Text downBindingText;
     public TMP_Text leftBindingText;
     public TMP_Text rightBindingText;
+    //Jump
+    [Header("Jump")]
+    public Button rebindJumpButton;
+    public TMP_Text jumpBindingText;
+    //Primary Secondary
+    [Header("Primary Secondary")]
+    public Button rebindPrimaryButton;
+    public Button rebindSecondaryButton;
+    public TMP_Text primaryBindingText;
+    public TMP_Text secondaryBindingText;
+    //Dash
+    [Header("Dash and upwards wall run")]
+    public Button rebindDashButton;
+    public TMP_Text dashBindingText;
+    public Button rebindUpwardsWallRunButton;
+    public TMP_Text upwardsWallRunBindingText;
+    //Use pickup
+    [Header("UsePickup")]
+    public Button rebindUsePickupButton;
+    public TMP_Text usePickupBindingText;
+    //Downwards wallRun
+    [Header("Downwards wall run")]
+    public Button rebindDownwardsWallRunButton;
+    public TMP_Text downwardsWallRunBindingText;
 
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
 
     private void Start()
     {
         UpdateBindingDisplay();
+        //Move
         rebindUpButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "up"));
         rebindDownButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "down"));
         rebindLeftButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "left"));
         rebindRightButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.MoveAction, "right"));
+        //Jump
+        rebindJumpButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.JumpAction, null));
+        //Primary Secondary
+        rebindPrimaryButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.UsePrimaryEquipment, null));
+        rebindSecondaryButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.UseSecondaryEquipment, null));
+        //Dash and up wall run
+        rebindDashButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.DashAction, null));
+        rebindUpwardsWallRunButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.UpwardsWallRun, null));
+        //use pickup
+        rebindUsePickupButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.UsePickup, null));
+        //downward wall run
+        rebindDownwardsWallRunButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.DownwardWallRun, null));
     }
 
     private void OnDisable()
@@ -39,10 +78,29 @@ public class KeybindManager : MonoBehaviour
         int downBindingIndex = FindBindingIndex(GameSettings.Instance.playerInputs.MoveAction, "down");
         int leftBindingIndex = FindBindingIndex(GameSettings.Instance.playerInputs.MoveAction, "left");
         int rightBindingIndex = FindBindingIndex(GameSettings.Instance.playerInputs.MoveAction, "right");
+        
         upBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[upBindingIndex].effectivePath);
         downBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[downBindingIndex].effectivePath);
         leftBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[leftBindingIndex].effectivePath);
         rightBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.MoveAction.bindings[rightBindingIndex].effectivePath);
+
+
+        int jumpBindingIndex = 0;
+        jumpBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.JumpAction.bindings[jumpBindingIndex].effectivePath);
+
+        int primaryBindingIndex = 0;
+        primaryBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UsePrimaryEquipment.bindings[primaryBindingIndex].effectivePath);
+        int secondaryBindingIndex = 0;
+        secondaryBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UseSecondaryEquipment.bindings[secondaryBindingIndex].effectivePath);
+
+        int dashBindingIndex = 0;
+        dashBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.DashAction.bindings[dashBindingIndex].effectivePath);
+        int upwardsWallRunBindingIndex = 0;
+        upwardsWallRunBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UpwardsWallRun.bindings[upwardsWallRunBindingIndex].effectivePath);
+        int usePickupBindingIndex = 0;
+        usePickupBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UsePickup.bindings[usePickupBindingIndex].effectivePath);
+        int downwardsWallRunBindingIndex = 0;
+        downwardsWallRunBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.DownwardWallRun.bindings[downwardsWallRunBindingIndex].effectivePath);
     }
 
     private int FindBindingIndex(InputAction action, string compositePart)
@@ -59,14 +117,17 @@ public class KeybindManager : MonoBehaviour
 
     private void StartRebinding(InputAction action, string compositePart)
     {
-        int bindingIndex = FindBindingIndex(action, compositePart);
-        if (bindingIndex == -1)
+        int bindingIndex = compositePart != null ? FindBindingIndex(action, compositePart) : 0;
+
+        if (bindingIndex == -1 && compositePart != null)
         {
             Debug.LogError($"Binding for {compositePart} not found.");
             return;
         }
+
         action.Disable();
         rebindingOperation?.Dispose();
+
         rebindingOperation = action.PerformInteractiveRebinding(bindingIndex)
             .WithControlsExcluding("<Mouse>/position")
             .WithControlsExcluding("<Mouse>/delta")
