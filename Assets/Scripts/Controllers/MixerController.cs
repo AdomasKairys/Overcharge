@@ -18,12 +18,6 @@ public class MixerController : MonoBehaviour
 	[SerializeField]
 	private string effectsVolumeParameter = "EffectsVolume";
 
-	[SerializeField]
-	private Slider musicVolumeSlider;
-
-	[SerializeField]
-	private Slider effectsVolumeSlider;
-
 	private const string MusicVolumeKey = "MusicVolume";
     private const string EffectsVolumeKey = "EffectsVolume";
 
@@ -37,8 +31,6 @@ public class MixerController : MonoBehaviour
     {
         SetMusicVolume(MusicVolume);
         SetEffectsVolume(EffectsVolume);
-		musicVolumeSlider.onValueChanged.AddListener(delegate { SetMusicVolume(musicVolumeSlider.value); });
-		effectsVolumeSlider.onValueChanged.AddListener(delegate { SetMusicVolume(musicVolumeSlider.value); });
 	}
 
     public void SetMasterVolume(float volume)
@@ -60,7 +52,7 @@ public class MixerController : MonoBehaviour
 
 	private void SetVolume(string parameter, float volume)
 	{
-		var mixerVolume = volume <= MinVolume ? -80 : Mathf.Log(volume) * 20;
+		mixer.SetFloat(parameter, volume <= MinVolume ? -80 : Mathf.Log(volume) * 20);
 	}
 
 	private static void SaveMusicVolume(float volume)

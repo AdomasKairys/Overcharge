@@ -75,9 +75,10 @@ public class UIController : MonoBehaviour
     void Update()
     {
         // Update the player state information
+        playerChargeBarSlider.value = playerStateController.currCharge.Value;
+
         if (playerStateController.GetState() == PlayerState.Chaser)
         {
-            playerChargeBarSlider.value = playerStateController.currCharge.Value;
             sliderColor.GetComponent<Image>().color = Color.red;
         }
 		else

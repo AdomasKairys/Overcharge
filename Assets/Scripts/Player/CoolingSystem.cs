@@ -1,77 +1,68 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using Unity.Netcode;
 using UnityEngine;
+using static Unity.Collections.AllocatorManager;
 
-public class CoolingSystem : MonoBehaviour
+public class CoolingSystem : NetworkBehaviour
 {
-    private string coolingStationTag = "CoolingStation";
-
-    public float coolValue = 20f;
-
-    private PlayerStateController playerStateController;
-    private new Light light;
-
-    public float coolingStationCooldown = 15f;
-    private bool isCoolingStationCooldown = false;
-    private float currentCoolingStationCooldown;
-
-    void Awake()
+    public float coolRate = 0.5f;
+    private void OnTriggerStay(Collider other)
     {
-        playerStateController = GetComponent<PlayerStateController>();
-        light = GetComponent<Light>();
-    }
-
-    void Update()
-    {
-        CoolDown(ref currentCoolingStationCooldown, coolingStationCooldown, ref isCoolingStationCooldown);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        ProcessCollision(other.gameObject);
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        ProcessCollision(other.gameObject);
-    }
-
-    void ProcessCollision(GameObject collider)
-    {
-        if (collider.CompareTag(coolingStationTag) && !isCoolingStationCooldown)
+        if (other.CompareTag("TagTrigger"))// reduntant check for future proofing
         {
-            //Heal();
-            if (playerStateController.currCharge.Value - coolValue <= 0)
+            PlayerStateController otherStateController = other.gameObject.GetComponentInParent<PlayerStateController>();
+            PlayerState otherState = otherStateController.GetState();
+            if (IsServer && otherState == PlayerState.Runner)
             {
-                playerStateController.currCharge.Value = 0;
+                if(otherStateController.currCharge.Value > 0)
+                    otherStateController.currCharge.Value -= coolRate*Time.deltaTime;
             }
-            else
-            {
-                playerStateController.currCharge.Value -= coolValue;
-            }
-            isCoolingStationCooldown = true;
-            currentCoolingStationCooldown = coolingStationCooldown;  
-            //light.enabled = !light.enabled;   //Norisi padaryti kad sviestu
         }
     }
+
+    //private void OnCollisionEnter(Collision other)
+    //{
+    //    ProcessCollision(other.gameObject);
+    //}
+
+    //void ProcessCollision(GameObject collider)
+    //{
+    //    if (collider.CompareTag(coolingStationTag) && !isCoolingStationCooldown)
+    //    {
+    //        //Heal();
+    //        if (playerStateController.currCharge.Value - coolValue <= 0)
+    //        {
+    //            playerStateController.currCharge.Value = 0;
+    //        }
+    //        else
+    //        {
+    //            playerStateController.currCharge.Value -= coolValue;
+    //        }
+    //        isCoolingStationCooldown = true;
+    //        currentCoolingStationCooldown = coolingStationCooldown;  
+    //        //light.enabled = !light.enabled;   //Norisi padaryti kad sviestu
+    //    }
+    //}
 
     //void Heal()
     //{
     //    Debug.Log("Heal");
     //}
 
-    private void CoolDown(ref float currentCooldown, float maxCooldown, ref bool isCooldown)
-    {
-        if (isCooldown)
-        {
-            currentCooldown -= Time.deltaTime;
-            if (currentCooldown <= 0f)
-            {
-                isCooldown = false;
-                currentCooldown = 0f;
-            }
-        }
-    }
+    //private void CoolDown(ref float currentCooldown, float maxCooldown, ref bool isCooldown)
+    //{
+    //    if (isCooldown)
+    //    {
+    //        currentCooldown -= Time.deltaTime;
+    //        if (currentCooldown <= 0f)
+    //        {
+    //            isCooldown = false;
+    //            currentCooldown = 0f;
+    //        }
+    //    }
+    //}
 
     //void UpdateLight()
     //{

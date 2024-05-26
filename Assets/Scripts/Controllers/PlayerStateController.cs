@@ -46,6 +46,7 @@ public class PlayerStateController : NetworkBehaviour
             // Increase charge for the chaser
         }
     }
+
     [ServerRpc]
     private void ChangeChargeValueServerRPC(NetworkObjectReference target)
     {
