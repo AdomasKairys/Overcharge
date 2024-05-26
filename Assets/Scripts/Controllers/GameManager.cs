@@ -123,8 +123,8 @@ public class GameManager : NetworkBehaviour
                     searching = false;
 				}
 			}
-            Transform playerTransform = Instantiate(playerPrefab);
-            playerTransform.position = spawnPoints[index].transform.position;
+            Transform playerTransform = Instantiate(playerPrefab, spawnPoints[index].transform);
+            //playerTransform.position = spawnPoints[index].transform.position;
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }
