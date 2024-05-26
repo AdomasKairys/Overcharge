@@ -86,6 +86,7 @@ public class PlayerStateController : NetworkBehaviour
     private void Die()
     {
         DieServerRPC(netObj); // deactivate the player object
+        //ChaerExplodes AudioClip
     }
     [ServerRpc]
     private void DieServerRPC(NetworkObjectReference netObjRef)

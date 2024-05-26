@@ -31,6 +31,7 @@ public class TagController : NetworkBehaviour
                 var sparks = Instantiate(tagSparks);
                 sparks.transform.position = other.ClosestPointOnBounds(transform.position);
                 sparks.Play();
+                //ChangeStates Audio
                 Destroy(sparks, 1f);
             }
             if (IsServer) 

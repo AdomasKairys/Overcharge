@@ -9,6 +9,8 @@ public class ScoreboardController : MonoBehaviour
 {
 	//[Header("Scoreboard")]
 	[SerializeField] private GameObject scoreboard;
+	[SerializeField] private Transform scoreboardListContainer;
+	[SerializeField] private Transform scoreboardTemplate;
 	//[SerializeField] private PlayerCard playCardPrefab;
 	//[SerializeField] private Transform playerCardParent;
 
@@ -16,14 +18,24 @@ public class ScoreboardController : MonoBehaviour
 	//[SerializeField] private Transform playerPrefab;
 
 	// Start is called before the first frame update
+
+	void Awake()
+	{
+		GameMultiplayer.Instance.OnPlayerDataNetworkListChanged += GameMultiplayer_OnPlayerDataNetworkListChanged;
+
+	}
+
 	void Start()
     {
 		scoreboard.SetActive(false);
 		if (GameManager.Instance != null)
 		{
-			//GameManager.PlayerJoined(PlayerCard.GetClient(), PlayerCard.GetName(), "Runner");
-			//GameMultiplayer.Instance.ScoreboardAdd(clientIdFixedString);
-			//GameMultiplayer.ScoreboardAdd(PlayerCard.GetClient());
+			foreach (PlayerData playerData in GameMultiplayer.Instance.GetPlayerList())
+			{
+				Transform playerCard = Instantiate(scoreboardTemplate, scoreboardListContainer);
+				playerCard.gameObject.SetActive(true);
+				playerCard.GetComponent<PlayerCard>().Initialize(playerData.playerName.ToString(), playerData.playerState.ToString());
+			}
 		}
 		else
         {
@@ -42,5 +54,25 @@ public class ScoreboardController : MonoBehaviour
 		{
 			scoreboard.SetActive(false);
 		}
+	}
+
+	private void GameMultiplayer_OnPlayerDataNetworkListChanged(object sender, System.EventArgs e)
+	{
+		for (int i = 0; i < scoreboardListContainer.childCount; i++)
+		{
+			Destroy(scoreboardListContainer.GetChild(i).gameObject);
+		}
+
+		foreach (PlayerData playerData in GameMultiplayer.Instance.GetPlayerList())
+		{
+			Transform playerCard = Instantiate(scoreboardTemplate, scoreboardListContainer);
+			playerCard.gameObject.SetActive(true);
+			playerCard.GetComponent<PlayerCard>().Initialize(playerData.playerName.ToString(), playerData.playerState.ToString());
+		}
+	}
+
+	private void OnDestroy()
+	{
+		GameMultiplayer.Instance.OnPlayerDataNetworkListChanged -= GameMultiplayer_OnPlayerDataNetworkListChanged;
 	}
 }

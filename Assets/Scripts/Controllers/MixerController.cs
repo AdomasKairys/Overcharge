@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Audio;
 
 public class MixerController : MonoBehaviour
@@ -17,7 +18,13 @@ public class MixerController : MonoBehaviour
 	[SerializeField]
 	private string effectsVolumeParameter = "EffectsVolume";
 
-    private const string MusicVolumeKey = "MusicVolume";
+	[SerializeField]
+	private Slider musicVolumeSlider;
+
+	[SerializeField]
+	private Slider effectsVolumeSlider;
+
+	private const string MusicVolumeKey = "MusicVolume";
     private const string EffectsVolumeKey = "EffectsVolume";
 
     private const float MinVolume = 0.0001f;
@@ -30,7 +37,9 @@ public class MixerController : MonoBehaviour
     {
         SetMusicVolume(MusicVolume);
         SetEffectsVolume(EffectsVolume);
-    }
+		musicVolumeSlider.onValueChanged.AddListener(delegate { SetMusicVolume(musicVolumeSlider.value); });
+		effectsVolumeSlider.onValueChanged.AddListener(delegate { SetMusicVolume(musicVolumeSlider.value); });
+	}
 
     public void SetMasterVolume(float volume)
     {
@@ -63,4 +72,5 @@ public class MixerController : MonoBehaviour
 	{
 		PlayerPrefs.SetFloat(EffectsVolumeKey, volume);
 	}
+
 }

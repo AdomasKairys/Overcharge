@@ -6417,6 +6417,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 927625299836011680, guid: f3575d22d35844b4dadd37384dce7dcd, type: 3}
+      propertyPath: musicVolumeSlider
+      value: 
+      objectReference: {fileID: 1962995629}
+    - target: {fileID: 927625299836011680, guid: f3575d22d35844b4dadd37384dce7dcd, type: 3}
+      propertyPath: effectsVolumeSlider
+      value: 
+      objectReference: {fileID: 1867639604}
     - target: {fileID: 3340033977329991013, guid: f3575d22d35844b4dadd37384dce7dcd, type: 3}
       propertyPath: m_Name
       value: MixerController

@@ -18,11 +18,13 @@ public class AudioOptions : MonoBehaviour
 	private void Start()
     {
         UpdateSliders();
-    }
+	}
 
 	private void UpdateSliders()
     {
         musicVolumeSlider.SetValueWithoutNotify(mixerController.MusicVolume);
 		effectsVolumeSlider.SetValueWithoutNotify(mixerController.EffectsVolume);
+
+        Debug.Log("Idiot");
 	}
 }

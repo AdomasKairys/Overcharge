@@ -212,9 +212,19 @@ public class GameMultiplayer : NetworkBehaviour
     public Color GetPlayerColor(int colorId) => playerColors[colorId];
     public void ChangePlayerState(ulong playerId, PlayerState newState) => ChangePlayerStateServerRPC(playerId, newState);
 
-    #region Color management
+	public List<PlayerData> GetPlayerList()
+	{
+		List<PlayerData> playerList = new List<PlayerData>();
+		foreach (PlayerData playerData in playerDataNetworkList)
+		{
+			playerList.Add(playerData);
+		}
+		return playerList;
+	}
 
-    public void ChangePlayerColor(int colorId)
+	#region Color management
+
+	public void ChangePlayerColor(int colorId)
     {
         ChangePlayerColorServerRPC(colorId);
     }
