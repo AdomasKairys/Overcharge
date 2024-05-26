@@ -7,22 +7,14 @@ using UnityEngine.SceneManagement;
 
 public class ScoreboardController : MonoBehaviour
 {
-	//[Header("Scoreboard")]
+	[Header("Scoreboard")]
 	[SerializeField] private GameObject scoreboard;
 	[SerializeField] private Transform scoreboardListContainer;
 	[SerializeField] private Transform scoreboardTemplate;
-	//[SerializeField] private PlayerCard playCardPrefab;
-	//[SerializeField] private Transform playerCardParent;
-
-	//private Dictionary<ulong, PlayerCard> _playerCards = new Dictionary<ulong, PlayerCard>();
-	//[SerializeField] private Transform playerPrefab;
-
-	// Start is called before the first frame update
 
 	void Awake()
 	{
 		GameMultiplayer.Instance.OnPlayerDataNetworkListChanged += GameMultiplayer_OnPlayerDataNetworkListChanged;
-
 	}
 
 	void Start()
