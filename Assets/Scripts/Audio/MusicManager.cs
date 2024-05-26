@@ -22,7 +22,7 @@ public class MusicManager : MonoBehaviour
 		audioSource = GetComponent<AudioSource>();
 	}
 
-	void Update()
+	void Start()
 	{
 		ResumeMusic();
 	}

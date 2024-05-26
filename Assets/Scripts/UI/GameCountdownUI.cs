@@ -9,10 +9,14 @@ public class GameCountdownUI : MonoBehaviour
     [SerializeField] private MonoBehaviour[] player;
     [SerializeField] private GameObject[] UI;
     [SerializeField] private NetworkObject networkObject;
-    private void Awake()
+
+	EffectsManager effectsManager;
+
+	private void Awake()
     {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
-    }
+		effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	}
     void Start()
     {
         player = player.Where(x => x.enabled).ToArray();
@@ -27,7 +31,8 @@ public class GameCountdownUI : MonoBehaviour
         if (GameManager.Instance.IsCountdownToStartActive())
         {
             Show();
-        }
+			effectsManager.PlaySFX(effectsManager.countDown);
+		}
         else
         {
             Hide();

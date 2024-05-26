@@ -9,6 +9,7 @@ TagManager:
   - Pickup
   - Magnet
   - ThirdPersonCam
+  - Audio
   layers:
   - Default
   - TransparentFX
