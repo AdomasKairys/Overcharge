@@ -142,21 +142,4 @@ public class KeybindManager : MonoBehaviour
         UpdateBindingDisplay();
         rebindingOperation?.Dispose();
     }
-
-    public void SaveBindings()
-    {
-        var rebinds = GameSettings.Instance.playerInputs.MoveAction.SaveBindingOverridesAsJson();
-        PlayerPrefs.SetString("rebinds", rebinds);
-        PlayerPrefs.Save();
-    }
-
-    public void LoadBindings()
-    {
-        var rebinds = PlayerPrefs.GetString("rebinds", string.Empty);
-        if (!string.IsNullOrEmpty(rebinds))
-        {
-            GameSettings.Instance.playerInputs.MoveAction.LoadBindingOverridesFromJson(rebinds);
-            UpdateBindingDisplay();
-        }
-    }
 }
