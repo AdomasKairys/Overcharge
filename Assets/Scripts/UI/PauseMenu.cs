@@ -71,11 +71,23 @@ public class PauseMenu : NetworkBehaviour
 
     public void LoadMenu()
     {
+        // TODO: should also leave lobby
+        if (GameLobby.Instance.IsLobbyHost())
+        {
+            GameLobby.Instance.DeleteLobby();
+        }
+        else
+        {
+            GameLobby.Instance.LeaveLobby();
+        }
         GameMultiplayer.Instance.Shutdown();
         SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString());
     }
+
     public void Quit()
 	{
+        Debug.Log("Quit called");
+        // TODO: should handle leaving lobby and shutting down connection
         Application.Quit();
     }
 }

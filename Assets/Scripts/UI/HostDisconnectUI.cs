@@ -24,7 +24,7 @@ public class HostDisconnectUI : MonoBehaviour
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
-        Debug.Log(NetworkManager.ServerClientId + " " + clientId);
+        //Debug.Log(NetworkManager.ServerClientId + " " + clientId);
         if (clientId == NetworkManager.ServerClientId)
         {
             Show();
