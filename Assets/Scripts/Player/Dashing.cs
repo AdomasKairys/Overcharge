@@ -75,7 +75,7 @@ public class Dashing : MonoBehaviour
 
         pm.isDashing = true;
         pm.maxYSpeed = maxDashYSpeed;
-		sfxTrigger.PlaySFX_CanStop("dash", 0f, 4f, false);
+		sfxTrigger.PlaySFX_CanStop("dash", false);
 
 		Transform forwardT;
 
@@ -95,6 +95,8 @@ public class Dashing : MonoBehaviour
         Invoke(nameof(DelayedDashForce), 0.025f);
 
         Invoke(nameof(ResetDash), dashDuration);
+
+		StartCoroutine(StopAudioAfterDash());
 	}
 
     private Vector3 delayedForceToApply;
@@ -134,4 +136,10 @@ public class Dashing : MonoBehaviour
 
         return direction.normalized;
     }
+
+	private IEnumerator StopAudioAfterDash()
+	{
+		yield return new WaitForSeconds(1.3f);
+		sfxTrigger.StopSFX("dash");
+	}
 }

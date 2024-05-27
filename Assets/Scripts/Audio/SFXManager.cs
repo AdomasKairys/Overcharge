@@ -13,7 +13,6 @@ public class SFXManager : MonoBehaviour
 	private Dictionary<string, AudioSource> audioSourceMap = new Dictionary<string, AudioSource>();
 	public AudioMixerGroup effects;
 	private AudioSource effectSource;
-	private AudioSource canStop;
 
 	void Awake()
 	{
@@ -57,7 +56,7 @@ public class SFXManager : MonoBehaviour
 		}
 	}
 
-	System.Text.StringBuilder sb = new System.Text.StringBuilder();
+	//System.Text.StringBuilder sb = new System.Text.StringBuilder();
 	public void RegisterSFX(string sfxName, AudioClip sfxClip)
 	{
 		if (!sfxDictionary.ContainsKey(sfxName))
@@ -66,13 +65,13 @@ public class SFXManager : MonoBehaviour
 			Debug.LogWarning($"I got '{sfxName}' effect");
 		}
 		// Iterate through the dictionary and append each key-value pair to the string builder
-		foreach (KeyValuePair<string, AudioClip> kvp in sfxDictionary)
-		{
-			sb.AppendLine($"Key: {kvp.Key}, Value: {kvp.Value.name}");
-		}
+		//foreach (KeyValuePair<string, AudioClip> kvp in sfxDictionary)
+		//{
+		//	sb.AppendLine($"Key: {kvp.Key}, Value: {kvp.Value.name}");
+		//}
 
 		// Log the concatenated string
-		Debug.LogWarning(sb.ToString());
+		//Debug.LogWarning(sb.ToString());
 	}
 
 	public void PlaySFX(string sfxName)
@@ -88,7 +87,7 @@ public class SFXManager : MonoBehaviour
 		}
 	}
 
-	public void PlaySFX_CanStop(string sfxName, float min, float max, bool loop)
+	public void PlaySFX_CanStop(string sfxName, bool loop)
 	{
 		if (sfxDictionary.TryGetValue(sfxName, out AudioClip sfxClip))
 		{
@@ -100,41 +99,21 @@ public class SFXManager : MonoBehaviour
 			}
 
 			AudioSource audioSource = audioSourceMap[sfxName];
-			
-			if (loop)										//Does the effect need to loop?
+
+			if (loop == true)                               //Does the effect need to loop?
 			{
-				if ((min != 0f && max != 0f) || max != 0f)  //Does the effect need to be looped in a certain time?
-				{ 
-					if (audioSource.time >= max)            //Has the effect passed the end time to start looping?
-					{
-						audioSource.clip = sfxClip;
-						audioSource.Play();
-						audioSource.time = min;
-						audioSource.loop = true;
-					}
-				}
-				else                                        //So that the effect can loop
-				{
-					audioSource.clip = sfxClip;
-					audioSource.Play();
-					audioSource.loop = true;
-				}
-			}
-			if (min == 0f && max != 0f)                     //Does the effect need to continue to a certain time without looping?
-			{
-				if (audioSource.time <= max)                //Has the effect reached the end time before stopping?
-				{
-					audioSource.clip = sfxClip;
-					audioSource.Play();
-				}
-				audioSource.Stop();
+				audioSource.loop = true;
+				audioSource.clip = sfxClip;
+				audioSource.Play();
+
 			}
 			else                                            //Just play the effect
 			{
+				audioSource.loop = false;
 				audioSource.clip = sfxClip;
 				audioSource.Play();
 			}
-			Debug.LogWarning($"I'm playing the '{sfxName}' music clip");
+			//Debug.LogWarning($"I'm playing the '{sfxName}' music clip");
 		}
 		else
 		{

@@ -17,11 +17,11 @@ public class SFXTrigger : MonoBehaviour
 		}
 	}
 
-	public void PlaySFX_CanStop(string sfxName, float min, float max, bool loop)
+	public void PlaySFX_CanStop(string sfxName, bool loop)
 	{
 		if (SFXManager.Instance != null)
 		{
-			SFXManager.Instance.PlaySFX_CanStop(sfxName, min, max, loop);
+			SFXManager.Instance.PlaySFX_CanStop(sfxName, loop);
 		}
 	}
 

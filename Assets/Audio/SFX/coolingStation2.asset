@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0faf8297f5595204aa24b92fd83f3fae, type: 3}
-  m_Name: coolingStation
+  m_Name: coolingStation2
   m_EditorClassIdentifier: 
-  sfxName: coolingStation
-  audioClip: {fileID: 8300000, guid: b0e0493670d669044bc966a68419de48, type: 3}
+  sfxName: coolingStation2
+  audioClip: {fileID: 8300000, guid: 2670e02acb526984bbd0c62919742484, type: 3}

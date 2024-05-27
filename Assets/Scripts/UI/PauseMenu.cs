@@ -82,8 +82,9 @@ public class PauseMenu : NetworkBehaviour
 		sfxTrigger.PlaySFX("button2");
 		sfxTrigger.StopSFX("dash");
 		sfxTrigger.StopSFX("charge");
-		sfxTrigger.StopSFX("coolingStation");
-        GameMultiplayer.Instance.Shutdown();
+		sfxTrigger.StopSFX("coolingStation1");
+		sfxTrigger.StopSFX("coolingStation2");
+		GameMultiplayer.Instance.Shutdown();
 		SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString());
     }
     public void Quit()

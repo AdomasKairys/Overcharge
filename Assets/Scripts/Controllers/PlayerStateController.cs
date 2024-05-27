@@ -20,6 +20,7 @@ public class PlayerStateController : NetworkBehaviour
     public float overcharge = 100.0f; // The maximum value of charge at which the player dies
 
     public event EventHandler OnPlayerDeath;
+    private bool isEffectPlaying = false;
 
 	SFXTrigger sfxTrigger;
 
@@ -52,15 +53,17 @@ public class PlayerStateController : NetworkBehaviour
             //Increase charge for the chaser
         }
 
-		if (GetState() == PlayerState.Chaser && GetState() == PlayerState.Runner)
+		if (GetState() != PlayerState.Dead)
 		{
-			if (currCharge.Value >= overcharge / 2)
+			if (currCharge.Value >= overcharge / 2 && !isEffectPlaying)
 			{
-				sfxTrigger.PlaySFX_CanStop("charge", 0f, 0f, true);
+				sfxTrigger.PlaySFX_CanStop("charge", true);
+                isEffectPlaying = true;
 			}
 			else
 			{
 				sfxTrigger.StopSFX("charge");
+				isEffectPlaying = false;
 			}
 		}
 
