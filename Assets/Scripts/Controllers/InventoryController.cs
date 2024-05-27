@@ -24,6 +24,9 @@ public class InventoryController : NetworkBehaviour
     [SerializeField]
     private GravityBombEffect _gravityBombEffect;
 
+    [SerializeField]
+    private SpeedBoostEffect _speedBoostEffect;
+
     public PickupType currentPickup = PickupType.None;
 
     private int currentPickupUses = 0;
@@ -185,6 +188,9 @@ public class InventoryController : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        // Fire particles for everyone
+        HandleSpeedBoostParticlesClientRpc();
+
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
@@ -202,6 +208,12 @@ public class InventoryController : NetworkBehaviour
         if (!IsOwner) return;
 
         _playerMovement.StartCoroutine(_playerMovement.UseSpeedBoost(2, 2));
+    }
+
+    [ClientRpc]
+    private void HandleSpeedBoostParticlesClientRpc()
+    {
+        _speedBoostEffect.PlayParticles(2f);
     }
 
     [ServerRpc]
@@ -274,7 +286,6 @@ public class InventoryController : NetworkBehaviour
     [ClientRpc]
     private void HandleGravityBombParticlesClientRpc()
     {
-        Debug.Log("Gravity bomb particles ClientRpc called");
         _gravityBombEffect.PlayParticles();
     }
 
