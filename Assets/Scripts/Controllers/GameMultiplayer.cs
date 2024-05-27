@@ -190,7 +190,7 @@ public class GameMultiplayer : NetworkBehaviour
             if (playerData.playerState != PlayerState.Dead)
                 playerDatas.Add(playerData);
         }
-        Debug.Log("GameMultiplayer: alive player count is  " + playerDatas.Count);
+        //Debug.Log("GameMultiplayer: alive player count is  " + playerDatas.Count);
         return playerDatas;
     }
     public PlayerData GetPlayerDataFromClientId(ulong clientId)
