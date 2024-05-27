@@ -21,6 +21,7 @@ public class GameManager : NetworkBehaviour
 
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private NetworkVariable<float> countDownToStartTimer = new NetworkVariable<float>(3f);
+    private NetworkVariable<float> countdownToEndTimer = new NetworkVariable<float>(8f);
 
     private List<Vector3> spawnPositions = new List<Vector3>();
     private void Awake()
@@ -68,30 +69,33 @@ public class GameManager : NetworkBehaviour
                 }                    
                 break;
             case State.GameOver:
-                // Temp
-                Debug.Log("GameManager: game is over, despawning players and loading in lobby");
-
-                DespawnPlayers();
-                SceneLoader.LoadScene(SceneLoader.Scene.CharacterSelectScene);
+                countdownToEndTimer.Value -= Time.deltaTime;
+                if(countdownToEndTimer.Value < 0)
+                {
+                    Debug.Log("GameManager: game is over, loading in lobby");
+                    //DespawnPlayers();
+                    SceneLoader.LoadScene(SceneLoader.Scene.CharacterSelectScene);
+                }                
                 break;
         }
     }
 
-    private void DespawnPlayers()
-    {
-        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-        {
-            var playerObject = client.PlayerObject;
-            if (playerObject != null && playerObject.IsSpawned)
-            {
-                Debug.Log("Found player object belonging to " + client);
-                playerObject.Despawn();
-                // Remove the player object from client to prevent automatic spawning on load
-                client.PlayerObject = null;
-            }
-            GameMultiplayer.Instance.ResetPlayerData();
-        }
-    }
+    //// Used to manually despawn all player objects
+    //private void DespawnPlayers()
+    //{
+    //    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+    //    {
+    //        var playerObject = client.PlayerObject;
+    //        if (playerObject != null && playerObject.IsSpawned)
+    //        {
+    //            Debug.Log("Found player object belonging to " + client);
+    //            playerObject.Despawn();
+    //            // Remove the player object from client to prevent automatic spawning on load
+    //            client.PlayerObject = null;
+    //        }
+    //        GameMultiplayer.Instance.ResetPlayerData();
+    //    }
+    //}
 
     public void SetRandomPlayerChaser()
     {
