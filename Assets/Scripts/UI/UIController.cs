@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 
@@ -37,6 +38,9 @@ public class UIController : MonoBehaviour
     [Header("Equipment Inventory")]
     [SerializeField] private TextMeshProUGUI _primaryText;
     [SerializeField] private TextMeshProUGUI _secondaryText;
+    public TextMeshProUGUI primaryKeybind;
+    public TextMeshProUGUI secondaryKeybind;
+    public TextMeshProUGUI pickupKeybind;
 
     TextMeshProUGUI textMesh_playerState;
     TextMeshProUGUI textMesh_velocity;
@@ -62,6 +66,10 @@ public class UIController : MonoBehaviour
         playerChargeBarSlider.value = playerStateController.currCharge.Value;
 
         sliderColor.GetComponent<Image>().color = Color.blue;
+
+        primaryKeybind.text= InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UsePrimaryEquipment.bindings[1].effectivePath);
+        secondaryKeybind.text= InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UseSecondaryEquipment.bindings[0].effectivePath);
+        pickupKeybind.text= InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UsePickup.bindings[0].effectivePath);
     }
 
     private void PlayerStateController_OnPlayerDeath(object sender, EventArgs e)

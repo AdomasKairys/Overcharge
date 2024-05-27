@@ -56,7 +56,7 @@ public class KeybindManager : MonoBehaviour
         //Jump
         rebindJumpButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.JumpAction, null));
         //Primary Secondary
-        rebindPrimaryButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.UsePrimaryEquipment, null));
+        rebindPrimaryButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.UsePrimaryEquipment, null,1));
         rebindSecondaryButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.UseSecondaryEquipment, null));
         //Dash and up wall run
         rebindDashButton.onClick.AddListener(() => StartRebinding(GameSettings.Instance.playerInputs.DashAction, null));
@@ -88,7 +88,7 @@ public class KeybindManager : MonoBehaviour
         int jumpBindingIndex = 0;
         jumpBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.JumpAction.bindings[jumpBindingIndex].effectivePath);
 
-        int primaryBindingIndex = 0;
+        int primaryBindingIndex = 1;
         primaryBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UsePrimaryEquipment.bindings[primaryBindingIndex].effectivePath);
         int secondaryBindingIndex = 0;
         secondaryBindingText.text = InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UseSecondaryEquipment.bindings[secondaryBindingIndex].effectivePath);
@@ -115,9 +115,9 @@ public class KeybindManager : MonoBehaviour
         return -1;
     }
 
-    private void StartRebinding(InputAction action, string compositePart)
+    private void StartRebinding(InputAction action, string compositePart, int index=0)
     {
-        int bindingIndex = compositePart != null ? FindBindingIndex(action, compositePart) : 0;
+        int bindingIndex = compositePart != null ? FindBindingIndex(action, compositePart) : index;
 
         if (bindingIndex == -1 && compositePart != null)
         {
