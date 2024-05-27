@@ -143,7 +143,6 @@ public class UIController : MonoBehaviour
     /// </summary>
     private void UpdatePickup()
     {
-        Debug.Log(cooldownPickupImage.fillAmount);
         if(inventoryController.currentPickup == InventoryController.PickupType.None)
         {
             cooldownPickupImage.fillAmount = 0f;
