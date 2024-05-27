@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -8,6 +6,7 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI text;   
     private void Awake()
     {
+        // TODO: this should be done only by the owner but this isn't a network behaviour
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
         Hide();
     }
@@ -18,10 +17,9 @@ public class GameOverUI : MonoBehaviour
         {
             text.text = GameManager.Instance.GetWinner().Value.playerName.ToString();
             Show();
-        }
-        else
-        {
-            Hide();
+
+            // Do this here instead of on destroy to ensure that GameManager isn't destroyed first
+            GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
         }
     }
     private void Show()
@@ -31,9 +29,5 @@ public class GameOverUI : MonoBehaviour
     private void Hide()
     {
         gameObject.SetActive(false);
-    }
-    private void OnDestroy()
-    {
-        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
     }
 }

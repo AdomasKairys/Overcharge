@@ -11,13 +11,25 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameLobby : MonoBehaviour
 {
     private const string KEY_RELAY_JOIN_CODE = "RelayJoinCode";
-    public static GameLobby Instance { get; private set; }
+
+    private static GameLobby _instance;
+    public static GameLobby Instance
+    {
+        get
+        {
+            if (_instance != null)
+                return _instance;
+            _instance = FindObjectOfType<GameLobby>();
+            return _instance;
+        }
+    }
 
     public event EventHandler OnCreateLobbyStarted;
     public event EventHandler OnCreateLobbyFailed;
@@ -36,7 +48,6 @@ public class GameLobby : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
         if(IsLobbyHost())
             callbacks.PlayerLeft += Callbacks_PlayerLeft;
         callbacks.KickedFromLobby += Callbacks_KickedFromLobby;

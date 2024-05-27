@@ -21,43 +21,12 @@ public class GameManager : NetworkBehaviour
 
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private NetworkVariable<float> countDownToStartTimer = new NetworkVariable<float>(3f);
+    private NetworkVariable<float> countdownToEndTimer = new NetworkVariable<float>(8f);
 
     private List<Vector3> spawnPositions = new List<Vector3>();
     private void Awake()
     {
         Instance = this;
-    }
-    private void Start()
-    {
-        Debug.Log(IsServer);
-        if (IsServer)
-            SetRandomPlayerChaser();
-    }
-    private void LateUpdate()
-    {
-        if (!IsServer)
-            return;
-        switch (state.Value)
-        {
-            case State.WaitingToStart:
-                if (NetworkManager.SpawnManager.SpawnedObjectsList.Where(no=>no.IsPlayerObject).Count() > 1)
-                {
-                    state.Value = State.CountdownToStart;
-                }
-                break;
-            case State.CountdownToStart:
-                countDownToStartTimer.Value -= Time.deltaTime;
-                if(countDownToStartTimer.Value < 0 ) {
-                    state.Value = State.GamePlaying; 
-                }
-                break;
-            case State.GamePlaying:
-                if(GameMultiplayer.Instance.IsGameOver())
-                    state.Value = State.GameOver;
-                break;
-            case State.GameOver:
-                break;
-        }
     }
 
     public override void OnNetworkSpawn()
@@ -67,7 +36,67 @@ public class GameManager : NetworkBehaviour
         {
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
         }
+        base.OnNetworkSpawn();
     }
+
+    private void LateUpdate()
+    {
+        if (!IsServer)
+            return;
+
+        switch (state.Value)
+        {
+            case State.WaitingToStart:
+                // Make sure all players' player prefabs have been spawned
+                if (NetworkManager.SpawnManager.SpawnedObjectsList.Where(no => no.IsPlayerObject).Count() == GameMultiplayer.Instance.GetPlayerCount())
+                {
+                    Debug.Log("GameManager: all players spawned, swithing to CountdownToStart");
+                    state.Value = State.CountdownToStart;
+                }
+                break;
+            case State.CountdownToStart:
+                countDownToStartTimer.Value -= Time.deltaTime;
+                if(countDownToStartTimer.Value < 0 ) {
+                    Debug.Log("GameManager: countdown finished, swithing to GamePlaying");
+                    state.Value = State.GamePlaying; 
+                }
+                break;
+            case State.GamePlaying:
+                if (GameMultiplayer.Instance.IsGameOver())
+                {
+                    Debug.Log("GameManager: one player (or none) left, swithing to GameOver");
+                    state.Value = State.GameOver;
+                }                    
+                break;
+            case State.GameOver:
+                countdownToEndTimer.Value -= Time.deltaTime;
+                if(countdownToEndTimer.Value < 0)
+                {
+                    Debug.Log("GameManager: game is over, loading in lobby");
+                    //DespawnPlayers();
+                    SceneLoader.LoadScene(SceneLoader.Scene.CharacterSelectScene);
+                }                
+                break;
+        }
+    }
+
+    //// Used to manually despawn all player objects
+    //private void DespawnPlayers()
+    //{
+    //    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+    //    {
+    //        var playerObject = client.PlayerObject;
+    //        if (playerObject != null && playerObject.IsSpawned)
+    //        {
+    //            Debug.Log("Found player object belonging to " + client);
+    //            playerObject.Despawn();
+    //            // Remove the player object from client to prevent automatic spawning on load
+    //            client.PlayerObject = null;
+    //        }
+    //        GameMultiplayer.Instance.ResetPlayerData();
+    //    }
+    //}
+
     public void SetRandomPlayerChaser()
     {
         var rand = new System.Random();
@@ -82,6 +111,8 @@ public class GameManager : NetworkBehaviour
 
     private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
+        if(!IsServer) return;
+
         //handle spawning better this is just so that player dont clip through the map
         //float sign = 1f;
         GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
@@ -127,6 +158,8 @@ public class GameManager : NetworkBehaviour
             //playerTransform.position = spawnPoints[index].transform.position;
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
+
+        SetRandomPlayerChaser();
     }
     public PlayerData? GetWinner()
     {
@@ -142,4 +175,22 @@ public class GameManager : NetworkBehaviour
 
     public float GetCountdownToStartTimer() => countDownToStartTimer.Value;
 
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsServer)
+        {
+            Debug.Log("GameManager: despawning");
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SceneManager_OnLoadEventCompleted;
+            state.Value = State.WaitingToStart;
+        }
+        base.OnNetworkDespawn();
+    }
+
+    public override void OnDestroy()
+    {
+        Instance = null;
+        Debug.Log("GameManager: destroyed");
+        base.OnDestroy();
+    }
 }

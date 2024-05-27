@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Services.Authentication;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,6 +26,8 @@ public class GameMultiplayer : NetworkBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        Application.wantsToQuit += HandleWantsToQuit;
 
         playerName = PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, "PlayerName"+UnityEngine.Random.Range(10,1000));
 
@@ -103,7 +104,7 @@ public class GameMultiplayer : NetworkBehaviour
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Host_OnClientDisconnectCallback;
         Debug.Log(playerDataNetworkList.Count);
         NetworkManager.Singleton.StartHost();
-        Debug.Log(playerDataNetworkList.Count);
+        //Debug.Log(playerDataNetworkList.Count);
 
 
     }
@@ -129,16 +130,7 @@ public class GameMultiplayer : NetworkBehaviour
                 playerDataNetworkList.RemoveAt(i);
         }
     }
-    public void Shutdown()
-    {
-        if(NetworkManager.Singleton.IsServer)
-        {
-            playerDataNetworkList.Clear();
-            Debug.Log(playerDataNetworkList.Count);
-        }
-        NetworkManager.Singleton.Shutdown();
-
-    }
+    
     public void KickPlayer(ulong clientId)
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
@@ -151,7 +143,7 @@ public class GameMultiplayer : NetworkBehaviour
         {
             playerDataNetworkList.Clear();
         }
-        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId() });
+        playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId(), playerState = PlayerState.Runner });
         SetPlayerNameServerRPC(GetPlayerName());
     }
 
@@ -189,6 +181,7 @@ public class GameMultiplayer : NetworkBehaviour
             if (playerData.playerState != PlayerState.Dead)
                 playerDatas.Add(playerData);
         }
+        //Debug.Log("GameMultiplayer: alive player count is  " + playerDatas.Count);
         return playerDatas;
     }
     public PlayerData GetPlayerDataFromClientId(ulong clientId)
@@ -200,11 +193,26 @@ public class GameMultiplayer : NetworkBehaviour
         }
         return default;
     }
+
+    public void ResetPlayerData()
+    {
+        if (!IsServer) return;
+
+        for (int i = 0; i < playerDataNetworkList.Count; i++)
+        {
+            PlayerData playerData = playerDataNetworkList[i];
+            playerData.playerState = PlayerState.Runner;
+            playerDataNetworkList[i] = playerData;
+        }
+    }
+
     public bool IsGameOver() => GetAlivePlayers().Count <= 1;
     public PlayerData GetPlayerData() => GetPlayerDataFromClientId(NetworkManager.Singleton.LocalClientId);
     public PlayerData GetPlayerDataFromPlayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];
     public Color GetPlayerColor(int colorId) => playerColors[colorId];
     public void ChangePlayerState(ulong playerId, PlayerState newState) => ChangePlayerStateServerRPC(playerId, newState);
+
+    public int GetPlayerCount() => playerDataNetworkList.Count;
 
     #region Color management
 
@@ -266,6 +274,53 @@ public class GameMultiplayer : NetworkBehaviour
         playerData.secondaryEquipment = (EquipmentType)secondaryEquipmentId;
 
         playerDataNetworkList[playerDataIndex] = playerData;
+    }
+
+    #endregion
+
+    #region Teardown
+
+    // Called when Application.Quit is called
+    private bool HandleWantsToQuit()
+    {
+        bool canQuit = !NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient;
+        StartCoroutine(DisconnectBeforeQuit());
+        return canQuit;
+    }
+
+    /// <summary>
+    /// In builds, if we are in a lobby and try to send a Leave request on application quit, it won't go through if we're quitting on the same frame.
+    /// So, we need to delay just briefly to let the request happen (though we don't need to wait for the result).
+    /// </summary>
+    IEnumerator DisconnectBeforeQuit()
+    {
+        if (NetworkManager.Singleton.IsServer)
+        {
+            if(GameLobby.Instance != null)
+            {
+                GameLobby.Instance.DeleteLobby();
+            }            
+            Shutdown();
+        }
+        else if (NetworkManager.Singleton.IsClient)
+        {
+            if (GameLobby.Instance != null)
+            {
+                GameLobby.Instance.LeaveLobby();
+            }
+            Shutdown();
+        }
+        yield return null;
+        Application.Quit();
+    }
+
+    public void Shutdown()
+    {
+        if (NetworkManager.Singleton.IsServer)
+        {
+            playerDataNetworkList.Clear();
+        }
+        NetworkManager.Singleton.Shutdown();
     }
 
     #endregion

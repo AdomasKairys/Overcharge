@@ -15,7 +15,7 @@ public class TagController : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log(transform.parent.gameObject.name + ": " + thisStateController);
+        //Debug.Log(transform.parent.gameObject.name + ": " + thisStateController);
     }
     private void OnTriggerEnter(Collider other)
     {

@@ -12,7 +12,7 @@ public class HostDisconnectUI : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log(NetworkManager.ServerClientId + " " + NetworkManager.Singleton.LocalClientId);
+        //Debug.Log(NetworkManager.ServerClientId + " " + NetworkManager.Singleton.LocalClientId);
 
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback; 
         playAgainButton.onClick.AddListener(() => {
@@ -24,7 +24,7 @@ public class HostDisconnectUI : MonoBehaviour
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
-        Debug.Log(NetworkManager.ServerClientId + " " + clientId);
+        //Debug.Log(NetworkManager.ServerClientId + " " + clientId);
         if (clientId == NetworkManager.ServerClientId)
         {
             Show();

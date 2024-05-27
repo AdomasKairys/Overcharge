@@ -116,7 +116,6 @@ public class PlayerMovement : NetworkBehaviour
         if (IsOwner)
         {
             GameSettings.Instance.playerInputs.MoveAction.Disable();
-
             GameSettings.Instance.playerInputs.JumpAction.performed -= OnJump;
             GameSettings.Instance.playerInputs.JumpAction.Disable();
         }
@@ -147,8 +146,12 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    // TODO: figure out why updates are being called for other player's intances even though this should be disabled on other players
+
     private void Update()
     {
+        if (!IsOwner) return;
+
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
         MyInput();
         StateHandler();
@@ -158,11 +161,15 @@ public class PlayerMovement : NetworkBehaviour
     }
     private void LateUpdate()
     {
+        if (!IsOwner) return;
+
         SpeedControl();
     }
 
     private void FixedUpdate()
     {
+        if (!IsOwner) return;
+
         MovePlayer(); 
     }
 

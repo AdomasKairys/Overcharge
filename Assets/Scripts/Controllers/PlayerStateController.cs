@@ -22,13 +22,13 @@ public class PlayerStateController : NetworkBehaviour
     public event EventHandler OnPlayerDeath;
 
     public NetworkObject netObj;
-    //[Header("Tagging")]
-    //public GameObject tagTrigger;
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(!IsOwner) return;
+
+
         // Change the player state if Enter is presed (for debugging)
         if (Input.GetKeyDown(KeyCode.Return))
         {

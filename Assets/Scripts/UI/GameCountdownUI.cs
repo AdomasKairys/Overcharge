@@ -22,46 +22,52 @@ public class GameCountdownUI : MonoBehaviour
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
     {
-        Debug.Log("State Changed" + GameManager.Instance.IsCountdownToStartActive());
-
         if (GameManager.Instance.IsCountdownToStartActive())
         {
             Show();
         }
-        else
+        else if (GameManager.Instance.IsGamePlaying())
         {
             Hide();
+
+            // Do this here instead of on destroy to ensure that GameManager isn't destroyed first
+            GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
         }
     }
+
     private void Update()
     {
         countdownText.text = Mathf.Ceil(GameManager.Instance.GetCountdownToStartTimer()).ToString();
     }
+
     private void Show()
     {
         SetTo(false);
         
         gameObject.SetActive(true);
     }
+
     private void Hide()
     {
         SetTo(true);
         
         gameObject.SetActive(false);
     }
+
     void SetTo(bool to)
     {
         foreach (GameObject o in UI)
         {
-            o.SetActive(to);
+            // An error is encountered here as if a game object has been destroyed
+            // this could also be causing the network object index out of bounds error
+            if (o != null)
+            {
+                o.SetActive(to);
+            }
         }
         foreach (MonoBehaviour mb in player)
         {
             mb.enabled = to;
         }
-    }
-    private void OnDestroy()
-    {
-        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
     }
 }

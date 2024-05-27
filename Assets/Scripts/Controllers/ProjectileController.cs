@@ -62,4 +62,14 @@ public class ProjectileController : EquipmentController
         if( _initialized && _useCooldown > 0f)
             _useCooldown -= Time.deltaTime;
     }
+
+    public override void OnNetworkDespawn()
+    {
+        if (_initialized)
+        {
+            _useAction.performed -= OnPress;
+        }
+
+        base.OnNetworkDespawn();
+    }
 }
