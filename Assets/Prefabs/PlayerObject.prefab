@@ -3178,8 +3178,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currCharge:
     m_InternalValue: 0
-  chargeRate: 1
-  overcharge: 20
+  chargeRate: 0.25
+  overcharge: 100
   netObj: {fileID: 3725760152432914651}
 --- !u!114 &6767623379712817156
 MonoBehaviour:
@@ -3452,7 +3452,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4742919576680228534}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.081241466, y: 0.68905985, z: -0.36147237, w: 0.6228436}
+  m_LocalRotation: {x: 0.08124148, y: 0.68905985, z: -0.36147237, w: 0.6228436}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
