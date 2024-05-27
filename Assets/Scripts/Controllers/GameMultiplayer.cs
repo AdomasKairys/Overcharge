@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -201,6 +202,19 @@ public class GameMultiplayer : NetworkBehaviour
         }
         return default;
     }
+
+    public void ResetPlayerData()
+    {
+        if (!IsServer) return;
+
+        for (int i = 0; i < playerDataNetworkList.Count; i++)
+        {
+            PlayerData playerData = playerDataNetworkList[i];
+            playerData.playerState = PlayerState.Runner;
+            playerDataNetworkList[i] = playerData;
+        }
+    }
+
     public bool IsGameOver() => GetAlivePlayers().Count <= 1;
     public PlayerData GetPlayerData() => GetPlayerDataFromClientId(NetworkManager.Singleton.LocalClientId);
     public PlayerData GetPlayerDataFromPlayerIndex(int playerIndex) => playerDataNetworkList[playerIndex];

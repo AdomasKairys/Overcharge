@@ -89,6 +89,7 @@ public class GameManager : NetworkBehaviour
                 // Remove the player object from client to prevent automatic spawning on load
                 client.PlayerObject = null;
             }
+            GameMultiplayer.Instance.ResetPlayerData();
         }
     }
 
@@ -150,7 +151,13 @@ public class GameManager : NetworkBehaviour
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SceneManager_OnLoadEventCompleted;
             state.Value = State.WaitingToStart;
         }
-        Instance = null;
         base.OnNetworkDespawn();
+    }
+
+    public override void OnDestroy()
+    {
+        Instance = null;
+        Debug.Log("GameManager: destroyed");
+        base.OnDestroy();
     }
 }
