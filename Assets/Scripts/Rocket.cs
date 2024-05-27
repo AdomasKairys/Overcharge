@@ -13,12 +13,10 @@ public class Rocket : NetworkBehaviour
     private NetworkVariable<bool> isCollided = new NetworkVariable<bool>(false);
     private Rigidbody ridgidBody;
 
-	//EffectsManager effectsManager;
 	SFXTrigger sfxTrigger;
 
 	private void Awake()
 	{
-		//effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
         sfxTrigger = GetComponent<SFXTrigger>();
     }
 
@@ -26,7 +24,6 @@ public class Rocket : NetworkBehaviour
     {
         rocket.up = shootDir;
 		sfxTrigger.PlaySFX("rocketShoot");
-		//effectsManager.PlaySFX(effectsManager.rocketShoot);
 
 		ridgidBody = GetComponent<Rigidbody>();
         float moveSpeed = 95f;
@@ -45,8 +42,7 @@ public class Rocket : NetworkBehaviour
         if (!IsOwner) return;
         if (collisionLayerMask == (collisionLayerMask | (1 << collision.gameObject.layer)))
         {
-			//sfxTrigger.PlaySFX("rocketHit");
-			//effectsManager.PlaySFX(effectsManager.rocketBoom);
+			sfxTrigger.PlaySFX("rocketHit");
 			KnockBackPlayer();
             particleController.PlayParticles();
             ridgidBody.velocity = Vector3.zero;

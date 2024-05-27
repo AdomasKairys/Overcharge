@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3355670436556487658}
   - component: {fileID: 7271416577543008199}
   - component: {fileID: 2668234423842206643}
+  - component: {fileID: 5093502064583102832}
   m_Layer: 0
   m_Name: CoolingStation
   m_TagString: Untagged
@@ -410,3 +411,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coolRate: 0.5
+--- !u!114 &5093502064583102832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3585913345813215629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2a6c9b2e3d99d4ca838848043ca290, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

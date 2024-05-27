@@ -10,10 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0faf8297f5595204aa24b92fd83f3fae, type: 3}
-  m_Name: sprint
+  m_Name: dash
   m_EditorClassIdentifier: 
-  sfxName: sprint
-  audioClip: {fileID: 8300000, guid: d6f1eae86c46dff49a6f71e9bff55896, type: 3}
-  loopStartTime: 0
-  loopEndTime: 0
-  loopEnabled: 0
+  sfxName: dash
+  audioClip: {fileID: 8300000, guid: 74ea67af7e84b6b4b9025bd7ddebc420, type: 3}

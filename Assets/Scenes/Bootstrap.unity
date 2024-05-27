@@ -548,8 +548,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1310095977}
-  - component: {fileID: 1310095976}
   - component: {fileID: 1310095978}
+  - component: {fileID: 1310095976}
   m_Layer: 0
   m_Name: SFXManager
   m_TagString: Audio
@@ -569,6 +569,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 541f8f8c166e6bb46bbf89e3b611b69a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  effects: {fileID: -7857728870771497311, guid: ba292486d3c14c64ea1b49065341a657, type: 2}
 --- !u!4 &1310095977
 Transform:
   m_ObjectHideFlags: 0

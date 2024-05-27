@@ -10,6 +10,7 @@ TagManager:
   - Magnet
   - ThirdPersonCam
   - Audio
+  - Color
   layers:
   - Default
   - TransparentFX

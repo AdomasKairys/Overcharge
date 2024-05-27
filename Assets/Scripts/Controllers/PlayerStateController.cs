@@ -21,12 +21,12 @@ public class PlayerStateController : NetworkBehaviour
 
     public event EventHandler OnPlayerDeath;
 
-	//EffectsManager effectsManager;
+	SFXTrigger sfxTrigger;
 
-	//private void Awake()
-	//{
-	//	effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
-	//}
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
 
 	public NetworkObject netObj;
     //[Header("Tagging")]
@@ -45,14 +45,26 @@ public class PlayerStateController : NetworkBehaviour
         if (GetState() == PlayerState.Chaser)
         {
             ChangeChargeValueServerRPC(netObj);
-
-            if(currCharge.Value >= overcharge)
-            {
-                Die();
-            }
-            // Increase charge for the chaser
+			if (currCharge.Value >= overcharge)
+			{
+				Die();
+			}		
+            //Increase charge for the chaser
         }
-    }
+
+		if (GetState() == PlayerState.Chaser && GetState() == PlayerState.Runner)
+		{
+			if (currCharge.Value >= overcharge / 2)
+			{
+				sfxTrigger.PlaySFX_CanStop("charge", 0f, 0f, true);
+			}
+			else
+			{
+				sfxTrigger.StopSFX("charge");
+			}
+		}
+
+	}
 
     [ServerRpc]
     private void ChangeChargeValueServerRPC(NetworkObjectReference target)
@@ -94,10 +106,10 @@ public class PlayerStateController : NetworkBehaviour
     private void Die()
     {
         DieServerRPC(netObj); // deactivate the player object							  
-		//effectsManager.PlaySFX(effectsManager.death); //ChargeExplodes AudioClip
+        sfxTrigger.PlaySFX("death"); //ChargeExplodes AudioClip
 
 	}
-    [ServerRpc]
+	[ServerRpc]
     private void DieServerRPC(NetworkObjectReference netObjRef)
     {
         if (!netObjRef.TryGet(out NetworkObject networkObject))

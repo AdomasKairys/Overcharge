@@ -44,12 +44,12 @@ public class Swinging : EquipmentController
 
     private InputAction _moveAction;
 
-	//EffectsManager effectsManager;
+	SFXTrigger sfxTrigger;
 
-	//private void Awake()
-	//{
-	//	effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
-	//}
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
 
 	public override void Initialize(EquipmentSlot slot, PlayerInputs playerInput)
     {
@@ -269,10 +269,10 @@ public class Swinging : EquipmentController
         //pm.ResetRestrictions();
 
         pm.isSwinging = true;
-		//effectsManager.PlaySFX(effectsManager.hookLaunch);
+		sfxTrigger.PlaySFX("grappleLaunch");
 
 		swingPoint = predictionHit.point;
-		//effectsManager.PlaySFX(effectsManager.hookHit);
+		sfxTrigger.PlaySFX("grappleHit");
 
 		joint = player.gameObject.AddComponent<SpringJoint>();
         joint.autoConfigureConnectedAnchor = false;

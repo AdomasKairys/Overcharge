@@ -29,7 +29,14 @@ public class Dashing : MonoBehaviour
     public float dashCd;
     private float dashCdTimer;
 
-    private void Start()
+	SFXTrigger sfxTrigger;
+
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
+
+	private void Start()
     {
         rb = GetComponent<Rigidbody>();
         pm = GetComponent<PlayerMovement>();
@@ -68,9 +75,9 @@ public class Dashing : MonoBehaviour
 
         pm.isDashing = true;
         pm.maxYSpeed = maxDashYSpeed;
+		sfxTrigger.PlaySFX_CanStop("dash", 0f, 4f, false);
 
-
-        Transform forwardT;
+		Transform forwardT;
 
         if (useCameraForward)
             forwardT = playerCam; /// where you're looking
@@ -88,7 +95,7 @@ public class Dashing : MonoBehaviour
         Invoke(nameof(DelayedDashForce), 0.025f);
 
         Invoke(nameof(ResetDash), dashDuration);
-    }
+	}
 
     private Vector3 delayedForceToApply;
     private void DelayedDashForce()
@@ -102,11 +109,12 @@ public class Dashing : MonoBehaviour
     private void ResetDash()
     {
         pm.isDashing = false;
-        pm.maxYSpeed = 0;
+        pm.maxYSpeed = 0;		
 
-
-        if (disableGravity)
+		if (disableGravity)
+        {
             rb.useGravity = true;
+		}         
     }
 
     private Vector3 GetDirection(Transform forwardT)

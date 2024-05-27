@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class SFXTrigger : MonoBehaviour
 {
-	private string sfxName;	  // Name of the SFX to play
-
 	void Start()
 	{
 
@@ -16,6 +14,22 @@ public class SFXTrigger : MonoBehaviour
 		if (SFXManager.Instance != null)
 		{
 			SFXManager.Instance.PlaySFX(sfxName);
+		}
+	}
+
+	public void PlaySFX_CanStop(string sfxName, float min, float max, bool loop)
+	{
+		if (SFXManager.Instance != null)
+		{
+			SFXManager.Instance.PlaySFX_CanStop(sfxName, min, max, loop);
+		}
+	}
+
+	public void StopSFX(string sfxName)
+	{
+		if (SFXManager.Instance != null)
+		{
+			SFXManager.Instance.StopSFX(sfxName);
 		}
 	}
 }

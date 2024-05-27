@@ -14,7 +14,14 @@ public class PauseMenu : NetworkBehaviour
     public GameObject[] NotPauseMenuUI;
     public ThirdPersonCam thirdPersonCam;
 
-    private void Start()
+	SFXTrigger sfxTrigger;
+
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
+
+	private void Start()
     {
         pauseMenu.SetActive(false);
     }
@@ -34,7 +41,8 @@ public class PauseMenu : NetworkBehaviour
     }
     public void Resume()
 	{
-        thirdPersonCam.UnfreezeCamera();
+		sfxTrigger.PlaySFX("button2");
+		thirdPersonCam.UnfreezeCamera();
         pauseMenu.SetActive(false);
         isPaused = false;
         setTo(true);
@@ -71,11 +79,16 @@ public class PauseMenu : NetworkBehaviour
 
     public void LoadMenu()
     {
+		sfxTrigger.PlaySFX("button2");
+		sfxTrigger.StopSFX("dash");
+		sfxTrigger.StopSFX("charge");
+		sfxTrigger.StopSFX("coolingStation");
         GameMultiplayer.Instance.Shutdown();
-        SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString());
+		SceneManager.LoadScene(SceneLoader.Scene.MainMenu.ToString());
     }
     public void Quit()
 	{
-        Application.Quit();
+		sfxTrigger.PlaySFX("button2");
+		Application.Quit();
     }
 }

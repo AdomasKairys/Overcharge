@@ -412,6 +412,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Color_4
       objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -647,6 +651,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Color_6
       objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -752,6 +760,10 @@ PrefabInstance:
     - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
       propertyPath: m_Name
       value: Color_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2104,6 +2116,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Color_3
       objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2258,6 +2274,7 @@ GameObject:
   m_Component:
   - component: {fileID: 862308745}
   - component: {fileID: 862308746}
+  - component: {fileID: 862308747}
   m_Layer: 5
   m_Name: EquipmentSelectUI
   m_TagString: Untagged
@@ -2302,6 +2319,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _primaryEquipmentDropdown: {fileID: 1746444009}
   _secondaryEquipmentDropdown: {fileID: 841928843}
+--- !u!114 &862308747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 862308744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2a6c9b2e3d99d4ca838848043ca290, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &898257114 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5682957541285895523, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
@@ -2438,6 +2467,10 @@ PrefabInstance:
     - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
       propertyPath: m_Name
       value: Color_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5699,6 +5732,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Color_7
       objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6613,6 +6650,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Color_5
       objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7049,6 +7090,10 @@ PrefabInstance:
     - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
       propertyPath: m_Name
       value: Color_0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9205849565329472694, guid: 20bbb4ee871b2d94891780e7a345fe60, type: 3}
+      propertyPath: m_TagString
+      value: Color
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
