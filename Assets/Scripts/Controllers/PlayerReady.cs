@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 
 public class PlayerReady : NetworkBehaviour
 {
@@ -21,8 +22,35 @@ public class PlayerReady : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
+    }
+
+    public override void OnNetworkSpawn()
+    {
         playerReadyDictionary = new Dictionary<ulong, bool>();
         AllPlayersReady = false;
+        InitializeReadyDictionaryServerRpc();
+        base.OnNetworkSpawn();
+    }
+
+    // Get the existing player ready data
+    [ServerRpc(RequireOwnership = false)]
+    private void InitializeReadyDictionaryServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        if (!IsServer) return;
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }
+            }
+        };
+
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            bool ready = IsPlayerReady(clientId);
+            SetPlayerReadyClientRPC(ready, clientId, clientRpcParams);
+        }
     }
 
     public void SetPlayerReadyState(bool ready)
@@ -81,7 +109,7 @@ public class PlayerReady : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void SetPlayerReadyClientRPC(bool ready, ulong clientId)
+    private void SetPlayerReadyClientRPC(bool ready, ulong clientId, ClientRpcParams clientRpcParams = default)
     {
         playerReadyDictionary[clientId] = ready;
         OnReadyChanged?.Invoke(this, EventArgs.Empty);
