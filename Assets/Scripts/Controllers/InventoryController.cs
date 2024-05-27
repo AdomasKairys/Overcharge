@@ -162,7 +162,7 @@ public class InventoryController : NetworkBehaviour
         switch (currentPickup)
         {
             case PickupType.SpeedBoost:
-                RequestUseSpeedBoostServerRpc((int)OwnerClientId); 
+                RequestUseSpeedBoostServerRpc();
                 break;
             case PickupType.GravityBomb:
                 //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
@@ -181,7 +181,7 @@ public class InventoryController : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void RequestUseSpeedBoostServerRpc(int clientId)
+    private void RequestUseSpeedBoostServerRpc(ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
 
@@ -189,7 +189,7 @@ public class InventoryController : NetworkBehaviour
         {
             Send = new ClientRpcSendParams
             {
-                TargetClientIds = new ulong[] { (ulong)clientId }
+                TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }
             }
         };
 
@@ -201,11 +201,7 @@ public class InventoryController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (currentPickupUses > 0)
-        {
-            Debug.Log("Speed boost used");
-            _playerMovement.StartCoroutine(_playerMovement.UseSpeedBoost(2, 2));
-        }
+        _playerMovement.StartCoroutine(_playerMovement.UseSpeedBoost(2, 2));
     }
 
     [ServerRpc]
