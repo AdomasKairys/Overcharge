@@ -23,6 +23,8 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         sw.enabled = false;
         prjc.enabled = false;
 
@@ -82,7 +84,6 @@ public class PlayerController : NetworkBehaviour
             }
         }
 
-        base.OnNetworkSpawn();
     }
 
     public override void OnNetworkDespawn()

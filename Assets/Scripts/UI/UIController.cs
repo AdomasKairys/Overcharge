@@ -31,7 +31,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private Image pickupImage;
     [SerializeField] private Sprite[] pickupSprites;
     [SerializeField] private Sprite noPickupSprite;
-    [SerializeField] private GameObject cooldownPickupImage;
+    [SerializeField] private Image cooldownPickupImage;
     [SerializeField] private InventoryController inventoryController;
     private bool shufflePickups = true;
 
@@ -48,7 +48,6 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         textMesh_velocity = velocityText.GetComponent<TextMeshProUGUI>();
         textMesh_playerState = playerStateText.GetComponent<TextMeshProUGUI>();
         if (player != null)
@@ -70,6 +69,8 @@ public class UIController : MonoBehaviour
         primaryKeybind.text= InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UsePrimaryEquipment.bindings[1].effectivePath);
         secondaryKeybind.text= InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UseSecondaryEquipment.bindings[0].effectivePath);
         pickupKeybind.text= InputControlPath.ToHumanReadableString(GameSettings.Instance.playerInputs.UsePickup.bindings[0].effectivePath);
+
+        cooldownPickupImage.fillAmount = 0f;
     }
 
     private void PlayerStateController_OnPlayerDeath(object sender, EventArgs e)
@@ -144,7 +145,7 @@ public class UIController : MonoBehaviour
     {
         if(inventoryController.currentPickup == InventoryController.PickupType.None)
         {
-            cooldownPickupImage.SetActive(false);
+            cooldownPickupImage.fillAmount = 0f;
             if (inventoryController.pickingUp)
             {
                 pickupName.text = "...";
@@ -166,6 +167,7 @@ public class UIController : MonoBehaviour
             if (inventoryController.canUseCurrentPickup)
             {
                 // TODO: not the most effiecent solution to update this every frame
+                cooldownPickupImage.fillAmount = 0f;
                 switch (inventoryController.currentPickup)
                 {
                     case InventoryController.PickupType.SpeedBoost:
@@ -173,12 +175,10 @@ public class UIController : MonoBehaviour
                     case InventoryController.PickupType.GravityBomb:
                         pickupImage.sprite = pickupSprites[1]; pickupName.text = "Gravity bomb"; break;
                 }
-                cooldownPickupImage.SetActive(false);
             }
             else
             {
-                // TODO: same here
-                cooldownPickupImage.SetActive(true);
+                cooldownPickupImage.fillAmount = inventoryController.GetRemainingCooldown() / inventoryController.GetCurrentPickupCooldown();
             }
         }
     }
