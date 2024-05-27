@@ -160,10 +160,11 @@ public class InventoryController : NetworkBehaviour
         switch (currentPickup)
         {
             case PickupType.SpeedBoost:
+                PlaySpeedBoostParticles();
                 RequestUseSpeedBoostServerRpc();
                 break;
             case PickupType.GravityBomb:
-                //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
+                PlayGravityBombParticles();
                 RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser); 
                 break;
         }
@@ -207,6 +208,11 @@ public class InventoryController : NetworkBehaviour
 
     [ClientRpc]
     private void HandleSpeedBoostParticlesClientRpc()
+    {
+        if (!IsOwner) PlaySpeedBoostParticles();
+    }
+
+    private void PlaySpeedBoostParticles()
     {
         _speedBoostEffect.PlayParticles(2f);
     }
@@ -259,16 +265,10 @@ public class InventoryController : NetworkBehaviour
         {
             if (chaser)
             {
-                //Debug.Log("Client " + OwnerClientId + " uses its PushTo method");
-                // Push other players towards the player who used the gravity bomb
-                //_playerMovement.PushTo(bombUserPosition, pushForce);
                 _playerMovement.UniversalKnockback(bombUserPosition, -pushForce, OwnerClientId);
             }
             else
             {
-                //Debug.Log("Client " + OwnerClientId + " uses its PushFrom method");
-                // Push other players away from the player who used the gravity bomb
-                //_playerMovement.PushFrom(bombUserPosition, pushForce);
                 _playerMovement.UniversalKnockback(bombUserPosition, pushForce, OwnerClientId);
             }
         }
@@ -280,6 +280,11 @@ public class InventoryController : NetworkBehaviour
 
     [ClientRpc]
     private void HandleGravityBombParticlesClientRpc()
+    {
+        if (!IsOwner) PlayGravityBombParticles(); 
+    }
+
+    private void PlayGravityBombParticles()
     {
         _gravityBombEffect.PlayParticles();
     }
