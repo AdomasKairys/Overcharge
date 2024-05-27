@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,11 +21,23 @@ public class InventoryController : NetworkBehaviour
     [SerializeField]
     private PlayerStateController _playerStateController;
 
+    [SerializeField]
+    private GravityBombEffect _gravityBombEffect;
+
+    [SerializeField]
+    private SpeedBoostEffect _speedBoostEffect;
+
     public PickupType currentPickup = PickupType.None;
 
     private int currentPickupUses = 0;
 
     private float currentPickupCooldown = 0f;
+
+    public float GetCurrentPickupCooldown() => currentPickupCooldown;
+
+    private float remainingCooldown = 0f;
+
+    public float GetRemainingCooldown() => remainingCooldown;
 
     public bool canUseCurrentPickup = false;
 
@@ -35,15 +49,11 @@ public class InventoryController : NetworkBehaviour
     {
         if (IsOwner)
         {
-            //_playerInputActions = new PlayerInputActions();
             _playerInputActionsPlayer = GameSettings.Instance.playerInputs;
 
             _usePickupAction = _playerInputActionsPlayer.UsePickup;
             _usePickupAction.performed += OnUsePickup;
-            _usePickupAction.Enable();
-
         }
-
         base.OnNetworkSpawn();
     }
 
@@ -52,9 +62,7 @@ public class InventoryController : NetworkBehaviour
         if (IsOwner)
         {
             _usePickupAction.performed -= OnUsePickup;
-            _usePickupAction.Disable();
         }
-
         base.OnNetworkDespawn();
     }
 
@@ -157,11 +165,11 @@ public class InventoryController : NetworkBehaviour
         switch (currentPickup)
         {
             case PickupType.SpeedBoost:
-                RequestUseSpeedBoostServerRpc((int)OwnerClientId); 
+                RequestUseSpeedBoostServerRpc();
                 break;
             case PickupType.GravityBomb:
                 //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
-                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser, (int)OwnerClientId); 
+                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser); 
                 break;
         }
 
@@ -176,15 +184,18 @@ public class InventoryController : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void RequestUseSpeedBoostServerRpc(int clientId)
+    private void RequestUseSpeedBoostServerRpc(ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
+
+        // Fire particles for everyone
+        HandleSpeedBoostParticlesClientRpc();
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
             {
-                TargetClientIds = new ulong[] { (ulong)clientId }
+                TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }
             }
         };
 
@@ -196,30 +207,29 @@ public class InventoryController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (currentPickupUses > 0)
-        {
-            Debug.Log("Speed boost used");
-            _playerMovement.StartCoroutine(_playerMovement.UseSpeedBoost(2, 2));
-        }
+        _playerMovement.StartCoroutine(_playerMovement.UseSpeedBoost(2, 2));
+    }
+
+    [ClientRpc]
+    private void HandleSpeedBoostParticlesClientRpc()
+    {
+        _speedBoostEffect.PlayParticles(2f);
     }
 
     [ServerRpc]
-    private void RequestUseGravityBombServerRpc(Vector3 userPosition, bool chaser, int clientId)
+    private void RequestUseGravityBombServerRpc(Vector3 userPosition, bool chaser, ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
 
-        //Debug.Log("Client " + clientId + " requested to use the gravity bomb at position " + userPosition);
+        // Tell everyone to fire particles
+        HandleGravityBombParticlesClientRpc();
 
-        if (!IsServer) return;
+        ulong bomberId = serverRpcParams.Receive.SenderClientId;
 
         // Iterate through all connected clients
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
-            if ((int)client.ClientId == clientId)
-            {
-
-            }
-            else
+            if(client.ClientId != bomberId)
             {
                 var playerObject = client.PlayerObject;
                 if (playerObject != null)
@@ -244,15 +254,11 @@ public class InventoryController : NetworkBehaviour
     {
         if(!IsOwner) return;
 
-        //Debug.Log("Client " + OwnerClientId + " had its ClientRpc called");
-
         float pushForce = 100f;
         float effectiveRange = 8.0f;
 
         // Calculate distance from the current player to the bomb user
         float distance = Vector3.Distance(transform.position, bombUserPosition);
-
-        Debug.Log("Client " + OwnerClientId + " distance to bomber: " + distance);
 
         if (distance <= effectiveRange)
         {
@@ -260,13 +266,15 @@ public class InventoryController : NetworkBehaviour
             {
                 //Debug.Log("Client " + OwnerClientId + " uses its PushTo method");
                 // Push other players towards the player who used the gravity bomb
-                _playerMovement.PushTo(bombUserPosition, pushForce);
+                //_playerMovement.PushTo(bombUserPosition, pushForce);
+                _playerMovement.UniversalKnockback(bombUserPosition, -pushForce, OwnerClientId);
             }
             else
             {
                 //Debug.Log("Client " + OwnerClientId + " uses its PushFrom method");
                 // Push other players away from the player who used the gravity bomb
-                _playerMovement.PushFrom(bombUserPosition, pushForce);
+                //_playerMovement.PushFrom(bombUserPosition, pushForce);
+                _playerMovement.UniversalKnockback(bombUserPosition, pushForce, OwnerClientId);
             }
         }
         else
@@ -275,9 +283,22 @@ public class InventoryController : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void HandleGravityBombParticlesClientRpc()
+    {
+        _gravityBombEffect.PlayParticles();
+    }
+
     private IEnumerator WaitPickupCooldown(float cooldown)
     {
-        yield return new WaitForSeconds(cooldown);
+        remainingCooldown = cooldown;
+
+        while (remainingCooldown > 0)
+        {
+            yield return null; // Wait for the next frame
+            remainingCooldown -= Time.deltaTime;
+        }
+
         canUseCurrentPickup = true;
     }
 
