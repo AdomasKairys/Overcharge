@@ -10,13 +10,13 @@ public class GameCountdownUI : MonoBehaviour
     [SerializeField] private GameObject[] UI;
     [SerializeField] private NetworkObject networkObject;
 
-	EffectsManager effectsManager;
+	//EffectsManager effectsManager;
 
-	private void Awake()
-    {
-        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
-		effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
-	}
+	//private void Awake()
+ //   {
+ //       GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+	//	effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	//}
     void Start()
     {
         player = player.Where(x => x.enabled).ToArray();
@@ -31,7 +31,7 @@ public class GameCountdownUI : MonoBehaviour
         if (GameManager.Instance.IsCountdownToStartActive())
         {
             Show();
-			effectsManager.PlaySFX(effectsManager.countDown);
+			//effectsManager.PlaySFX(effectsManager.countDown);
 		}
         else
         {

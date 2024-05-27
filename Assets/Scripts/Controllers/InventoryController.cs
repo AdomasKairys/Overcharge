@@ -30,12 +30,12 @@ public class InventoryController : NetworkBehaviour
 
     private float pickingUpDelay = 3.6f;
 
-	EffectsManager effectsManager;
+	//EffectsManager effectsManager;
 
-	private void Awake()
-	{
-		effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
-	}
+	//private void Awake()
+	//{
+	//	effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	//}
 
 	public override void OnNetworkSpawn()
     {
@@ -117,7 +117,7 @@ public class InventoryController : NetworkBehaviour
     /// </summary>
     private IEnumerator Pickup(int pickupIndex)
     {
-		effectsManager.PlaySFX(effectsManager.itemPickUp);
+		//effectsManager.PlaySFX(effectsManager.itemPickUp);
 		// Waits the delay
 		yield return new WaitForSeconds(pickingUpDelay);
 
@@ -163,12 +163,12 @@ public class InventoryController : NetworkBehaviour
         {
             case PickupType.SpeedBoost:
                 RequestUseSpeedBoostServerRpc((int)OwnerClientId);
-				effectsManager.PlaySFX(effectsManager.itemSpeedBoost);
+				//effectsManager.PlaySFX(effectsManager.itemSpeedBoost);
 				break;
             case PickupType.GravityBomb:
                 //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
                 RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser, (int)OwnerClientId);
-				effectsManager.PlaySFX(effectsManager.itemGravityBomb);
+				//effectsManager.PlaySFX(effectsManager.itemGravityBomb);
 				break;
         }
 

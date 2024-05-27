@@ -21,7 +21,14 @@ public class PlayerStateController : NetworkBehaviour
 
     public event EventHandler OnPlayerDeath;
 
-    public NetworkObject netObj;
+	//EffectsManager effectsManager;
+
+	//private void Awake()
+	//{
+	//	effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	//}
+
+	public NetworkObject netObj;
     //[Header("Tagging")]
     //public GameObject tagTrigger;
 
@@ -86,9 +93,10 @@ public class PlayerStateController : NetworkBehaviour
 
     private void Die()
     {
-        DieServerRPC(netObj); // deactivate the player object
-        //ChaerExplodes AudioClip
-    }
+        DieServerRPC(netObj); // deactivate the player object							  
+		//effectsManager.PlaySFX(effectsManager.death); //ChargeExplodes AudioClip
+
+	}
     [ServerRpc]
     private void DieServerRPC(NetworkObjectReference netObjRef)
     {

@@ -44,12 +44,12 @@ public class Swinging : EquipmentController
 
     private InputAction _moveAction;
 
-	EffectsManager effectsManager;
+	//EffectsManager effectsManager;
 
-	private void Awake()
-	{
-		effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
-	}
+	//private void Awake()
+	//{
+	//	effectsManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<EffectsManager>();
+	//}
 
 	public override void Initialize(EquipmentSlot slot, PlayerInputs playerInput)
     {
@@ -269,10 +269,10 @@ public class Swinging : EquipmentController
         //pm.ResetRestrictions();
 
         pm.isSwinging = true;
-		effectsManager.PlaySFX(effectsManager.hookLaunch);
+		//effectsManager.PlaySFX(effectsManager.hookLaunch);
 
 		swingPoint = predictionHit.point;
-		effectsManager.PlaySFX(effectsManager.hookHit);
+		//effectsManager.PlaySFX(effectsManager.hookHit);
 
 		joint = player.gameObject.AddComponent<SpringJoint>();
         joint.autoConfigureConnectedAnchor = false;

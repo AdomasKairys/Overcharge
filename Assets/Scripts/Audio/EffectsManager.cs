@@ -7,21 +7,26 @@ public class EffectsManager : MonoBehaviour
     [SerializeField] AudioSource SFXSource;
 
     [Header("Audio Clips for Effects")]
+	[Header("Audio Clips for Rocket")]
 	public AudioClip rocketShoot;
 	public AudioClip rocketBoom;
 
+	[Header("Audio Clips for Grappling Hook")]
 	public AudioClip hookHit;
 	public AudioClip hookLaunch;
 
+	[Header("Audio Clip for CountDown")]
 	public AudioClip countDown;
 
+	[Header("Audio Clips for Pick Ups")]
 	public AudioClip itemPickUp;
 	public AudioClip itemSpeedBoost;
 	public AudioClip itemGravityBomb;
 
-	public AudioClip colorChange;
-	public AudioClip button1;
-	public AudioClip button2;
+	public AudioClip switchState;
+	public AudioClip death;
+	public AudioClip cooling;
+	public AudioClip sprint;
 
 	// Start is called before the first frame update
 	private void Start()
