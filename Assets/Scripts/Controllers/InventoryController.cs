@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +20,9 @@ public class InventoryController : NetworkBehaviour
 
     [SerializeField]
     private PlayerStateController _playerStateController;
+
+    [SerializeField]
+    private GravityBombEffect _gravityBombEffect;
 
     public PickupType currentPickup = PickupType.None;
 
@@ -35,15 +40,11 @@ public class InventoryController : NetworkBehaviour
     {
         if (IsOwner)
         {
-            //_playerInputActions = new PlayerInputActions();
             _playerInputActionsPlayer = GameSettings.Instance.playerInputs;
 
             _usePickupAction = _playerInputActionsPlayer.UsePickup;
             _usePickupAction.performed += OnUsePickup;
-            _usePickupAction.Enable();
-
         }
-
         base.OnNetworkSpawn();
     }
 
@@ -52,9 +53,7 @@ public class InventoryController : NetworkBehaviour
         if (IsOwner)
         {
             _usePickupAction.performed -= OnUsePickup;
-            _usePickupAction.Disable();
         }
-
         base.OnNetworkDespawn();
     }
 
@@ -161,7 +160,7 @@ public class InventoryController : NetworkBehaviour
                 break;
             case PickupType.GravityBomb:
                 //Debug.Log("Client " + OwnerClientId + " will request to use gravity bomb");
-                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser, (int)OwnerClientId); 
+                RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser); 
                 break;
         }
 
@@ -204,22 +203,19 @@ public class InventoryController : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void RequestUseGravityBombServerRpc(Vector3 userPosition, bool chaser, int clientId)
+    private void RequestUseGravityBombServerRpc(Vector3 userPosition, bool chaser, ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
 
-        //Debug.Log("Client " + clientId + " requested to use the gravity bomb at position " + userPosition);
+        // Tell everyone to fire particles
+        HandleGravityBombParticlesClientRpc();
 
-        if (!IsServer) return;
+        ulong bomberId = serverRpcParams.Receive.SenderClientId;
 
         // Iterate through all connected clients
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
-            if ((int)client.ClientId == clientId)
-            {
-
-            }
-            else
+            if(client.ClientId != bomberId)
             {
                 var playerObject = client.PlayerObject;
                 if (playerObject != null)
@@ -244,15 +240,11 @@ public class InventoryController : NetworkBehaviour
     {
         if(!IsOwner) return;
 
-        //Debug.Log("Client " + OwnerClientId + " had its ClientRpc called");
-
         float pushForce = 100f;
         float effectiveRange = 8.0f;
 
         // Calculate distance from the current player to the bomb user
         float distance = Vector3.Distance(transform.position, bombUserPosition);
-
-        Debug.Log("Client " + OwnerClientId + " distance to bomber: " + distance);
 
         if (distance <= effectiveRange)
         {
@@ -260,19 +252,28 @@ public class InventoryController : NetworkBehaviour
             {
                 //Debug.Log("Client " + OwnerClientId + " uses its PushTo method");
                 // Push other players towards the player who used the gravity bomb
-                _playerMovement.PushTo(bombUserPosition, pushForce);
+                //_playerMovement.PushTo(bombUserPosition, pushForce);
+                _playerMovement.UniversalKnockback(bombUserPosition, -pushForce, OwnerClientId);
             }
             else
             {
                 //Debug.Log("Client " + OwnerClientId + " uses its PushFrom method");
                 // Push other players away from the player who used the gravity bomb
-                _playerMovement.PushFrom(bombUserPosition, pushForce);
+                //_playerMovement.PushFrom(bombUserPosition, pushForce);
+                _playerMovement.UniversalKnockback(bombUserPosition, pushForce, OwnerClientId);
             }
         }
         else
         {
             Debug.Log("Client " + OwnerClientId + " is too far away from bomber");
         }
+    }
+
+    [ClientRpc]
+    private void HandleGravityBombParticlesClientRpc()
+    {
+        Debug.Log("Gravity bomb particles ClientRpc called");
+        _gravityBombEffect.PlayParticles();
     }
 
     private IEnumerator WaitPickupCooldown(float cooldown)
