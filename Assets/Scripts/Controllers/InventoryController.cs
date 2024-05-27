@@ -30,6 +30,12 @@ public class InventoryController : NetworkBehaviour
 
     private float currentPickupCooldown = 0f;
 
+    public float GetCurrentPickupCooldown() => currentPickupCooldown;
+
+    private float remainingCooldown = 0f;
+
+    public float GetRemainingCooldown() => remainingCooldown;
+
     public bool canUseCurrentPickup = false;
 
     public bool pickingUp = false;
@@ -278,7 +284,14 @@ public class InventoryController : NetworkBehaviour
 
     private IEnumerator WaitPickupCooldown(float cooldown)
     {
-        yield return new WaitForSeconds(cooldown);
+        remainingCooldown = cooldown;
+
+        while (remainingCooldown > 0)
+        {
+            yield return null; // Wait for the next frame
+            remainingCooldown -= Time.deltaTime;
+        }
+
         canUseCurrentPickup = true;
     }
 

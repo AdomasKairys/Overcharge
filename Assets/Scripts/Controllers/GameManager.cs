@@ -62,7 +62,7 @@ public class GameManager : NetworkBehaviour
                 }
                 break;
             case State.GamePlaying:
-                if (GameMultiplayer.Instance.IsGameOver())
+                if (false && GameMultiplayer.Instance.IsGameOver())
                 {
                     Debug.Log("GameManager: one player (or none) left, swithing to GameOver");
                     state.Value = State.GameOver;
