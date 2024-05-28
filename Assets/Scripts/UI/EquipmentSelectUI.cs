@@ -16,6 +16,10 @@ public class EquipmentSelectUI : MonoBehaviour
 
 	private void Awake()
     {
+        _primaryEquipmentDropdown.value = (int) GameMultiplayer.Instance.GetPlayerData().primaryEquipment;
+
+        _secondaryEquipmentDropdown.value = (int)GameMultiplayer.Instance.GetPlayerData().secondaryEquipment;
+
         _primaryEquipmentDropdown.onValueChanged.AddListener(PrimaryChanged);
 
         _secondaryEquipmentDropdown.onValueChanged.AddListener(SecondaryChanged);
