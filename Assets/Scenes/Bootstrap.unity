@@ -155,19 +155,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneMusicSettings:
   - sceneName: MainMenu
-    musicClip: {fileID: 8300000, guid: 5d5d2b8277aeb884fa22f735fd7938ad, type: 3}
+    musicClip: {fileID: 8300000, guid: 0f866f5f610e77e428118faa2bba8238, type: 3}
     loopStartTime: 0
     loopEndTime: 0
     loopEnabled: 0
   - sceneName: CharacterSelectScene
-    musicClip: {fileID: 8300000, guid: f7fb1b97f8bbe414690cb91bb72f0641, type: 3}
-    loopStartTime: 1.7
-    loopEndTime: 19.6
-    loopEnabled: 1
+    musicClip: {fileID: 8300000, guid: ac0d72a9ffb77c7419feb4f913dbf9e0, type: 3}
+    loopStartTime: 0
+    loopEndTime: 0
+    loopEnabled: 0
   - sceneName: map1
-    musicClip: {fileID: 8300000, guid: 04c5567c5886b0f40a7f37c8f64cef85, type: 3}
-    loopStartTime: 12
-    loopEndTime: 98
+    musicClip: {fileID: 8300000, guid: c20a3067049db6047a7009593184ac50, type: 3}
+    loopStartTime: 38.5
+    loopEndTime: 182.3
     loopEnabled: 1
 --- !u!82 &445849868
 AudioSource:

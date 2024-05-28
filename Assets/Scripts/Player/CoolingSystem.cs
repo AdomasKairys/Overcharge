@@ -23,10 +23,8 @@ public class CoolingSystem : NetworkBehaviour
 			PlayerState otherState = otherStateController.GetState();
 			if (otherState == PlayerState.Runner && otherStateController.currCharge.Value > 0 && !isSoundPlaying)
 			{
-				//sfxTrigger.PlaySFX("coolingStation1");
 				sfxTrigger.PlaySFX_CanStop("coolingStation1", false);
 				StartCoroutine(PlayEffectLoop());
-				//sfxTrigger.PlaySFX_CanStop("coolingStation2", true);
 				isSoundPlaying = true;
             }
             playerOnStationAmm++;
@@ -45,10 +43,10 @@ public class CoolingSystem : NetworkBehaviour
 				{
 					if (!isSoundPlaying) //play the audio when the player is on the stattion when he switcher states
 					{
-                        sfxTrigger.PlaySFX_CanStop("coolingStation1", false);
-                        StartCoroutine(PlayEffectLoop());
-                        isSoundPlaying = true;
-                    }
+						sfxTrigger.PlaySFX_CanStop("coolingStation1", false);
+						StartCoroutine(PlayEffectLoop());
+						isSoundPlaying = true;
+					}
 					if (IsServer)
 					{
 						Debug.Log("reduce");
@@ -84,7 +82,7 @@ public class CoolingSystem : NetworkBehaviour
 
 	private IEnumerator PlayEffectLoop()
 	{
-		yield return new WaitForSeconds(1.6f);
+		yield return new WaitForSeconds(1.2f);
 		sfxTrigger.PlaySFX_CanStop("coolingStation2", true);
 	}
 

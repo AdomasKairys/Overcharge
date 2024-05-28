@@ -13,7 +13,4 @@ MonoBehaviour:
   m_Name: speedBoost
   m_EditorClassIdentifier: 
   sfxName: speedBoost
-  audioClip: {fileID: 8300000, guid: 4a7d61b7575ff174db4d94bafde694e1, type: 3}
-  loopStartTime: 0
-  loopEndTime: 0
-  loopEnabled: 0
+  audioClip: {fileID: 8300000, guid: b63b388d467b8f143a31c58c56de1fe4, type: 3}

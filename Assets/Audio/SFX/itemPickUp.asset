@@ -13,7 +13,4 @@ MonoBehaviour:
   m_Name: itemPickUp
   m_EditorClassIdentifier: 
   sfxName: itemPickUp
-  audioClip: {fileID: 8300000, guid: daf784c986f8e1d4a9a917a03f7601cc, type: 3}
-  loopStartTime: 0
-  loopEndTime: 0
-  loopEnabled: 0
+  audioClip: {fileID: 8300000, guid: 43d69914c18a6094587fed96aafa7a01, type: 3}

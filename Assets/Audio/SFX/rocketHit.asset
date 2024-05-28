@@ -13,7 +13,4 @@ MonoBehaviour:
   m_Name: rocketHit
   m_EditorClassIdentifier: 
   sfxName: rocketHit
-  audioClip: {fileID: 8300000, guid: 81d070cd9cabc6b46b17e3487bbaff7b, type: 3}
-  loopStartTime: 0
-  loopEndTime: 0
-  loopEnabled: 0
+  audioClip: {fileID: 8300000, guid: cf5879d50da9edb4e9c3935e96b24bed, type: 3}

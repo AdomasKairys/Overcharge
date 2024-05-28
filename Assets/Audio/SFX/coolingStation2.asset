@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: coolingStation2
   m_EditorClassIdentifier: 
   sfxName: coolingStation2
-  audioClip: {fileID: 8300000, guid: 2670e02acb526984bbd0c62919742484, type: 3}
+  audioClip: {fileID: 8300000, guid: 0473344f7f865b546a5ba40f191d7693, type: 3}

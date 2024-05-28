@@ -123,11 +123,11 @@ public class InventoryController : NetworkBehaviour
     /// </summary>
     private IEnumerator Pickup(int pickupIndex)
     {
-		sfxTrigger.PlaySFX("itemPickUp");
 		// Waits the delay
 		yield return new WaitForSeconds(pickingUpDelay);
+		sfxTrigger.PlaySFX("itemPickUp");
 
-        switch (pickupIndex)
+		switch (pickupIndex)
         {
             case 1:
                 currentPickup = PickupType.SpeedBoost; 
