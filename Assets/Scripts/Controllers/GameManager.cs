@@ -79,6 +79,7 @@ public class GameManager : NetworkBehaviour
                 countdownToEndTimer.Value -= Time.deltaTime;
                 if(countdownToEndTimer.Value < 0)
                 {
+                    SFXManager.Instance.StopAllSFX();
                     Debug.Log("GameManager: game is over, loading in lobby");
                     //DespawnPlayers();
                     SceneLoader.LoadScene(SceneLoader.Scene.CharacterSelectScene);

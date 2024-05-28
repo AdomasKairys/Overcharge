@@ -79,11 +79,8 @@ public class PauseMenu : NetworkBehaviour
 
     public void LoadMenu()
     {
-		sfxTrigger.PlaySFX("button2");
-		sfxTrigger.StopSFX("dash");
-		sfxTrigger.StopSFX("charge");
-		sfxTrigger.StopSFX("coolingStation1");
-		sfxTrigger.StopSFX("coolingStation2");
+        SFXManager.Instance.StopAllSFX();
+        sfxTrigger.PlaySFX("button2");
         // TODO: should also leave lobby
         if (GameLobby.Instance.IsLobbyHost())
         {

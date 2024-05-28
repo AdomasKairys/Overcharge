@@ -49,7 +49,12 @@ public class Dashing : MonoBehaviour
     {
         Dash();
     }
-
+    private void OnEnable()
+    {
+        GameSettings.Instance.playerInputs.MoveAction.Enable();
+        GameSettings.Instance.playerInputs.DashAction.performed += OnDash;
+        GameSettings.Instance.playerInputs.DashAction.Enable();
+    }
     private void OnDisable()
     {
         GameSettings.Instance.playerInputs.MoveAction.Disable();

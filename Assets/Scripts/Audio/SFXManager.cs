@@ -129,5 +129,12 @@ public class SFXManager : MonoBehaviour
 			audioSourceMap[sfxName].loop = false;
 		}
 	}
+	public void StopAllSFX()
+	{
+		foreach(AudioSource audioSource in audioSourceMap.Values) 
+		{ 
+			audioSource.Stop();
+		}
+	}
 }
 
