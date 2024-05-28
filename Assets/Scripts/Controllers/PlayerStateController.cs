@@ -56,7 +56,7 @@ public class PlayerStateController : NetworkBehaviour
 
 		if (GetState() != PlayerState.Dead)
 		{
-			if (currCharge.Value >= overcharge / 2 && !isEffectPlaying)
+			if (currCharge.Value >= overcharge/2 && !isEffectPlaying)
 			{
 				sfxTrigger.PlaySFX_CanStop("charge", true);
                 isEffectPlaying = true;

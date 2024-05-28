@@ -3357,7 +3357,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currCharge:
     m_InternalValue: 0
-  chargeRate: 0.25
+  chargeRate: 1
   overcharge: 100
   netObj: {fileID: 3725760152432914651}
 --- !u!114 &6767623379712817156
