@@ -38,15 +38,11 @@ public class Dashing : MonoBehaviour
 
 	private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        pm = GetComponent<PlayerMovement>();
-    }
-
-    private void OnEnable()
-    {
         GameSettings.Instance.playerInputs.MoveAction.Enable();
         GameSettings.Instance.playerInputs.DashAction.performed += OnDash;
         GameSettings.Instance.playerInputs.DashAction.Enable();
+        rb = GetComponent<Rigidbody>();
+        pm = GetComponent<PlayerMovement>();
     }
 
     private void OnDash(InputAction.CallbackContext context)

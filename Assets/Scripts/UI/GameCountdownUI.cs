@@ -32,6 +32,7 @@ public class GameCountdownUI : MonoBehaviour
 			sfxTrigger.PlaySFX("countDown");
         }
         else if (GameManager.Instance.IsGamePlaying())
+        { 
             Hide();
 
             // Do this here instead of on destroy to ensure that GameManager isn't destroyed first
