@@ -46,7 +46,7 @@ public class CoolingSystem : NetworkBehaviour
         {
             PlayerStateController otherStateController = other.gameObject.GetComponentInParent<PlayerStateController>();
             PlayerState otherState = otherStateController.GetState();
-            if (IsServer && otherState == PlayerState.Runner)
+            if (otherState == PlayerState.Runner)
             {
 				if (otherStateController.currCharge.Value > 0.1f)
 				{
@@ -56,17 +56,21 @@ public class CoolingSystem : NetworkBehaviour
                         StartCoroutine(PlayEffectLoop());
                         isSoundPlaying = true;
                     }
-					otherStateController.currCharge.Value -= coolRate * Time.deltaTime;
+					if(IsServer)
+						otherStateController.currCharge.Value -= coolRate * Time.deltaTime;
 				}
 				else //stopping sound when charge is less than 0.1f, there will be audio cut off when one player finishes cooling down
 				{
-					StopAllCoroutines();
-					sfxTrigger.StopSFX("coolingStation1");
-					sfxTrigger.StopSFX("coolingStation2");
-					isSoundPlaying = false;
-				}
-			}		
-		}
+					StopCoolingSound();
+                }
+			}
+			else if (otherState == PlayerState.Chaser && isSoundPlaying && playerOnStationAmm == 1) //if the only player statnding on the platform is chaser stop the audiot if its player (can still be playing if player swithc states while on the platform
+			{
+				StopCoolingSound();
+            }
+
+
+        }
     }
 
 	private void OnTriggerExit(Collider other)
@@ -76,11 +80,7 @@ public class CoolingSystem : NetworkBehaviour
             playerOnStationAmm--;
             if (isSoundPlaying && playerOnStationAmm == 0) //Stop the audio when every player is off the platform and the audio is still playing
 			{
-				StopAllCoroutines();
-				sfxTrigger.StopSFX("coolingStation1");
-				sfxTrigger.StopSFX("coolingStation2");
-				isSoundPlaying = false;
-
+				StopCoolingSound();
             }
 				
         }	
@@ -91,4 +91,12 @@ public class CoolingSystem : NetworkBehaviour
 		yield return new WaitForSeconds(1.6f);
 		sfxTrigger.PlaySFX_CanStop("coolingStation2", true);
 	}
+
+	private void StopCoolingSound()
+	{
+        StopAllCoroutines();
+        sfxTrigger.StopSFX("coolingStation1");
+        sfxTrigger.StopSFX("coolingStation2");
+        isSoundPlaying = false;
+    }
 }
