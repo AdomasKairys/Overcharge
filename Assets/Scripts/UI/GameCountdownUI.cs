@@ -23,9 +23,15 @@ public class GameCountdownUI : MonoBehaviour
         player = player.Where(x => x.enabled).ToArray();
         UI = UI.Where(x => x.activeSelf).ToArray();
         Hide();
+        UpdateCountdown();
     }
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
+    {
+        UpdateCountdown();
+    }
+
+    private void UpdateCountdown()
     {
         if (GameManager.Instance.IsCountdownToStartActive())
         {
@@ -33,7 +39,7 @@ public class GameCountdownUI : MonoBehaviour
             sfxTrigger.PlaySFX("countDown");
         }
         else if (GameManager.Instance.IsGamePlaying())
-        { 
+        {
             Hide();
             // Do this here instead of on destroy to ensure that GameManager isn't destroyed first
             GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
