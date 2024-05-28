@@ -12,11 +12,20 @@ public class Rocket : NetworkBehaviour
     [SerializeField] private ParticleController particleController;
     private NetworkVariable<bool> isCollided = new NetworkVariable<bool>(false);
     private Rigidbody ridgidBody;
-    public void Setup(Vector3 shootDir)
+
+	SFXTrigger sfxTrigger;
+
+	private void Awake()
+	{
+        sfxTrigger = GetComponent<SFXTrigger>();
+    }
+
+	public void Setup(Vector3 shootDir)
     {
         rocket.up = shootDir;
+		sfxTrigger.PlaySFX("rocketShoot");
 
-        ridgidBody = GetComponent<Rigidbody>();
+		ridgidBody = GetComponent<Rigidbody>();
         float moveSpeed = 95f;
         ridgidBody.AddForce(shootDir * moveSpeed, ForceMode.Impulse);
         Destroy(gameObject, 5f);
@@ -33,7 +42,8 @@ public class Rocket : NetworkBehaviour
         if (!IsOwner) return;
         if (collisionLayerMask == (collisionLayerMask | (1 << collision.gameObject.layer)))
         {
-            KnockBackPlayer();
+			sfxTrigger.PlaySFX("rocketHit");
+			KnockBackPlayer();
             particleController.PlayParticles();
             ridgidBody.velocity = Vector3.zero;
             if (IsServer)

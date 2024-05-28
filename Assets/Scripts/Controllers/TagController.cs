@@ -12,8 +12,15 @@ public class TagController : NetworkBehaviour
     [SerializeField] private ParticleSystem tagSparks;
     private NetworkVariable<bool> blocked = new NetworkVariable<bool>(false); // whether the tagging functionality for this player is blocked
 
-    // Start is called before the first frame update
-    void Start()
+	SFXTrigger sfxTrigger;
+
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
+
+	// Start is called before the first frame update
+	void Start()
     {
         //Debug.Log(transform.parent.gameObject.name + ": " + thisStateController);
     }
@@ -31,7 +38,8 @@ public class TagController : NetworkBehaviour
                 var sparks = Instantiate(tagSparks);
                 sparks.transform.position = other.ClosestPointOnBounds(transform.position);
                 sparks.Play();
-                Destroy(sparks, 1f);
+				sfxTrigger.PlaySFX("switchState"); //ChangeStates Audio
+				Destroy(sparks, 1f);
             }
             if (IsServer) 
             {

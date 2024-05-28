@@ -38,9 +38,16 @@ public class InventoryController : NetworkBehaviour
 
     public bool pickingUp = false;
 
-    private float pickingUpDelay = 3f;
+    private float pickingUpDelay = 3.6f;
 
-    public override void OnNetworkSpawn()
+	SFXTrigger sfxTrigger;
+
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
+
+	public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
@@ -116,8 +123,9 @@ public class InventoryController : NetworkBehaviour
     /// </summary>
     private IEnumerator Pickup(int pickupIndex)
     {
-        // Waits the delay
-        yield return new WaitForSeconds(pickingUpDelay);
+		sfxTrigger.PlaySFX("itemPickUp");
+		// Waits the delay
+		yield return new WaitForSeconds(pickingUpDelay);
 
         switch (pickupIndex)
         {
@@ -161,10 +169,12 @@ public class InventoryController : NetworkBehaviour
         {
             case PickupType.SpeedBoost:
                 PlaySpeedBoostParticles();
+                sfxTrigger.PlaySFX("speedBoost");
                 RequestUseSpeedBoostServerRpc();
                 break;
             case PickupType.GravityBomb:
                 PlayGravityBombParticles();
+                sfxTrigger.PlaySFX("gravityBomb");
                 RequestUseGravityBombServerRpc(gameObject.transform.position, _playerStateController.GetState() == PlayerState.Chaser); 
                 break;
         }

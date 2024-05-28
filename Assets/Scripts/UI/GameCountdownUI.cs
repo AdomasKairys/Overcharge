@@ -9,11 +9,15 @@ public class GameCountdownUI : MonoBehaviour
     [SerializeField] private MonoBehaviour[] player;
     [SerializeField] private GameObject[] UI;
     [SerializeField] private NetworkObject networkObject;
-    private void Awake()
-    {
-        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
-    }
-    void Start()
+
+	SFXTrigger sfxTrigger;
+
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
+
+	void Start()
     {
         player = player.Where(x => x.enabled).ToArray();
         UI = UI.Where(x => x.activeSelf).ToArray();
@@ -25,9 +29,9 @@ public class GameCountdownUI : MonoBehaviour
         if (GameManager.Instance.IsCountdownToStartActive())
         {
             Show();
+			sfxTrigger.PlaySFX("countDown");
         }
         else if (GameManager.Instance.IsGamePlaying())
-        {
             Hide();
 
             // Do this here instead of on destroy to ensure that GameManager isn't destroyed first
