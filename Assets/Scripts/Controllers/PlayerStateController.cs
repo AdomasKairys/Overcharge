@@ -44,6 +44,11 @@ public class PlayerStateController : NetworkBehaviour
             SetStateServerRPC(netObj);
         }
 
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            Die();
+        }
+
         if (GetState() == PlayerState.Chaser)
         {
             ChangeChargeValueServerRPC(netObj);

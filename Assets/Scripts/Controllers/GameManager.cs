@@ -72,6 +72,8 @@ public class GameManager : NetworkBehaviour
                 if (GameMultiplayer.Instance.IsGameOver())
                 {
                     Debug.Log("GameManager: one player (or none) left, swithing to GameOver");
+                    PlayerData winner = GameMultiplayer.Instance.GetAlivePlayers().First();
+                    GameMultiplayer.Instance.AddWinToPlayer(winner);
                     state.Value = State.GameOver;
                 }                    
                 break;
@@ -81,7 +83,7 @@ public class GameManager : NetworkBehaviour
                 {
                     SFXManager.Instance.StopAllSFX();
                     Debug.Log("GameManager: game is over, loading in lobby");
-                    //DespawnPlayers();
+                    GameMultiplayer.Instance.ResetPlayerData();
                     SceneLoader.LoadScene(SceneLoader.Scene.CharacterSelectScene);
                 }                
                 break;
@@ -177,6 +179,7 @@ public class GameManager : NetworkBehaviour
         }
         return null;
     }
+
     public bool IsGamePlaying() => state.Value == State.GamePlaying;
     public bool IsCountdownToStartActive() => state.Value == State.CountdownToStart;
     public bool IsGameOver() => state.Value == State.GameOver;

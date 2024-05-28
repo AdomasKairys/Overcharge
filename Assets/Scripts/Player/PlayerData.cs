@@ -13,6 +13,7 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
     public PlayerState playerState;
     public FixedString64Bytes playerName;
     public FixedString64Bytes playerId;
+    public int winCount;
 
     // Equipment information
     public EquipmentType primaryEquipment;
@@ -35,6 +36,7 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
         serializer.SerializeValue(ref primaryEquipment);
         serializer.SerializeValue(ref secondaryEquipment);
         serializer.SerializeValue(ref playerState);
+        serializer.SerializeValue(ref winCount);
     }
 }
 

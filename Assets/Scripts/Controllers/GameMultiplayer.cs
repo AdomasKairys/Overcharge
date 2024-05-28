@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class GameMultiplayer : NetworkBehaviour
 
     public const int MAX_PLAYER_AMOUNT = 4;
     public const string PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
+    public const string PLAYER_PREFS_PLAYER_WIN_COUNT = "PlayerWinCount";
+
     public static GameMultiplayer Instance { get; private set; }
     public int NetworkManager_Server_OnClientConnectCallback { get; private set; }
 
@@ -22,6 +25,8 @@ public class GameMultiplayer : NetworkBehaviour
 
     private NetworkList<PlayerData> playerDataNetworkList = null;
     private string playerName;
+    private int playerWinCount;
+
     private void Awake()
     {
         Instance = this;
@@ -31,11 +36,16 @@ public class GameMultiplayer : NetworkBehaviour
 
         playerName = PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, "PlayerName"+UnityEngine.Random.Range(10,1000));
 
+        playerWinCount = PlayerPrefs.GetInt(PLAYER_PREFS_PLAYER_WIN_COUNT, 0);
+
+
         playerDataNetworkList = new NetworkList<PlayerData>();
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
     }
 
     public string GetPlayerName() => playerName;
+    public int GetPlayerWinCount() => playerWinCount;
+
     public void SetPlayerName(string playerName)
     {
         this.playerName = playerName;
@@ -59,21 +69,23 @@ public class GameMultiplayer : NetworkBehaviour
 
     private void NetworkManager_Client_OnClientConnectedCallback(ulong clientId)
     {
-        SetPlayerNameServerRPC(GetPlayerName());
+        SetPlayerNameServerRPC(GetPlayerName(), GetPlayerWinCount());
         SetPlayerIdServerRPC(AuthenticationService.Instance.PlayerId);
     }
     [ServerRpc(RequireOwnership = false)]
-    private void SetPlayerNameServerRPC(string playerName, ServerRpcParams serverRpcParams = default)
+    private void SetPlayerNameServerRPC(string playerName, int winCount, ServerRpcParams serverRpcParams = default)
     {
         int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
         PlayerData playerData = playerDataNetworkList[playerDataIndex];
 
         playerData.playerName = playerName;
+        playerData.winCount = winCount;
 
-		//PlayerCard playerCard = new PlayerCard();
-		//PlayerCard.SetName(playerName);
 
-		playerDataNetworkList[playerDataIndex] = playerData;
+        //PlayerCard playerCard = new PlayerCard();
+        //PlayerCard.SetName(playerName);
+
+        playerDataNetworkList[playerDataIndex] = playerData;
     }
     [ServerRpc(RequireOwnership = false)]
     private void SetPlayerIdServerRPC(string playerId, ServerRpcParams serverRpcParams = default)
@@ -149,9 +161,8 @@ public class GameMultiplayer : NetworkBehaviour
             playerDataNetworkList.Clear();
         }
         playerDataNetworkList.Add(new PlayerData { clientId = clientId, colorId = GetFirstUnusedColorId(), playerState = PlayerState.Runner });
-        SetPlayerNameServerRPC(GetPlayerName());
+        SetPlayerNameServerRPC(GetPlayerName(), GetPlayerWinCount());
     }
-
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest, NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
     {
         if (SceneManager.GetActiveScene().name != SceneLoader.Scene.CharacterSelectScene.ToString())
@@ -198,6 +209,41 @@ public class GameMultiplayer : NetworkBehaviour
                 return playerData;
         }
         return default;
+    }
+    public void AddWinToPlayer(PlayerData player)
+    {
+        if (!IsServer) return;
+
+        PlayerData playerData = new PlayerData();
+        playerData.clientId = ulong.MaxValue;
+        for (int i = 0; i < playerDataNetworkList.Count; i++)
+        {
+            if (playerDataNetworkList[i].Equals(player))
+            {
+                playerData = playerDataNetworkList[i];
+                playerData.winCount++;
+                playerDataNetworkList[i] = playerData;
+                break;
+            }
+        }
+        if (playerData.clientId != ulong.MaxValue)
+        {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { playerData.clientId }
+                }
+            };
+            UpdateWinCountClientRPC(playerData.winCount, clientRpcParams);
+        }
+    }
+    [ClientRpc]
+    private void UpdateWinCountClientRPC(int winCount, ClientRpcParams clientRpcParams = default)
+    {
+        PlayerPrefs.SetInt(PLAYER_PREFS_PLAYER_WIN_COUNT, winCount);
+        playerWinCount = winCount;
+        PlayerPrefs.Save();
     }
 
     public void ResetPlayerData()

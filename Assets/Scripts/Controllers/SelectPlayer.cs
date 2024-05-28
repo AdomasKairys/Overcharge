@@ -12,6 +12,7 @@ public class SelectPlayer : MonoBehaviour
     [SerializeField] private GameObject readyGameObject;
     [SerializeField] private PlayerVisual playerVisual;
     [SerializeField] private TextMeshPro playerNameText;
+    [SerializeField] private TextMeshPro winCount;
     [SerializeField] private Button kickButton;
 
     private void Awake()
@@ -62,6 +63,7 @@ public class SelectPlayer : MonoBehaviour
             Color playerColor = GameMultiplayer.Instance.GetPlayerColor(playerData.colorId);
             playerNameText.color = playerColor;
             playerNameText.text = playerData.playerName.ToString();
+            winCount.text = playerData.winCount.ToString();
             playerVisual.SetPlayerColor(playerColor);
         }
         else
