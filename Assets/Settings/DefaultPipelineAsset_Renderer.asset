@@ -1,87 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-4946240533847897792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Ocluded
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  settings:
-    passTag: Ocluded
-    Event: 300
-    filterSettings:
-      RenderQueueType: 1
-      LayerMask:
-        serializedVersion: 2
-        m_Bits: 4096
-      PassNames: []
-    overrideMaterial: {fileID: 2100000, guid: 1879d016620a61f47b93b7953a5c1818, type: 2}
-    overrideMaterialPassIndex: 0
-    overrideShader: {fileID: 0}
-    overrideShaderPassIndex: 0
-    overrideMode: 0
-    overrideDepthState: 1
-    depthCompareFunction: 5
-    enableWrite: 0
-    stencilSettings:
-      overrideStencilState: 0
-      stencilReference: 0
-      stencilCompareFunction: 8
-      passOperation: 0
-      failOperation: 0
-      zFailOperation: 0
-    cameraSettings:
-      overrideCamera: 0
-      restoreCamera: 1
-      offset: {x: 0, y: 0, z: 0, w: 0}
-      cameraFieldOfView: 60
---- !u!114 &-1227293315028484745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efc90e4ecba6041499f0132122f1655f, type: 3}
-  m_Name: ScreenSpaceOutlines
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  renderPassEvent: 350
-  outlinesLayerMask:
-    m_Bits: 8137
-  outlineSettings:
-    outlineColor:
-      r: 0
-      g: 0
-      b: 0
-      a: 1
-    outlineScale: 1
-    depthThreshold: 2
-    robertsCrossMultiplier: 100
-    normalThreshold: 0.4
-    steepAngleThreshold: 0.2
-    steepAngleMultiplier: 25
-    colorFormat: 0
-    depthBufferBits: 16
-    filterMode: 0
-    backgroundColor:
-      r: 0
-      g: 0
-      b: 0
-      a: 0
-    perObjectData: 0
-    enableDynamicBatching: 0
-    enableInstancing: 0
---- !u!114 &-430853021331192114
+--- !u!114 &-8542225751223851821
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -109,7 +28,49 @@ MonoBehaviour:
     overrideShaderPassIndex: 0
     overrideMode: 1
     overrideDepthState: 0
-    depthCompareFunction: 1
+    depthCompareFunction: 4
+    enableWrite: 1
+    stencilSettings:
+      overrideStencilState: 0
+      stencilReference: 0
+      stencilCompareFunction: 8
+      passOperation: 0
+      failOperation: 0
+      zFailOperation: 0
+    cameraSettings:
+      overrideCamera: 0
+      restoreCamera: 1
+      offset: {x: 0, y: 0, z: 0, w: 0}
+      cameraFieldOfView: 60
+--- !u!114 &-4388704714606308808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
+  m_Name: Ocluded
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings:
+    passTag: Ocluded
+    Event: 300
+    filterSettings:
+      RenderQueueType: 1
+      LayerMask:
+        serializedVersion: 2
+        m_Bits: 4096
+      PassNames: []
+    overrideMaterial: {fileID: 0}
+    overrideMaterialPassIndex: 0
+    overrideShader: {fileID: 0}
+    overrideShaderPassIndex: 0
+    overrideMode: 0
+    overrideDepthState: 1
+    depthCompareFunction: 5
     enableWrite: 0
     stencilSettings:
       overrideStencilState: 0
@@ -133,16 +94,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
-  m_Name: Ultra_PipelineAsset_ForwardRenderer
+  m_Name: DefaultPipelineAsset_Renderer
   m_EditorClassIdentifier: 
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
     hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
   m_RendererFeatures:
-  - {fileID: -4946240533847897792}
-  - {fileID: -430853021331192114}
-  - {fileID: 2753966201140803299}
-  m_RendererFeatureMap: 40895bd6706c5bbbce8626b9754d05fae3f66d36ab0d3826
+  - {fileID: -4388704714606308808}
+  - {fileID: -8542225751223851821}
+  - {fileID: 2805986522664362590}
+  m_RendererFeatureMap: 3812cf7d503018c3d3a41b1bf0ea73895e62f127e0ddf026
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -181,7 +142,7 @@ MonoBehaviour:
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
---- !u!114 &2753966201140803299
+--- !u!114 &2805986522664362590
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -191,52 +152,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d613f08f173d4dd895bb07b3230baa9, type: 3}
-  m_Name: FullScreenPassRendererFeature
+  m_Name: Outlines
   m_EditorClassIdentifier: 
   m_Active: 1
-  injectionPoint: 600
+  injectionPoint: 450
   fetchColorBuffer: 1
   requirements: -1
   passMaterial: {fileID: 2100000, guid: a39aadb287aeb494d81684aaad9985f0, type: 2}
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
---- !u!114 &4315399939452534948
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efc90e4ecba6041499f0132122f1655f, type: 3}
-  m_Name: ScreenSpaceOutlines
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  renderPassEvent: 350
-  outlinesLayerMask:
-    m_Bits: 329
-  outlineSettings:
-    outlineColor:
-      r: 0
-      g: 0
-      b: 0
-      a: 1
-    outlineScale: 1
-    depthThreshold: 1.5
-    robertsCrossMultiplier: 100
-    normalThreshold: 0.4
-    steepAngleThreshold: 0.2
-    steepAngleMultiplier: 25
-    colorFormat: 0
-    depthBufferBits: 16
-    filterMode: 0
-    backgroundColor:
-      r: 0
-      g: 0
-      b: 0
-      a: 0
-    perObjectData: 0
-    enableDynamicBatching: 0
-    enableInstancing: 0
