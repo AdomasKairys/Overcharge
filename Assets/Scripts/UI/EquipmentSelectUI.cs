@@ -12,12 +12,16 @@ public class EquipmentSelectUI : MonoBehaviour
     [SerializeField] private TMP_Dropdown _secondaryEquipmentDropdown;
     private int _previousSecondaryValue = 0;
 
-    private void Awake()
+	SFXTrigger sfxTrigger;
+
+	private void Awake()
     {
         _primaryEquipmentDropdown.onValueChanged.AddListener(PrimaryChanged);
 
         _secondaryEquipmentDropdown.onValueChanged.AddListener(SecondaryChanged);
-    }
+
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
 
     private void PrimaryChanged(int value)
     {
@@ -28,11 +32,13 @@ public class EquipmentSelectUI : MonoBehaviour
             _secondaryEquipmentDropdown.value = _previousPrimaryValue;
 
             GameMultiplayer.Instance.ChangePlayerEquipment(_primaryEquipmentDropdown.value, _secondaryEquipmentDropdown.value);
-        }
+			sfxTrigger.PlaySFX("equip");
+		}
         else
         {
             GameMultiplayer.Instance.ChangePlayerEquipment(value, _secondaryEquipmentDropdown.value);
-        }
+			sfxTrigger.PlaySFX("equip");
+		}
 
         // Update the previous values after handling the change
         _previousPrimaryValue = _primaryEquipmentDropdown.value;
@@ -48,11 +54,13 @@ public class EquipmentSelectUI : MonoBehaviour
             _primaryEquipmentDropdown.value = _previousSecondaryValue;
 
             GameMultiplayer.Instance.ChangePlayerEquipment(_primaryEquipmentDropdown.value, _secondaryEquipmentDropdown.value);
-        }
+			sfxTrigger.PlaySFX("equip");
+		}
         else
         {
             GameMultiplayer.Instance.ChangePlayerEquipment(_primaryEquipmentDropdown.value, value);
-        }
+			sfxTrigger.PlaySFX("equip");
+		}
 
         // Update the previous values after handling the change
         _previousPrimaryValue = _primaryEquipmentDropdown.value;

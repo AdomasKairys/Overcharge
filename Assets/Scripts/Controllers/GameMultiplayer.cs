@@ -39,8 +39,9 @@ public class GameMultiplayer : NetworkBehaviour
     public void SetPlayerName(string playerName)
     {
         this.playerName = playerName;
+		//PlayerCard.SetName(playerName);
 
-        PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
+		PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
     }
     private void PlayerDataNetworkList_OnListChanged(NetworkListEvent<PlayerData> changeEvent)
     {
@@ -69,7 +70,10 @@ public class GameMultiplayer : NetworkBehaviour
 
         playerData.playerName = playerName;
 
-        playerDataNetworkList[playerDataIndex] = playerData;
+		//PlayerCard playerCard = new PlayerCard();
+		//PlayerCard.SetName(playerName);
+
+		playerDataNetworkList[playerDataIndex] = playerData;
     }
     [ServerRpc(RequireOwnership = false)]
     private void SetPlayerIdServerRPC(string playerId, ServerRpcParams serverRpcParams = default)
@@ -135,9 +139,10 @@ public class GameMultiplayer : NetworkBehaviour
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
         NetworkManager_Host_OnClientDisconnectCallback(clientId);
-    }
+		//GameManager.PlayerLeft(clientId);
+	}
 
-    private void NetworkManager_OnClientConnectedCallback(ulong clientId)
+	private void NetworkManager_OnClientConnectedCallback(ulong clientId)
     {
         if (NetworkManager.Singleton.ConnectedClientsList.Count < playerDataNetworkList.Count && NetworkManager.Singleton.IsServer)
         {
@@ -188,7 +193,8 @@ public class GameMultiplayer : NetworkBehaviour
     {
         foreach (PlayerData playerData in playerDataNetworkList)
         {
-            if (playerData.clientId == clientId)
+			//PlayerCard.SetClient(clientId);
+			if (playerData.clientId == clientId)
                 return playerData;
         }
         return default;
@@ -213,10 +219,19 @@ public class GameMultiplayer : NetworkBehaviour
     public void ChangePlayerState(ulong playerId, PlayerState newState) => ChangePlayerStateServerRPC(playerId, newState);
 
     public int GetPlayerCount() => playerDataNetworkList.Count;
+	public List<PlayerData> GetPlayerList()
+	{
+		List<PlayerData> playerList = new List<PlayerData>();
+		foreach (PlayerData playerData in playerDataNetworkList)
+		{
+			playerList.Add(playerData);
+		}
+		return playerList;
+	}
 
-    #region Color management
+	#region Color management
 
-    public void ChangePlayerColor(int colorId)
+	public void ChangePlayerColor(int colorId)
     {
         ChangePlayerColorServerRPC(colorId);
     }

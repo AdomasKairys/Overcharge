@@ -1,81 +1,66 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using Unity.Netcode;
 using UnityEngine;
+using static Unity.Collections.AllocatorManager;
 
-public class CoolingSystem : MonoBehaviour
+public class CoolingSystem : NetworkBehaviour
 {
-    private string coolingStationTag = "CoolingStation";
+    public float coolRate = 0.5f;
 
-    public float coolValue = 20f;
+	SFXTrigger sfxTrigger;
 
-    private PlayerStateController playerStateController;
-    private new Light light;
+	private void Awake()
+	{
+		sfxTrigger = GetComponent<SFXTrigger>();
+	}
 
-    public float coolingStationCooldown = 15f;
-    private bool isCoolingStationCooldown = false;
-    private float currentCoolingStationCooldown;
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("TagTrigger"))// reduntant check for future proofing
+		{
+			PlayerStateController otherStateController = other.gameObject.GetComponentInParent<PlayerStateController>();
+			PlayerState otherState = otherStateController.GetState();
+			if (otherState == PlayerState.Runner)
+			{
+				//sfxTrigger.PlaySFX("coolingStation1");
+				sfxTrigger.PlaySFX_CanStop("coolingStation1", false);
+				StartCoroutine(PlayEffectLoop());
+				//sfxTrigger.PlaySFX_CanStop("coolingStation2", true);
+			}
+		}
+	}
 
-    void Awake()
+	private void OnTriggerStay(Collider other)
     {
-        playerStateController = GetComponent<PlayerStateController>();
-        light = GetComponent<Light>();
-    }
-
-    void Update()
-    {
-        CoolDown(ref currentCoolingStationCooldown, coolingStationCooldown, ref isCoolingStationCooldown);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        ProcessCollision(other.gameObject);
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        ProcessCollision(other.gameObject);
-    }
-
-    void ProcessCollision(GameObject collider)
-    {
-        if (collider.CompareTag(coolingStationTag) && !isCoolingStationCooldown)
+        if (other.CompareTag("TagTrigger"))// reduntant check for future proofing
         {
-            //Heal();
-            if (playerStateController.currCharge.Value - coolValue <= 0)
+            PlayerStateController otherStateController = other.gameObject.GetComponentInParent<PlayerStateController>();
+            PlayerState otherState = otherStateController.GetState();
+            if (IsServer && otherState == PlayerState.Runner)
             {
-                playerStateController.currCharge.Value = 0;
-            }
-            else
-            {
-                playerStateController.currCharge.Value -= coolValue;
-            }
-            isCoolingStationCooldown = true;
-            currentCoolingStationCooldown = coolingStationCooldown;  
-            //light.enabled = !light.enabled;   //Norisi padaryti kad sviestu
-        }
+                if(otherStateController.currCharge.Value > 0)
+                {
+					otherStateController.currCharge.Value -= coolRate * Time.deltaTime;			
+				}			
+			}		
+		}
     }
 
-    //void Heal()
-    //{
-    //    Debug.Log("Heal");
-    //}
+	private void OnTriggerExit(Collider other)
+	{
+		if (other.CompareTag("TagTrigger"))// reduntant check for future proofing
+		{
+			StopAllCoroutines();
+			sfxTrigger.StopSFX("coolingStation1");
+			sfxTrigger.StopSFX("coolingStation2");
+		}	
+	}
 
-    private void CoolDown(ref float currentCooldown, float maxCooldown, ref bool isCooldown)
-    {
-        if (isCooldown)
-        {
-            currentCooldown -= Time.deltaTime;
-            if (currentCooldown <= 0f)
-            {
-                isCooldown = false;
-                currentCooldown = 0f;
-            }
-        }
-    }
-
-    //void UpdateLight()
-    //{
-
-    //}
-
+	private IEnumerator PlayEffectLoop()
+	{
+		yield return new WaitForSeconds(1.6f);
+		sfxTrigger.PlaySFX_CanStop("coolingStation2", true);
+	}
 }

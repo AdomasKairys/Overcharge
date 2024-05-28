@@ -8,7 +8,14 @@ public class GameManager : NetworkBehaviour
 {
     [SerializeField] private Transform playerPrefab;
 
-    public static GameManager Instance { get; private set; }
+	[Header("Scoreboard")]
+	[SerializeField] private GameObject scoreboard;
+	[SerializeField] private PlayerCard playCardPrefab;
+	[SerializeField] private Transform playerCardParent;
+
+	private Dictionary<ulong, PlayerCard> _playerCards = new Dictionary<ulong, PlayerCard>();
+
+	public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
     private enum State
@@ -174,7 +181,6 @@ public class GameManager : NetworkBehaviour
     public bool IsGameOver() => state.Value == State.GameOver;
 
     public float GetCountdownToStartTimer() => countDownToStartTimer.Value;
-
 
     public override void OnNetworkDespawn()
     {

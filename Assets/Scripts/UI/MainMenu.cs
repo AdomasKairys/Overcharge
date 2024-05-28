@@ -5,8 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+	public GameObject Options;
 	public GameObject Keybinds;
-    public void PlayGame()
+	public GameObject Audio;
+
+	public void PlayGame()
 	{
 		SceneManager.LoadSceneAsync("LobbyScene");
 	}
@@ -14,6 +17,16 @@ public class MainMenu : MonoBehaviour
 	{
 		Application.Quit();
 	}
+
+	public void OptionsOn()
+	{
+		Options.SetActive(true);
+	}
+	public void OptionsOff()
+	{
+		Options.SetActive(false);
+	}
+
 	public void KeybindsOn()
 	{
 		Keybinds.SetActive(true);
@@ -21,5 +34,14 @@ public class MainMenu : MonoBehaviour
 	public void KeybindsOff()
 	{
 		Keybinds.SetActive(false);
+	}
+
+	public void AudioOn()
+	{
+		Audio.SetActive(true);
+	}
+	public void AudioOff()
+	{
+		Audio.SetActive(false);
 	}
 }

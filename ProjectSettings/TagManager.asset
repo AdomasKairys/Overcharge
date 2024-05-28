@@ -10,6 +10,8 @@ TagManager:
   - Magnet
   - ThirdPersonCam
   - SpawnPoint
+  - Audio
+  - Color
   layers:
   - Default
   - TransparentFX
