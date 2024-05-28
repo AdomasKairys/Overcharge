@@ -3,7 +3,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
-public class GameCountdownUI : MonoBehaviour
+public class GameCountdownUI : NetworkBehaviour
 {
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private MonoBehaviour[] player;
@@ -12,17 +12,20 @@ public class GameCountdownUI : MonoBehaviour
 
 	private SFXTrigger sfxTrigger;
 
-	private void Awake()
+	public override void OnNetworkSpawn()
 	{
-        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
-		sfxTrigger = GetComponent<SFXTrigger>();
+        base.OnNetworkSpawn();
+        if (IsOwner)
+        {
+            GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+            sfxTrigger = GetComponent<SFXTrigger>();
+        }
 	}
 
 	void Start()
     {
         player = player.Where(x => x.enabled).ToArray();
         UI = UI.Where(x => x.activeSelf).ToArray();
-        Hide();
         UpdateCountdown();
     }
 

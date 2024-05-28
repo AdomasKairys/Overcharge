@@ -1,9 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
-using static Unity.Collections.AllocatorManager;
 
 public class CoolingSystem : NetworkBehaviour
 {
@@ -18,10 +15,6 @@ public class CoolingSystem : NetworkBehaviour
 	{
 		sfxTrigger = GetComponent<SFXTrigger>();
 	}
-    private void Update()
-    {
-		Debug.Log(playerOnStationAmm);
-    }
     private void OnTriggerEnter(Collider other)
 	{
 		if (other.CompareTag("TagTrigger"))// reduntant check for future proofing
@@ -56,8 +49,11 @@ public class CoolingSystem : NetworkBehaviour
                         StartCoroutine(PlayEffectLoop());
                         isSoundPlaying = true;
                     }
-					if(IsServer)
+					if (IsServer)
+					{
+						Debug.Log("reduce");
 						otherStateController.currCharge.Value -= coolRate * Time.deltaTime;
+					}
 				}
 				else //stopping sound when charge is less than 0.1f, there will be audio cut off when one player finishes cooling down
 				{
